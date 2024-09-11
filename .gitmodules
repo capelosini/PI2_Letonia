@@ -1,0 +1,3 @@
+[submodule "CAE"]
+	path = CAE
+	url = https://github.com/capelosini/CAE
