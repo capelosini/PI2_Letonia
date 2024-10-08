@@ -16,7 +16,6 @@ void onEvent(ALLEGRO_EVENT event, Scene* scene, CAEngine* engine){
 
 void onStartGame (Scene* scene) {
     changeScene(engine, stageOne);
-    freeScene(mainMenu);
 }
 
 void gameSceneScript(Scene* self) {
@@ -56,8 +55,8 @@ void gameSceneScript(Scene* self) {
 int main (){
     GameConfig engineConfig;
     engineConfig.fps=60;
-    engineConfig.posX=0;
-    engineConfig.posY=0;
+    engineConfig.posX=20;
+    engineConfig.posY=20;
     engineConfig.sizeX=1280;
     engineConfig.sizeY=720;
     engineConfig.title="Letonia Project";
@@ -83,25 +82,25 @@ int main (){
 
     // FASE
     stageOne = createScene(engine, gameSceneScript);
+    stageOne->camera.maxLimit.x = 1920;
+    stageOne->camera.maxLimit.y = 1280;
     player = createGameObject(ANIMATED_SPRITE, 100, 100, 17, 20, stageOne);
+    player->physics.enabled = 1;
+    player->physics.friction = 0.4;
+    player->physics.maxSpeed = 5;
+    player->collisionEnabled = 1;
+    player->collisionType = COLLISION_RECT;
     setGameObjectAnimation(player, loadBitmap(engine, "assets/images/walk-sheet.png"), 17, 20, 8, 10);
     stageOne->camera.followTarget = player;
 
-    setupSceneWorld(stageOne, loadBitmap(engine, "assets/images/map.webp"), 10, 10);
-    for (int i=0; i<10; i++){
-        for (int j=0; j<10; j++){
-            if (i==0 && j==0){
-                addWorldTile(stageOne, 0, 0, j, i);
-            } else if (i==0){
-                addWorldTile(stageOne, 1, 0, j, i);
-            } 
-            else{
-                addWorldTile(stageOne, 1, 1, j, i);
-            }
-        }
-    }
+    setupSceneWorld(stageOne, loadBitmap(engine, "assets/images/map.png"), 1920, 1280);
+    addWorldTile(stageOne, 0, 0, 0, 0); 
 
-
+    GameObject* map= createGameObject(SOLID, 0, 0, 1920, 1280, stageOne) ;
+    map->color = al_map_rgba(0, 0, 0, 0);
+    map->collisionEnabled = 1;
+    map->collisionType = COLLISION_RECT;
+    map->invertedCollision = 1;
     while (engine->isAlive){
         render(engine);
     }
