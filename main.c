@@ -14,7 +14,7 @@ void onEvent(ALLEGRO_EVENT event, Scene* scene, CAEngine* engine){
     }
 }
 
-void onStartGame (Scene* scene) {
+void onStartGame(Scene* scene) {
     changeScene(engine, stageOne);
 }
 
@@ -71,7 +71,7 @@ int main (){
     ALLEGRO_BITMAP *bgImage = loadBitmap(engine, "assets/images/menu.jpg");
     GameObject* background = createGameObject(SPRITE, 0, 0, engine->displayWidth, engine->displayHeight, mainMenu);
     setGameObjectBitmap(background, bgImage);
-
+    
     Font* titleFont = loadTTF(engine, "assets/fonts/kalam-bold.ttf", 80);
     char* titleText = "Revolução em cartas";
     addTextToScene(mainMenu, createText(titleText, engine->displayWidth/2 - al_get_text_width(titleFont->font, titleText)/2, 50, al_map_rgb(255, 255, 255), titleFont));
