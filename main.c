@@ -43,10 +43,12 @@ void gameSceneScript(Scene* self) {
         player->physics.directions.x = -1;
         player->physics.acc.x = 1;
         player->animation.index.y = 0;
+        player->animation.direction.x=-1;
     } else if (right) {
         player->physics.directions.x = 1;
         player->physics.acc.x = 1;
         player->animation.index.y = 0;
+        player->animation.direction.x=1;
     } else {
         player->physics.acc.x = 0;
     }
@@ -74,9 +76,9 @@ int main (){
     
     Font* titleFont = loadTTF(engine, "assets/fonts/kalam-bold.ttf", 80);
     char* titleText = "Revolução em cartas";
-    addTextToScene(mainMenu, createText(titleText, engine->displayWidth/2 - al_get_text_width(titleFont->font, titleText)/2, 50, al_map_rgb(255, 255, 255), titleFont));
+    addTextToScene(mainMenu, createText(titleText, engine->displayWidth/2 - al_get_text_width(titleFont->font, titleText)/2, 50, al_map_rgb(0, 0, 0), titleFont));
 
-    addButtonToScene(mainMenu, createButton(engine, engine->displayWidth / 2 - 75, engine->displayHeight / 2 - 25, 150, 50, al_map_rgb(217, 95, 54), al_map_rgb(255, 255, 255), "Começar", "assets/fonts/roboto.ttf", NULL, onStartGame));
+    addButtonToScene(mainMenu, createButton(engine, engine->displayWidth / 2 - 75, engine->displayHeight / 2 - 25, 150, 50, al_map_rgb(217, 95, 54), al_map_rgb(0, 0, 0), "Jogar", "assets/fonts/roboto.ttf", NULL, onStartGame));
 
     changeScene(engine, mainMenu);
 
@@ -84,7 +86,7 @@ int main (){
     stageOne = createScene(engine, gameSceneScript);
     stageOne->camera.maxLimit.x = 1920;
     stageOne->camera.maxLimit.y = 1280;
-    player = createGameObject(ANIMATED_SPRITE, 100, 100, 17, 20, stageOne);
+    player = createGameObject(ANIMATED_SPRITE, 100, 700, 50, 53, stageOne);
     player->physics.enabled = 1;
     player->physics.friction = 0.4;
     player->physics.maxSpeed = 5;
