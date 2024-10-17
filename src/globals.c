@@ -1,10 +1,13 @@
 #include "../CAE/include/CAE.h"
 #include "../include/globals.h"
+#include <stdlib.h>
+#include <time.h>
 
 extern CAEngine* engine;
 extern Scene* mainMenu;
 extern Scene* stageOne;
 extern GameObject* player;
+extern float leafMatrix[100][3];
 int walkIndex = 0;
 
 //kill engine
@@ -108,5 +111,19 @@ void textBox(int x, int y, int width, int padding, char* text) {
     free(line);
     free(copyText);
     free(newText);
-    free(font);
+    al_destroy_font(font);
+}
+
+void leafEffect (Scene* self) {
+    for (int i = 0; i < 100; i++) {
+        al_draw_filled_rectangle(leafMatrix[i][0], leafMatrix[i][1], leafMatrix[i][0] + 7, leafMatrix[i][1] + 5, al_map_rgb(50, 180, 50));
+        leafMatrix[i][1] += leafMatrix[i][2];
+        leafMatrix[i][0] += 0.5;
+
+        if (leafMatrix[i][1] > engine->displayHeight) {
+            leafMatrix[i][0] = rand() % (engine->displayWidth + 100) - 100;
+            leafMatrix[i][1] = rand() % engine->displayHeight - engine->displayHeight;
+            leafMatrix[i][2] = rand() % 2 + 1;
+        }
+    }
 }

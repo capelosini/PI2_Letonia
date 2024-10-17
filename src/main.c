@@ -1,14 +1,19 @@
 #include "../CAE/include/CAE.h"
 #include "../include/globals.h"
 #include <stdio.h>
+#include <stdlib.h>
+#include <time.h>
 
 CAEngine* engine;
 Scene* mainMenu;
 Scene* stageOne;
 GameObject* player;
+float leafMatrix[100][3];
 
 
 int main () {
+    srand(time(NULL));
+
     GameConfig engineConfig;
     engineConfig.fps=60;
     engineConfig.posX=20;
@@ -22,17 +27,19 @@ int main () {
     setEventFunction(engine, onEvent);
 
     // MENU
-    mainMenu = createScene(engine, NULL);
+    mainMenu = createScene(engine, leafEffect);
 
-    ALLEGRO_BITMAP *bgImage = loadBitmap(engine, "../assets/images/menu.jpg");
-    GameObject* background = createGameObject(SPRITE, 0, 0, engine->displayWidth, engine->displayHeight, mainMenu);
-    setGameObjectBitmap(background, bgImage);
+    for (int i = 0; i < 100; i++) {
+        leafMatrix[i][0] = rand() % (engine->displayWidth + 100) - 100;
+        leafMatrix[i][1] = rand() % engine->displayHeight - engine->displayHeight;
+        leafMatrix[i][2] = rand() % 2 + 1;
+    }
     
     Font* titleFont = loadTTF(engine, "../assets/fonts/kalam-bold.ttf", 80);
-    char* titleText = "Pênis";
-    addTextToScene(mainMenu, createText(titleText, engine->displayWidth/2 - al_get_text_width(titleFont->font, titleText)/2, 50, al_map_rgb(0, 0, 0), titleFont));
+    char* titleText = "Revolução Em Cartas";
+    addTextToScene(mainMenu, createText(titleText, engine->displayWidth/2 - al_get_text_width(titleFont->font, titleText)/2, 50, al_map_rgb(255, 255, 255), titleFont));
 
-    addButtonToScene(mainMenu, createButton(engine, engine->displayWidth / 2 - 75, engine->displayHeight / 2 - 25, 150, 50, al_map_rgb(217, 95, 54), al_map_rgb(255, 255, 255), "Começar", "../assets/fonts/roboto.ttf", NULL, onStartStageOne));
+    addButtonToScene(mainMenu, createButton(engine, engine->displayWidth / 2 - 75, engine->displayHeight / 2 - 25, 150, 50, al_map_rgb(217, 95, 54), al_map_rgb(255, 255, 255), "Jogar", "../assets/fonts/roboto.ttf", NULL, onStartStageOne));
 
     changeScene(engine, mainMenu);
 
