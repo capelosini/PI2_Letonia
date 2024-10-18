@@ -1,5 +1,6 @@
 #include "../CAE/include/CAE.h"
 #include "../include/globals.h"
+#include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
 
@@ -44,4 +45,20 @@ void textBox(int x, int y, int width, int padding, char* text) {
     free(copyText);
     free(newText);
     al_destroy_font(font);
+}
+
+void loadMap(const char *filename, Scene* scene){
+    FILE* mapFile = fopen(filename, "rb");
+    if (mapFile == NULL) {
+        printf("Error: could not open map file %s\n", filename);
+        return;
+    }
+    struct TileFromMapFile tile;
+    fread(&tile, sizeof(struct TileFromMapFile), 1, mapFile);
+    while (!feof(mapFile)){
+        printf("%d %d %d %d\n", tile.idX, tile.idY, tile.x, tile.y);
+        addWorldTile(scene, tile.idX, tile.idY, tile.x, tile.y);
+        fread(&tile, sizeof(struct TileFromMapFile), 1, mapFile);
+    }
+    fclose(mapFile);
 }

@@ -125,8 +125,10 @@ int main () {
 
     // FASE 1
     stageOne = createScene(engine, gameSceneScript);
-    stageOne->camera.maxLimit.x = 3840;
-    stageOne->camera.maxLimit.y = 2560;
+    stageOne->camera.maxLimit.x = 200*16;
+    stageOne->camera.maxLimit.y = 100*16;
+    stageOne->camera.minLimit.x = 0;
+    stageOne->camera.minLimit.y = 0;
     player = createGameObject(ANIMATED_SPRITE, 700, 50, 34, 40, stageOne);
     player->physics.enabled = 1;
     player->physics.friction = 0.4;
@@ -135,14 +137,15 @@ int main () {
     player->collisionType = COLLISION_RECT;
     setGameObjectAnimation(player, loadBitmap(engine, "./assets/images/player-sprite-sheet.png"), 17, 20, 8, 15);
     stageOne->camera.followTarget = player;
+    stageOne->camera.zoom=1;
 
     letterTest=createText("Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut ut tincidunt elit. Nunc a magna at nulla tempor iaculis. Curabitur at enim sollicitudin, varius nisi vel, viverra odio. Ut porta metus sed metus gravida elementum. Pellentesque ut mi id quam euismod convallis. Duis vulputate tempus sagittis. Quisque aliquam justo justo, eget lobortis neque tempor non.Integer porta volutpat turpis, nec venenatis ante volutpat sit amet. Proin condimentum vitae augue id tincidunt. Donec tristique lectus non dui pellentesque tincidunt. In sit amet leo suscipit, feugiat leo id, condimentum tellus. Proin vel tempor metus. Mauris in auctor velit. Donec justo justo, iaculis eget pellentesque eget, interdum a nibh. Aenean tincidunt tempor sem. Integer eget elementum metus. Suspendisse non fringilla nunc, sit amet suscipit diam.Suspendisse a justo lorem. Phasellus ac nulla sed arcu fermentum sollicitudin. Suspendisse potenti. Aenean a augue venenatis, rhoncus sapien ut, laoreet felis. Vivamus mi neque, iaculis ac ligula eget, fermentum maximus elit. Praesent at elementum lorem, et tincidunt leo. Nunc ut lacinia ligula. Aliquam eu est finibus, iaculis ipsum vitae, dignissim risus. Proin pulvinar urna sit amet metus pharetra, eget pulvinar nisl sodales. Proin aliquam dolor at urna dignissim maximus. Nulla imperdiet varius pulvinar", 
     300, 200, 250, al_map_rgb(255, 255, 255), al_map_rgba(0, 0, 0, 100), NULL, lettersFont, 40, 20, stageOne);
 
-    setupSceneWorld(stageOne, loadBitmap(engine, "./assets/images/map.png"), 3840, 2560);
-    addWorldTile(stageOne, 0, 0, 0, 0); 
-
-    GameObject* map= createGameObject(SOLID, 0, 0, 3840, 2560, stageOne) ;
+    //setupSceneWorld(stageOne, loadBitmap(engine, "./assets/images/map.png"), 3840, 2560);
+    setupSceneWorld(stageOne, loadBitmap(engine, "./map-sheet.png"), 16, 16);
+    loadMap("./map.CAE", stageOne);
+    GameObject* map= createGameObject(SOLID, 0, 0, 200*16, 100*16, stageOne);
     map->color = al_map_rgba(0, 0, 0, 0);
     map->collisionEnabled = 1;
     map->collisionType = COLLISION_RECT;
