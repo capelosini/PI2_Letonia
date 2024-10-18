@@ -52,7 +52,7 @@ Mkfile.old
 dkms.conf
 
 # Binary
-build
+build/*
 
 #compile
 .vscode
