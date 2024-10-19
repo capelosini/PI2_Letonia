@@ -8,6 +8,7 @@ CAEngine* engine;
 Scene* mainMenu;
 Scene* stageOne;
 GameObject* player;
+GameObject* ghostPlayerMenu;
 Font* lettersFont;
 Text* letterTest;
 float leafMatrix[100][3];
@@ -33,7 +34,7 @@ void gameSceneScript(Scene* self) {
     ALLEGRO_KEYBOARD_STATE keyState;
     al_get_keyboard_state(&keyState);
     
-    Vector2 mov = getMovimentVector2(&keyState, ALLEGRO_KEY_A, ALLEGRO_KEY_D, ALLEGRO_KEY_W, ALLEGRO_KEY_S);
+    Vector2 mov = getMovementVector2(&keyState, ALLEGRO_KEY_A, ALLEGRO_KEY_D, ALLEGRO_KEY_W, ALLEGRO_KEY_S);
     
     char e = al_key_down(&keyState, ALLEGRO_KEY_E);
     
@@ -64,7 +65,7 @@ void gameSceneScript(Scene* self) {
     }
 }
 
-void leafEffect (Scene* self) {
+void mainMenuScript (Scene* self) {
     for (int i = 0; i < 100; i++) {
         al_draw_filled_rectangle(leafMatrix[i][0], leafMatrix[i][1], leafMatrix[i][0] + 7, leafMatrix[i][1] + 5, al_map_rgb(50, 180, 50));
         leafMatrix[i][1] += leafMatrix[i][2];
@@ -76,6 +77,19 @@ void leafEffect (Scene* self) {
             leafMatrix[i][2] = rand() % 2 + 1;
         }
     }
+
+    if (ghostPlayerMenu->position.x >= engine->displayWidth/2-ghostPlayerMenu->width) {
+        ghostPlayerMenu->physics.acc.x = 0;
+        ghostPlayerMenu->animation.index.y=1;
+        if (al_get_timer_count(engine->timer)/60 >= 3){
+            ghostPlayerMenu->physics.acc.x = 1;
+            ghostPlayerMenu->animation.index.y=3;
+            ghostPlayerMenu->physics.directions.x=1;
+        }
+    } else{
+        al_set_timer_count(engine->timer, 0);
+    }
+
 }
 
 int main () {
@@ -94,7 +108,7 @@ int main () {
     setEventFunction(engine, onEvent);
 
     // MENU
-    mainMenu = createScene(engine, leafEffect);
+    mainMenu = createScene(engine, mainMenuScript);
 
     for (int i = 0; i < 100; i++) {
         leafMatrix[i][0] = rand() % (engine->displayWidth + 100) - 100;
@@ -109,11 +123,22 @@ int main () {
 
     addButtonToScene(mainMenu, createButton(engine, engine->displayWidth / 2 - 75, engine->displayHeight / 2 - 25, 150, 50, al_map_rgb(217, 95, 54), al_map_rgb(255, 255, 255), "Jogar", "./assets/fonts/roboto.ttf", NULL, onStartStageOne));
 
+    mainMenu->backgroundColor = al_map_rgb(0, 0, 20);
+
+    ghostPlayerMenu = createGameObject(ANIMATED_SPRITE, -60, engine->displayHeight-200, 45, 40, mainMenu);
+    setGameObjectAnimation(ghostPlayerMenu, loadBitmap(engine, "./assets/images/player-sprite-sheet.png"), 17, 20, 8, 15);
+    ghostPlayerMenu->animation.index.y = 3;
+    ghostPlayerMenu->physics.enabled=1;
+    ghostPlayerMenu->physics.friction=0.2;
+    ghostPlayerMenu->physics.maxSpeed=4;
+    ghostPlayerMenu->physics.directions.x=1;
+    ghostPlayerMenu->physics.acc.x=1;
+
     changeScene(engine, mainMenu);
 
     // FASE 1
     stageOne = createScene(engine, gameSceneScript);
-    player = createGameObject(ANIMATED_SPRITE, 700, 50, 34, 40, stageOne);
+    player = createGameObject(ANIMATED_SPRITE, 700, 50, 44, 50, stageOne);
     player->physics.enabled = 1;
     player->physics.friction = 0.4;
     player->physics.maxSpeed = 4;
