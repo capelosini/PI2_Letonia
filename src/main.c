@@ -33,40 +33,28 @@ void gameSceneScript(Scene* self) {
     ALLEGRO_KEYBOARD_STATE keyState;
     al_get_keyboard_state(&keyState);
     
-    char up = al_key_down(&keyState, ALLEGRO_KEY_W);
-    char down = al_key_down(&keyState, ALLEGRO_KEY_S);
-    char left = al_key_down(&keyState, ALLEGRO_KEY_A);
-    char right = al_key_down(&keyState, ALLEGRO_KEY_D);
+    Vector2 mov = getMovimentVector2(&keyState, ALLEGRO_KEY_A, ALLEGRO_KEY_D, ALLEGRO_KEY_W, ALLEGRO_KEY_S);
+    
     char e = al_key_down(&keyState, ALLEGRO_KEY_E);
     
-    if (up) {
-        player->physics.directions.y = -1;
-        player->physics.acc.y = 1;
-        walkIndex = 2;
-    } else if (down) {
-        player->physics.directions.y = 1;
-        player->physics.acc.y = 1;
-        walkIndex = 1;
-    } else {
-        player->physics.acc.y = 0;
+    player->physics.acc = (Vector2){abs(mov.x), abs(mov.y)};
+
+    if (mov.y != 0){
+        player->physics.directions.y = mov.y;
+        if (mov.y < 0){
+            walkIndex = 2;
+        } else{
+            walkIndex = 1;
+        }
     }
-    
-    if (left) {
-        player->physics.directions.x = -1;
-        player->physics.acc.x = 1;
-        player->animation.direction.x = -1;
-        walkIndex = 0;
-    } else if (right) {
-        player->physics.directions.x = 1;
-        player->physics.acc.x = 1;
-        player->animation.direction.x = 1;
-        walkIndex = 0;
-    } else {
-        player->physics.acc.x = 0;
+    if (mov.x != 0){
+        walkIndex=0;
+        player->physics.directions.x = mov.x;
+        player->animation.direction.x = mov.x;
     }
 
     player->animation.index.y = 3 + walkIndex;
-    if (!(up || down || left || right))
+    if (!(mov.x || mov.y))
         player->animation.index.y = walkIndex;
 
     if(e){
@@ -117,7 +105,7 @@ int main () {
     Font* titleFont = loadTTF(engine, "./assets/fonts/kalam-bold.ttf", 80);
     lettersFont = loadTTF(engine, "./assets/fonts/kalam.ttf", 10);
     char* titleText = "Revolução Em Cartas";
-    createText(titleText, engine->displayWidth/2 - al_get_text_width(titleFont->font, titleText)/2, 50, 0, al_map_rgb(255, 255, 255), al_map_rgba(0,0,0,0), NULL, titleFont, 0, 0, mainMenu);
+    addText(titleText, engine->displayWidth/2 - al_get_text_width(titleFont->font, titleText)/2, 50, 0, al_map_rgb(255, 255, 255), al_map_rgba(0,0,0,0), NULL, titleFont, 0, 0, mainMenu);
 
     addButtonToScene(mainMenu, createButton(engine, engine->displayWidth / 2 - 75, engine->displayHeight / 2 - 25, 150, 50, al_map_rgb(217, 95, 54), al_map_rgb(255, 255, 255), "Jogar", "./assets/fonts/roboto.ttf", NULL, onStartStageOne));
 
@@ -125,10 +113,6 @@ int main () {
 
     // FASE 1
     stageOne = createScene(engine, gameSceneScript);
-    stageOne->camera.maxLimit.x = 200*16;
-    stageOne->camera.maxLimit.y = 100*16;
-    stageOne->camera.minLimit.x = 0;
-    stageOne->camera.minLimit.y = 0;
     player = createGameObject(ANIMATED_SPRITE, 700, 50, 34, 40, stageOne);
     player->physics.enabled = 1;
     player->physics.friction = 0.4;
@@ -136,10 +120,15 @@ int main () {
     player->collisionEnabled = 1;
     player->collisionType = COLLISION_RECT;
     setGameObjectAnimation(player, loadBitmap(engine, "./assets/images/player-sprite-sheet.png"), 17, 20, 8, 15);
-    stageOne->camera.followTarget = player;
-    stageOne->camera.zoom=1;
 
-    letterTest=createText("Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut ut tincidunt elit. Nunc a magna at nulla tempor iaculis. Curabitur at enim sollicitudin, varius nisi vel, viverra odio. Ut porta metus sed metus gravida elementum. Pellentesque ut mi id quam euismod convallis. Duis vulputate tempus sagittis. Quisque aliquam justo justo, eget lobortis neque tempor non.Integer porta volutpat turpis, nec venenatis ante volutpat sit amet. Proin condimentum vitae augue id tincidunt. Donec tristique lectus non dui pellentesque tincidunt. In sit amet leo suscipit, feugiat leo id, condimentum tellus. Proin vel tempor metus. Mauris in auctor velit. Donec justo justo, iaculis eget pellentesque eget, interdum a nibh. Aenean tincidunt tempor sem. Integer eget elementum metus. Suspendisse non fringilla nunc, sit amet suscipit diam.Suspendisse a justo lorem. Phasellus ac nulla sed arcu fermentum sollicitudin. Suspendisse potenti. Aenean a augue venenatis, rhoncus sapien ut, laoreet felis. Vivamus mi neque, iaculis ac ligula eget, fermentum maximus elit. Praesent at elementum lorem, et tincidunt leo. Nunc ut lacinia ligula. Aliquam eu est finibus, iaculis ipsum vitae, dignissim risus. Proin pulvinar urna sit amet metus pharetra, eget pulvinar nisl sodales. Proin aliquam dolor at urna dignissim maximus. Nulla imperdiet varius pulvinar", 
+    stageOne->camera.maxLimit.x = 200*16;
+    stageOne->camera.maxLimit.y = 100*16;
+    stageOne->camera.minLimit.x = 0;
+    stageOne->camera.minLimit.y = 0;
+    stageOne->camera.followTarget = player;
+    stageOne->camera.zoom=2;
+
+    letterTest=addText("Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut ut tincidunt elit. Nunc a magna at nulla tempor iaculis. Curabitur at enim sollicitudin, varius nisi vel, viverra odio. Ut porta metus sed metus gravida elementum. Pellentesque ut mi id quam euismod convallis. Duis vulputate tempus sagittis. Quisque aliquam justo justo, eget lobortis neque tempor non.Integer porta volutpat turpis, nec venenatis ante volutpat sit amet. Proin condimentum vitae augue id tincidunt. Donec tristique lectus non dui pellentesque tincidunt. In sit amet leo suscipit, feugiat leo id, condimentum tellus. Proin vel tempor metus. Mauris in auctor velit. Donec justo justo, iaculis eget pellentesque eget, interdum a nibh. Aenean tincidunt tempor sem. Integer eget elementum metus. Suspendisse non fringilla nunc, sit amet suscipit diam.Suspendisse a justo lorem. Phasellus ac nulla sed arcu fermentum sollicitudin. Suspendisse potenti. Aenean a augue venenatis, rhoncus sapien ut, laoreet felis. Vivamus mi neque, iaculis ac ligula eget, fermentum maximus elit. Praesent at elementum lorem, et tincidunt leo. Nunc ut lacinia ligula. Aliquam eu est finibus, iaculis ipsum vitae, dignissim risus. Proin pulvinar urna sit amet metus pharetra, eget pulvinar nisl sodales. Proin aliquam dolor at urna dignissim maximus. Nulla imperdiet varius pulvinar", 
     300, 200, 250, al_map_rgb(255, 255, 255), al_map_rgba(0, 0, 0, 100), NULL, lettersFont, 40, 20, stageOne);
 
     //setupSceneWorld(stageOne, loadBitmap(engine, "./assets/images/map.png"), 3840, 2560);
