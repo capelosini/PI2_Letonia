@@ -56,7 +56,6 @@ void loadMap(const char *filename, Scene* scene){
     struct TileFromMapFile tile;
     fread(&tile, sizeof(struct TileFromMapFile), 1, mapFile);
     while (!feof(mapFile)){
-        printf("%d %d %d %d\n", tile.idX, tile.idY, tile.x, tile.y);
         addWorldTile(scene, tile.idX, tile.idY, tile.x, tile.y);
         fread(&tile, sizeof(struct TileFromMapFile), 1, mapFile);
     }

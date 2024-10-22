@@ -9,8 +9,10 @@ Scene* mainMenu;
 Scene* stageOne;
 GameObject* player;
 GameObject* ghostPlayerMenu;
+GameObject* letterObj;
 Font* lettersFont;
 Text* letterTest;
+Text* pressEMessage;
 float leafMatrix[100][3];
 
 int walkIndex = 0;
@@ -22,7 +24,13 @@ void onEvent(ALLEGRO_EVENT event, Scene* scene, CAEngine* engine){
             engine->isAlive = 0;
         }
     }
+    else if (event.type == ALLEGRO_EVENT_KEY_UP){
+        if (pressEMessage->visible && event.keyboard.keycode == ALLEGRO_KEY_E){
+            letterTest->visible=!letterTest->visible;
+        }
+    }
 }
+
 
 //stage change
 void onStartStageOne(Scene* scene) {
@@ -35,8 +43,6 @@ void gameSceneScript(Scene* self) {
     al_get_keyboard_state(&keyState);
     
     Vector2 mov = getMovementVector2(&keyState, ALLEGRO_KEY_A, ALLEGRO_KEY_D, ALLEGRO_KEY_W, ALLEGRO_KEY_S);
-    
-    char e = al_key_down(&keyState, ALLEGRO_KEY_E);
     
     player->physics.acc = (Vector2){abs(mov.x), abs(mov.y)};
 
@@ -58,10 +64,12 @@ void gameSceneScript(Scene* self) {
     if (!(mov.x || mov.y))
         player->animation.index.y = walkIndex;
 
-    if(e){
-        letterTest->visible=1;
-    } else {
-        letterTest->visible=0;
+    if (dist(player->position.x, player->position.y, player->width, player->height, letterObj->position.x, letterObj->position.y, letterObj->width, letterObj->height)
+    <= 60){
+        pressEMessage->visible = 1;
+    } else{
+        pressEMessage->visible = 0;
+        letterTest->visible = 0;
     }
 }
 
@@ -74,7 +82,7 @@ void mainMenuScript (Scene* self) {
         if (leafMatrix[i][1] > engine->displayHeight) {
             leafMatrix[i][0] = randInt(100, engine->displayWidth-5);
             leafMatrix[i][1] = randInt(-20, 0);
-            leafMatrix[i][2] = randInt(1,2);
+            leafMatrix[i][2] = randFloat(1,2);
         }
     }
 
@@ -109,12 +117,13 @@ int main () {
     mainMenu = createScene(engine, mainMenuScript);
 
     for (int i = 0; i < 100; i++) {
-        leafMatrix[i][0] = randInt(100, engine->displayWidth-5);
-        leafMatrix[i][1] = randInt(-50, 0);
-        leafMatrix[i][2] = randInt(0,2);
+        leafMatrix[i][0] = randInt(0, engine->displayWidth-5);
+        leafMatrix[i][1] = randInt(-500, 10);
+        leafMatrix[i][2] = randFloat(1,2);
     }
     
     Font* titleFont = loadTTF(engine, "./assets/fonts/kalam-bold.ttf", 80);
+    Font* stdMessageFont = loadTTF(engine, "./assets/fonts/kalam.ttf", 17);
     lettersFont = loadTTF(engine, "./assets/fonts/kalam.ttf", 10);
     char* titleText = "Revolução Em Cartas";
     addText(titleText, engine->displayWidth/2 - al_get_text_width(titleFont->font, titleText)/2, 50, 0, al_map_rgb(255, 255, 255), al_map_rgba(0,0,0,0), NULL, titleFont, 0, 0, mainMenu);
@@ -136,6 +145,9 @@ int main () {
 
     // FASE 1
     stageOne = createScene(engine, gameSceneScript);
+    letterObj = createGameObject(ANIMATED_SPRITE, 200, 200, 12, 12, stageOne);
+    setGameObjectAnimation(letterObj, loadBitmap(engine, "./assets/images/letter-sheet.png"), 12,12, 5, 16);
+    //letterObj->collisionEnabled = 1;
     player = createGameObject(ANIMATED_SPRITE, 700, 50, 44, 50, stageOne);
     player->physics.enabled = 1;
     player->physics.friction = 0.4;
@@ -153,6 +165,11 @@ int main () {
 
     letterTest=addText("Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut ut tincidunt elit. Nunc a magna at nulla tempor iaculis. Curabitur at enim sollicitudin, varius nisi vel, viverra odio. Ut porta metus sed metus gravida elementum. Pellentesque ut mi id quam euismod convallis. Duis vulputate tempus sagittis. Quisque aliquam justo justo, eget lobortis neque tempor non.Integer porta volutpat turpis, nec venenatis ante volutpat sit amet. Proin condimentum vitae augue id tincidunt. Donec tristique lectus non dui pellentesque tincidunt. In sit amet leo suscipit, feugiat leo id, condimentum tellus. Proin vel tempor metus. Mauris in auctor velit. Donec justo justo, iaculis eget pellentesque eget, interdum a nibh. Aenean tincidunt tempor sem. Integer eget elementum metus. Suspendisse non fringilla nunc, sit amet suscipit diam.Suspendisse a justo lorem. Phasellus ac nulla sed arcu fermentum sollicitudin. Suspendisse potenti. Aenean a augue venenatis, rhoncus sapien ut, laoreet felis. Vivamus mi neque, iaculis ac ligula eget, fermentum maximus elit. Praesent at elementum lorem, et tincidunt leo. Nunc ut lacinia ligula. Aliquam eu est finibus, iaculis ipsum vitae, dignissim risus. Proin pulvinar urna sit amet metus pharetra, eget pulvinar nisl sodales. Proin aliquam dolor at urna dignissim maximus. Nulla imperdiet varius pulvinar", 
     300, 200, 250, al_map_rgb(255, 255, 255), al_map_rgba(0, 0, 0, 100), NULL, lettersFont, 40, 20, stageOne);
+    letterTest->visible = 0;
+
+    pressEMessage=addText("Pressione E para ler a carta", engine->displayWidth/2, 200, 0, al_map_rgb(255, 255, 255), al_map_rgba(0, 0, 0, 100), NULL, stdMessageFont, 40, 20, stageOne);
+    pressEMessage->position.x -= al_get_text_width(stdMessageFont->font, pressEMessage->text)/2;
+    pressEMessage->visible=0;
 
     //setupSceneWorld(stageOne, loadBitmap(engine, "./assets/images/map.png"), 3840, 2560);
     setupSceneWorld(stageOne, loadBitmap(engine, "./map-sheet.png"), 16, 16);
