@@ -72,9 +72,9 @@ void mainMenuScript (Scene* self) {
         leafMatrix[i][0] += 0.5;
 
         if (leafMatrix[i][1] > engine->displayHeight) {
-            leafMatrix[i][0] = rand() % (engine->displayWidth + 100) - 100;
-            leafMatrix[i][1] = rand() % engine->displayHeight - engine->displayHeight;
-            leafMatrix[i][2] = rand() % 2 + 1;
+            leafMatrix[i][0] = randInt(100, engine->displayWidth-5);
+            leafMatrix[i][1] = randInt(-20, 0);
+            leafMatrix[i][2] = randInt(1,2);
         }
     }
 
@@ -93,8 +93,6 @@ void mainMenuScript (Scene* self) {
 }
 
 int main () {
-    srand(time(NULL));
-
     GameConfig engineConfig;
     engineConfig.fps=60;
     engineConfig.posX=20;
@@ -111,9 +109,9 @@ int main () {
     mainMenu = createScene(engine, mainMenuScript);
 
     for (int i = 0; i < 100; i++) {
-        leafMatrix[i][0] = rand() % (engine->displayWidth + 100) - 100;
-        leafMatrix[i][1] = rand() % engine->displayHeight - engine->displayHeight;
-        leafMatrix[i][2] = rand() % 2 + 1;
+        leafMatrix[i][0] = randInt(100, engine->displayWidth-5);
+        leafMatrix[i][1] = randInt(-50, 0);
+        leafMatrix[i][2] = randInt(0,2);
     }
     
     Font* titleFont = loadTTF(engine, "./assets/fonts/kalam-bold.ttf", 80);
@@ -164,6 +162,7 @@ int main () {
     map->collisionEnabled = 1;
     map->collisionType = COLLISION_RECT;
     map->invertedCollision = 1;
+
     while (engine->isAlive){
         render(engine);
     }
