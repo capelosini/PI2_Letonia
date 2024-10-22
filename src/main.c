@@ -9,15 +9,17 @@ Scene* mainMenu;
 Scene* stageOne;
 GameObject* player;
 GameObject* ghostPlayerMenu;
+GameObject* constructionQG;
 GameObject* letterObj;
 Font* lettersFont;
 Text* letterTest;
 Text* pressEMessage;
+bool letterPicked = false;
 float leafMatrix[100][3];
 
 int walkIndex = 0;
 
-//kill engine
+//action handle on events
 void onEvent(ALLEGRO_EVENT event, Scene* scene, CAEngine* engine){
     if (event.type == ALLEGRO_EVENT_KEY_DOWN){
         if (event.keyboard.keycode == ALLEGRO_KEY_ESCAPE){
@@ -25,8 +27,14 @@ void onEvent(ALLEGRO_EVENT event, Scene* scene, CAEngine* engine){
         }
     }
     else if (event.type == ALLEGRO_EVENT_KEY_UP){
-        if (pressEMessage->visible && event.keyboard.keycode == ALLEGRO_KEY_E){
-            letterTest->visible=!letterTest->visible;
+        if (event.keyboard.keycode == ALLEGRO_KEY_E){
+            if (!(letterPicked) && pressEMessage->visible) {
+                letterPicked = true;
+                letterObj->visible = 0;
+                pressEMessage->visible = 0;
+            } else if (letterPicked) {
+                letterTest->visible=!letterTest->visible;
+            }
         }
     }
 }
@@ -64,15 +72,18 @@ void gameSceneScript(Scene* self) {
     if (!(mov.x || mov.y))
         player->animation.index.y = walkIndex;
 
-    if (dist(player->position.x, player->position.y, player->width, player->height, letterObj->position.x, letterObj->position.y, letterObj->width, letterObj->height)
-    <= 60){
-        pressEMessage->visible = 1;
-    } else{
-        pressEMessage->visible = 0;
-        letterTest->visible = 0;
+    if (!(letterPicked)) {
+        if (dist(player->position.x, player->position.y, player->width, player->height, letterObj->position.x, letterObj->position.y, letterObj->width, letterObj->height)
+        <= 60){
+            pressEMessage->visible = 1;
+        } else{
+            pressEMessage->visible = 0;
+            letterTest->visible = 0;
+        }
     }
 }
 
+//menu animation
 void mainMenuScript (Scene* self) {
     for (int i = 0; i < 100; i++) {
         al_draw_filled_rectangle(leafMatrix[i][0], leafMatrix[i][1], leafMatrix[i][0] + 7, leafMatrix[i][1] + 5, al_map_rgb(50, 180, 50));
@@ -80,7 +91,7 @@ void mainMenuScript (Scene* self) {
         leafMatrix[i][0] += 0.5;
 
         if (leafMatrix[i][1] > engine->displayHeight) {
-            leafMatrix[i][0] = randInt(100, engine->displayWidth-5);
+            leafMatrix[i][0] = randInt(-100, engine->displayWidth-5);
             leafMatrix[i][1] = randInt(-20, 0);
             leafMatrix[i][2] = randFloat(1,2);
         }
@@ -117,7 +128,7 @@ int main () {
     mainMenu = createScene(engine, mainMenuScript);
 
     for (int i = 0; i < 100; i++) {
-        leafMatrix[i][0] = randInt(0, engine->displayWidth-5);
+        leafMatrix[i][0] = randInt(-100, engine->displayWidth-5);
         leafMatrix[i][1] = randInt(-500, 10);
         leafMatrix[i][2] = randFloat(1,2);
     }
@@ -143,8 +154,20 @@ int main () {
 
     changeScene(engine, mainMenu);
 
-    // FASE 1
+    // MAPA DO JOGO
     stageOne = createScene(engine, gameSceneScript);
+
+    stageOne->camera.maxLimit.x = 200*16;
+    stageOne->camera.maxLimit.y = 100*16;
+    stageOne->camera.minLimit.x = 0;
+    stageOne->camera.minLimit.y = 0;
+    stageOne->camera.zoom=2;
+
+    constructionQG = createGameObject(SOLID, stageOne->camera.maxLimit.x/2, stageOne->camera.maxLimit.y/2, 160, 160, stageOne);
+    setGameObjectAnimation(constructionQG, loadBitmap(engine, "./assets/images/QG.png"), 160, 160, 1, 1);
+    constructionQG->collisionEnabled = 1;
+    constructionQG->collisionType = COLLISION_RECT;
+
     letterObj = createGameObject(ANIMATED_SPRITE, 200, 200, 12, 12, stageOne);
     setGameObjectAnimation(letterObj, loadBitmap(engine, "./assets/images/letter-sheet.png"), 12,12, 5, 16);
     //letterObj->collisionEnabled = 1;
@@ -155,24 +178,18 @@ int main () {
     player->collisionEnabled = 1;
     player->collisionType = COLLISION_RECT;
     setGameObjectAnimation(player, loadBitmap(engine, "./assets/images/player-sprite-sheet.png"), 17, 20, 8, 15);
-
-    stageOne->camera.maxLimit.x = 200*16;
-    stageOne->camera.maxLimit.y = 100*16;
-    stageOne->camera.minLimit.x = 0;
-    stageOne->camera.minLimit.y = 0;
     stageOne->camera.followTarget = player;
-    stageOne->camera.zoom=2;
 
-    letterTest=addText("Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut ut tincidunt elit. Nunc a magna at nulla tempor iaculis. Curabitur at enim sollicitudin, varius nisi vel, viverra odio. Ut porta metus sed metus gravida elementum. Pellentesque ut mi id quam euismod convallis. Duis vulputate tempus sagittis. Quisque aliquam justo justo, eget lobortis neque tempor non.Integer porta volutpat turpis, nec venenatis ante volutpat sit amet. Proin condimentum vitae augue id tincidunt. Donec tristique lectus non dui pellentesque tincidunt. In sit amet leo suscipit, feugiat leo id, condimentum tellus. Proin vel tempor metus. Mauris in auctor velit. Donec justo justo, iaculis eget pellentesque eget, interdum a nibh. Aenean tincidunt tempor sem. Integer eget elementum metus. Suspendisse non fringilla nunc, sit amet suscipit diam.Suspendisse a justo lorem. Phasellus ac nulla sed arcu fermentum sollicitudin. Suspendisse potenti. Aenean a augue venenatis, rhoncus sapien ut, laoreet felis. Vivamus mi neque, iaculis ac ligula eget, fermentum maximus elit. Praesent at elementum lorem, et tincidunt leo. Nunc ut lacinia ligula. Aliquam eu est finibus, iaculis ipsum vitae, dignissim risus. Proin pulvinar urna sit amet metus pharetra, eget pulvinar nisl sodales. Proin aliquam dolor at urna dignissim maximus. Nulla imperdiet varius pulvinar", 
-    300, 200, 250, al_map_rgb(255, 255, 255), al_map_rgba(0, 0, 0, 100), NULL, lettersFont, 40, 20, stageOne);
+    letterTest=addText("Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut ut tincidunt elit. Nunc a magna at nulla tempor iaculis. Curabitur at enim sollicitudin, varius nisi vel, viverra odio. Ut porta metus sed metus gravida elementum. Pellentesque ut mi id quam euismod convallis. Duis vulputate tempus sagittis. Quisque aliquam justo justo, eget lobortis neque tempor non.Integer porta volutpat turpis, nec venenatis ante volutpat sit amet. Proin condimentum vitae augue id tincidunt. Donec tristique lectus non dui pellentesque tincidunt. In sit amet leo suscipit, feugiat leo id, condimentum tellus. Proin vel tempor metus. Mauris in auctor velit. Donec justo justo, iaculis eget pellentesque eget, interdum a nibh. Aenean tincidunt tempor sem. Integer eget elementum metus. Suspendisse non fringilla nunc, sit amet suscipit diam.Suspendisse a justo lorem. Phasellus ac nulla sed arcu fermentum sollicitudin.", 
+    300, 200, 250, al_map_rgb(0, 0, 0), al_map_rgba(155, 122, 73, 100), NULL, lettersFont, 40, 20, stageOne);
     letterTest->visible = 0;
 
-    pressEMessage=addText("Pressione E para ler a carta", engine->displayWidth/2, 200, 0, al_map_rgb(255, 255, 255), al_map_rgba(0, 0, 0, 100), NULL, stdMessageFont, 40, 20, stageOne);
+    pressEMessage=addText("Pressione E para pegar a carta", engine->displayWidth/2, 200, 0, al_map_rgb(255, 255, 255), al_map_rgba(0, 0, 0, 100), NULL, stdMessageFont, 40, 20, stageOne);
     pressEMessage->position.x -= al_get_text_width(stdMessageFont->font, pressEMessage->text)/2;
     pressEMessage->visible=0;
 
     //setupSceneWorld(stageOne, loadBitmap(engine, "./assets/images/map.png"), 3840, 2560);
-    setupSceneWorld(stageOne, loadBitmap(engine, "./map-sheet.png"), 16, 16);
+    setupSceneWorld(stageOne, loadBitmap(engine, "./assets/images/map-sheet.png"), 16, 16);
     loadMap("./map.CAE", stageOne);
     GameObject* map= createGameObject(SOLID, 0, 0, 200*16, 100*16, stageOne);
     map->color = al_map_rgba(0, 0, 0, 0);
