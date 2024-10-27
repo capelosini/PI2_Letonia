@@ -13,6 +13,8 @@ GameObject* player;
 GameObject* ghostPlayerMenu;
 GameObject* baseObj;
 GameObject* letterObj;
+GameObject* obj8;
+GameObject* returnBase;
 Font* lettersFont;
 Text* letterContent;
 Text* pressEMessage;
@@ -23,7 +25,7 @@ float fallingLeafs[100][3];
 int walkIndex = 0;
 
 //action handle on events
-void onEvent(ALLEGRO_EVENT event, Scene* scene, CAEngine* engine) {
+void onEvent(ALLEGRO_EVENT event, Scene * scene, CAEngine * engine) {
     if (event.type == ALLEGRO_EVENT_KEY_DOWN) {
         if (event.keyboard.keycode == ALLEGRO_KEY_ESCAPE) {
             engine->isAlive = 0;
@@ -36,7 +38,7 @@ void onEvent(ALLEGRO_EVENT event, Scene* scene, CAEngine* engine) {
                 letterObj->visible = 0;
                 pressEMessage->visible = 0;
             }
-            else if (letterPicked) {
+            else if (letterPicked ) {
                 letterContent->visible = !letterContent->visible;
             }
         }
@@ -46,15 +48,29 @@ void onEvent(ALLEGRO_EVENT event, Scene* scene, CAEngine* engine) {
 
 //stage change
 void onOpenBase(Scene* scene) {
+    if (engine->currentScene == gameMap)
+    {
+        player->position.x = 450;
+        player->position.y = 900;
+    }
     changeScene(engine, insideBase);
 }
 void onOpenGameMap(Scene* scene) {
-    player->position = (Vector2){ gameMap->camera.maxLimit.x / 2 - player->width - 10, gameMap->camera.maxLimit.y / 2 + 10 };
+    player->position = (Vector2){ gameMap->camera.maxLimit.x / 2 - player->width - 140, gameMap->camera.maxLimit.y / 2 - 95  };
     gameMap->camera.offset = (Vector2){ gameMap->camera.maxLimit.x - engine->displayWidth, gameMap->camera.maxLimit.y - engine->displayHeight };
     changeScene(engine, gameMap);
 }
 void onOpenSinopse(Scene* scene) {
     changeScene(engine, sinopse);
+}
+
+void onPlayerCollision(GameObject* self, GameObject* obj)
+{
+    if(obj == obj8)
+    onOpenGameMap(NULL);
+    if (obj == returnBase)
+    onOpenBase(NULL);
+
 }
 
 
@@ -96,6 +112,7 @@ void gameSceneScript(Scene* self) {
             letterContent->visible = 0;
         }
     }
+
 }
 
 
@@ -175,14 +192,14 @@ int main() {
 
     // - - - BASE - - -
     insideBase = createScene(engine, gameSceneScript);
-    insideBase->camera.minLimit.x = 0;
-    insideBase->camera.minLimit.y = 0;
-    insideBase->camera.maxLimit.x = 1000;
-    insideBase->camera.maxLimit.y = 1000;
-    insideBase->camera.zoom = 1.5;
-    setupSceneWorld(insideBase, loadBitmap(engine, "./assets/images/map.png"), 1000, 1000);
+    insideBase->camera.minLimit.x = 5;
+    insideBase->camera.minLimit.y = 5;
+    insideBase->camera.maxLimit.x = 1001;
+    insideBase->camera.maxLimit.y = 1001;
+    insideBase->camera.zoom = 2;
+    setupSceneWorld(insideBase, loadBitmap(engine, "./assets/images/map.png"),1000 , 1000);
     addWorldTile(insideBase, 0, 0, 0, 0);
-    GameObject* baseRoom = createGameObject(SOLID, 20, 30, 960, 950, insideBase);
+    GameObject* baseRoom = createGameObject(SOLID, 10, 0, 990, 990, insideBase);
     baseRoom->color = al_map_rgba(0, 0, 0, 0);
     baseRoom->collisionEnabled = 1;
     baseRoom->invertedCollision = 1;
@@ -190,19 +207,7 @@ int main() {
     //ao invés do botão, criar um if dentro de um swich case no while e verificar (player.y >= 950 & player.x >= esquerda da escada & <= direita da escada) que ative onOpenGameMap
     addButtonToScene(insideBase, createButton(engine, 0, 0, 100, 50, al_map_rgb(150, 120, 70), al_map_rgb(20, 20, 20), "Mundo Aberto", "./assets/fonts/roboto.ttf", NULL, onOpenGameMap));
 
-    player = createGameObject(ANIMATED_SPRITE, 700, 50, 44, 50, insideBase);
-    player->position.x = 100;
-    player->position.y = 50;
-    player->physics.enabled = 1;
-    player->physics.friction = 0.4;
-    player->physics.maxSpeed = 4;
-    player->collisionEnabled = 1;
-    player->collisionType = COLLISION_RECT;
-    player->startCollisionOffset.y = 15;
-    setGameObjectAnimation(player, loadBitmap(engine, "./assets/images/player-sprite-sheet.png"), 17, 20, 8, 15);
-    insideBase->camera.followTarget = player;
-
-    letterObj = createGameObject(ANIMATED_SPRITE, 500, 280, 12, 12, insideBase);
+    letterObj = createGameObject(ANIMATED_SPRITE, 467, 280, 12, 12, insideBase);
     setGameObjectAnimation(letterObj, loadBitmap(engine, "./assets/images/letter-sheet.png"), 12, 12, 5, 16);
     //como o letterContent tá sendo passado para >base, quando tenta abrir a carta em >gameMap ele não abre já que não está nessa cena e não dá pra incluir letterContent em >gameMap pq o addGameObjectToScene() não aceita parâmetro do tipo Text*
     //dependendo da resolução vai precisar mudar dentro de gameSceneScript que é onde gerencia a visibilidade da carta 
@@ -214,6 +219,50 @@ int main() {
     pressEMessage->position.x -= al_get_text_width(stdMessageFont->font, pressEMessage->text) / 2;
     pressEMessage->visible = 0;
 
+    player = createGameObject(ANIMATED_SPRITE, 700, 50, 44, 50, insideBase);
+    player->position.x = 450;
+    player->position.y = 300;
+    player->physics.enabled = 1;
+    player->physics.friction = 0.4;
+    player->physics.maxSpeed = 4;
+    player->collisionEnabled = 1;
+    player->collisionType = COLLISION_RECT;
+    player->startCollisionOffset.y = 15;
+    player->onCollision = onPlayerCollision;
+    setGameObjectAnimation(player, loadBitmap(engine, "./assets/images/player-sprite-sheet.png"), 17, 20, 8, 15);
+    insideBase->camera.followTarget = player;
+    GameObject*  obj1 = createGameObject(SOLID, 10, 10, 78, 38, insideBase);
+    obj1 ->color = al_map_rgba(0, 0, 0, 0);
+    obj1->collisionEnabled = 1 ;
+    GameObject* obj2 = createGameObject(SOLID, 10, 150, 17, 70, insideBase);
+    obj2->color = al_map_rgba(0, 0, 0, 0);
+    obj2->collisionEnabled = 1;
+    GameObject* obj3 = createGameObject(SOLID, 10, 275, 17, 45, insideBase);
+    obj3->color = al_map_rgba(0, 0, 0, 0);
+    obj3->collisionEnabled = 1;
+    GameObject* obj4 = createGameObject(SOLID, 340, 175, 300, 100, insideBase);
+    obj4->color = al_map_rgba(0, 0, 0, 0);
+    obj4->collisionEnabled = 1;
+    GameObject* obj5 = createGameObject(SOLID, 940, 20, 30 , 105, insideBase);
+    obj5->color = al_map_rgba(0, 0, 0, 0);
+    obj5->collisionEnabled = 1;
+    GameObject* obj6 = createGameObject(SOLID, 975, 175, 30, 100, insideBase);
+    obj6->color = al_map_rgba(0, 0, 0, 0);
+    obj6->collisionEnabled = 1;
+    GameObject* obj7 = createGameObject(SOLID, 975, 325, 30, 45, insideBase);
+    obj7->color = al_map_rgba(0, 0, 0, 0);
+    obj7->collisionEnabled = 1;
+    obj8 = createGameObject(SOLID, 350, 985, 275, 10, insideBase); 
+    obj8->color = al_map_rgba(0, 0, 0, 0); 
+    obj8->collisionEnabled = 1; 
+
+
+
+
+
+
+
+
 
     // - - - MAPA DO JOGO - - -
     gameMap = createScene(engine, gameSceneScript);
@@ -221,9 +270,8 @@ int main() {
     gameMap->camera.minLimit.y = 0;
     gameMap->camera.maxLimit.x = 200 * 16;
     gameMap->camera.maxLimit.y = 100 * 16;
-    gameMap->camera.zoom = 2;
+    gameMap->camera.zoom = 1.5;
     gameMap->camera.followTarget = player;
-
     //setupSceneWorld(gameMap, loadBitmap(engine, "./assets/images/map.png"), 3840, 2560);
     setupSceneWorld(gameMap, loadBitmap(engine, "./assets/images/map-sheet.png"), 16, 16);
     loadMap("./map.CAE", gameMap);
@@ -233,17 +281,37 @@ int main() {
     map->collisionType = COLLISION_RECT;
     map->invertedCollision = 1;
 
-    addGameObjectToScene(gameMap, player);
-    //addGameObjectToScene(gameMap, letterContent);
-
     baseObj = createGameObject(SPRITE, gameMap->camera.maxLimit.x / 2 - 335, gameMap->camera.maxLimit.y / 2 - 330, 335, 330, gameMap);
-    setGameObjectBitmap(baseObj, loadBitmap(engine, "./assets/images/base.png"));
+    ALLEGRO_BITMAP* baseBitMap = loadBitmap(engine, "./assets/images/base.png");
+    setGameObjectBitmap(baseObj, baseBitMap);
     baseObj->collisionEnabled = 1;
     baseObj->collisionType = COLLISION_RECT;
-    baseObj->startCollisionOffset.x = 20;
-    baseObj->startCollisionOffset.y = 30;
-    baseObj->endCollisionOffset.x = -20;
-    baseObj->endCollisionOffset.y = -15;
+    baseObj->startCollisionOffset.x = 80;
+    baseObj->startCollisionOffset.y = 210;
+    baseObj->endCollisionOffset.x = -60;
+    baseObj->endCollisionOffset.y = -85;
+    addGameObjectToScene(gameMap, player);
+    GameObject* houseTop = createGameObject(SPRITE, baseObj->position.x, baseObj->position.y-10, baseObj->width, baseObj->height/2 +70, gameMap);
+    setGameObjectBitmap(houseTop, createSubBitmap(engine, baseBitMap,0,0,500,500/2 + 70));
+    returnBase = createGameObject(SOLID, baseObj->position.x+ 170, baseObj->position.y +245, 5, 2, gameMap);
+    returnBase->color = al_map_rgba(0, 0, 0, 0);
+    returnBase->collisionEnabled = 1;
+    GameObject* left = createGameObject(SOLID, baseObj->position.x + 79 , baseObj->position.y + 293, 55, 1, gameMap);
+    left->color = al_map_rgba(0, 0, 0, 0);
+    left->collisionEnabled = 1;
+    GameObject* left2 = createGameObject(SOLID, baseObj->position.x + 79, baseObj->position.y + 280, 1, 10, gameMap);
+    left2->color = al_map_rgba(0, 0, 0, 0);
+    left2->collisionEnabled = 1;
+    GameObject* right = createGameObject(SOLID, baseObj->position.x + 213, baseObj->position.y + 293, 59, 1, gameMap);
+    right->color = al_map_rgba(0, 0, 0, 0);
+    right->collisionEnabled = 1;
+    GameObject* right2 = createGameObject(SOLID, baseObj->position.x + 273, baseObj->position.y + 278, 1, 13, gameMap);
+    right2->color = al_map_rgba(0, 0, 0, 0);
+    right2->collisionEnabled = 1;
+
+  
+    //addGameObjectToScene(gameMap, letterContent);
+
 
     //addButtonToScene(gameMap, createButton(engine, 0, 0, 100, 50, al_map_rgb(150, 120, 70), al_map_rgb(20, 20, 20), "sinopse", "./assets/fonts/roboto.ttf", NULL, onOpenSinopse));
 
