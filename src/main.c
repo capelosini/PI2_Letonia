@@ -55,18 +55,17 @@ void onOpenBase(Scene* scene) {
     }
     changeScene(engine, insideBase);
 }
-
 void onOpenGameMap(Scene* scene) {
-    player->position = (Vector2){ gameMap->camera.maxLimit.x / 2 - player->width - 140, gameMap->camera.maxLimit.y / 2 - 95  };
-    gameMap->camera.offset = (Vector2){ gameMap->camera.maxLimit.x - engine->displayWidth, gameMap->camera.maxLimit.y - engine->displayHeight };
+    player->position = (Vector2){ baseObj->position.x + baseObj->width/2 - 18, baseObj->position.y + baseObj->height - 98 };
+    gameMap->camera.offset = (Vector2){ player->position.x, player->position.y };
     changeScene(engine, gameMap);
 }
-
 void onOpenSinopse(Scene* scene) {
     changeScene(engine, sinopse);
 }
 
-void onPlayerCollision(GameObject* self, GameObject* obj){
+void onPlayerCollision(GameObject* self, GameObject* obj)
+{
     if(obj == obj8)
     onOpenGameMap(NULL);
     if (obj == returnBase)
@@ -160,10 +159,6 @@ int main() {
     engine = initEngine(engineConfig);
     setEventFunction(engine, onEvent);
 
-    // fonts
-    Font* titleFont = loadTTF(engine, "./assets/fonts/kalam-bold.ttf", 80);
-    Font* stdMessageFont = loadTTF(engine, "./assets/fonts/kalam.ttf", 17);
-    lettersFont = loadTTF(engine, "./assets/fonts/kalam.ttf", 10);
 
     // - - - MENU - - -
     mainMenu = createScene(engine, mainMenuScript);
@@ -174,8 +169,11 @@ int main() {
         fallingLeafs[i][2] = randFloat(1, 2);
     }
 
+    Font* titleFont = loadTTF(engine, "./assets/fonts/kalam-bold.ttf", 80);
+    Font* stdMessageFont = loadTTF(engine, "./assets/fonts/kalam.ttf", 17);
+    lettersFont = loadTTF(engine, "./assets/fonts/kalam.ttf", 10);
     char* titleText = "Revolução Em Cartas";
-    createText(titleText, engine->displayWidth / 2 - al_get_text_width(titleFont->font, titleText) / 2, 50, 0, al_map_rgb(255, 255, 255), al_map_rgba(0, 0, 0, 0), NULL, titleFont, 0, 0, mainMenu);
+    addText(titleText, engine->displayWidth / 2 - al_get_text_width(titleFont->font, titleText) / 2, 50, 0, al_map_rgb(255, 255, 255), al_map_rgba(0, 0, 0, 0), NULL, titleFont, 0, 0, mainMenu);
 
     addButtonToScene(mainMenu, createButton(engine, engine->displayWidth / 2 - 75, engine->displayHeight / 2 - 25, 150, 50, al_map_rgb(217, 95, 54), al_map_rgb(255, 255, 255), "Jogar", "./assets/fonts/roboto.ttf", NULL, onOpenBase));
 
@@ -206,18 +204,18 @@ int main() {
     baseRoom->collisionEnabled = 1;
     baseRoom->invertedCollision = 1;
     
-    // DID: ao invés do botão, criar um if dentro de um swich case no while e verificar (player.y >= 950 & player.x >= esquerda da escada & <= direita da escada) que ative onOpenGameMap
-    //addButtonToScene(insideBase, createButton(engine, 0, 0, 100, 50, al_map_rgb(150, 120, 70), al_map_rgb(20, 20, 20), "Mundo Aberto", "./assets/fonts/roboto.ttf", NULL, onOpenGameMap));
+    //ao invés do botão, criar um if dentro de um swich case no while e verificar (player.y >= 950 & player.x >= esquerda da escada & <= direita da escada) que ative onOpenGameMap
+    addButtonToScene(insideBase, createButton(engine, 0, 0, 100, 50, al_map_rgb(150, 120, 70), al_map_rgb(20, 20, 20), "Mundo Aberto", "./assets/fonts/roboto.ttf", NULL, onOpenGameMap));
 
     letterObj = createGameObject(ANIMATED_SPRITE, 467, 280, 12, 12, insideBase);
     setGameObjectAnimation(letterObj, loadBitmap(engine, "./assets/images/letter-sheet.png"), 12, 12, 5, 16);
     //como o letterContent tá sendo passado para >base, quando tenta abrir a carta em >gameMap ele não abre já que não está nessa cena e não dá pra incluir letterContent em >gameMap pq o addGameObjectToScene() não aceita parâmetro do tipo Text*
     //dependendo da resolução vai precisar mudar dentro de gameSceneScript que é onde gerencia a visibilidade da carta 
-    letterContent = createText("Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut ut tincidunt elit. Nunc a magna at nulla tempor iaculis. Curabitur at enim sollicitudin, varius nisi vel, viverra odio. Ut porta metus sed metus gravida elementum. Pellentesque ut mi id quam euismod convallis. Duis vulputate tempus sagittis. Quisque aliquam justo justo, eget lobortis neque tempor non.Integer porta volutpat turpis, nec venenatis ante volutpat sit amet. Proin condimentum vitae augue id tincidunt. Donec tristique lectus non dui pellentesque tincidunt. In sit amet leo suscipit, feugiat leo id, condimentum tellus. Proin vel tempor metus. Mauris in auctor velit. Donec justo justo, iaculis eget pellentesque eget, interdum a nibh. Aenean tincidunt tempor sem. Integer eget elementum metus. Suspendisse non fringilla nunc, sit amet suscipit diam.Suspendisse a justo lorem. Phasellus ac nulla sed arcu fermentum sollicitudin.",
+    letterContent = addText("Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut ut tincidunt elit. Nunc a magna at nulla tempor iaculis. Curabitur at enim sollicitudin, varius nisi vel, viverra odio. Ut porta metus sed metus gravida elementum. Pellentesque ut mi id quam euismod convallis. Duis vulputate tempus sagittis. Quisque aliquam justo justo, eget lobortis neque tempor non.Integer porta volutpat turpis, nec venenatis ante volutpat sit amet. Proin condimentum vitae augue id tincidunt. Donec tristique lectus non dui pellentesque tincidunt. In sit amet leo suscipit, feugiat leo id, condimentum tellus. Proin vel tempor metus. Mauris in auctor velit. Donec justo justo, iaculis eget pellentesque eget, interdum a nibh. Aenean tincidunt tempor sem. Integer eget elementum metus. Suspendisse non fringilla nunc, sit amet suscipit diam.Suspendisse a justo lorem. Phasellus ac nulla sed arcu fermentum sollicitudin.",
         300, 200, 250, al_map_rgb(0, 0, 0), al_map_rgba(155, 122, 73, 200), NULL, lettersFont, 40, 20, insideBase);
     letterContent->visible = 0;
 
-    pressEMessage = createText("Pressione E para pegar a carta", engine->displayWidth / 2, 200, 0, al_map_rgb(255, 255, 255), al_map_rgba(0, 0, 0, 100), NULL, stdMessageFont, 40, 20, insideBase);
+    pressEMessage = addText("Pressione E para pegar a carta", engine->displayWidth / 2, 200, 0, al_map_rgb(255, 255, 255), al_map_rgba(0, 0, 0, 100), NULL, stdMessageFont, 40, 20, insideBase);
     pressEMessage->position.x -= al_get_text_width(stdMessageFont->font, pressEMessage->text) / 2;
     pressEMessage->visible = 0;
 
@@ -259,6 +257,13 @@ int main() {
     obj8->collisionEnabled = 1; 
 
 
+
+
+
+
+
+
+
     // - - - MAPA DO JOGO - - -
     gameMap = createScene(engine, gameSceneScript);
     gameMap->camera.minLimit.x = 0;
@@ -276,7 +281,7 @@ int main() {
     map->collisionType = COLLISION_RECT;
     map->invertedCollision = 1;
 
-    baseObj = createGameObject(SPRITE, gameMap->camera.maxLimit.x / 2 - 335, gameMap->camera.maxLimit.y / 2 - 330, 335, 330, gameMap);
+    baseObj = createGameObject(SPRITE, 0, 0, 335, 330, gameMap);
     ALLEGRO_BITMAP* baseBitMap = loadBitmap(engine, "./assets/images/base.png");
     setGameObjectBitmap(baseObj, baseBitMap);
     baseObj->collisionEnabled = 1;
@@ -286,6 +291,7 @@ int main() {
     baseObj->endCollisionOffset.x = -60;
     baseObj->endCollisionOffset.y = -85;
     addGameObjectToScene(gameMap, player);
+    addTextToScene(gameMap, letterContent);
     GameObject* houseTop = createGameObject(SPRITE, baseObj->position.x, baseObj->position.y-10, baseObj->width, baseObj->height/2 +70, gameMap);
     setGameObjectBitmap(houseTop, createSubBitmap(engine, baseBitMap,0,0,500,500/2 + 70));
     returnBase = createGameObject(SOLID, baseObj->position.x+ 170, baseObj->position.y +245, 5, 2, gameMap);
@@ -304,8 +310,6 @@ int main() {
     right2->color = al_map_rgba(0, 0, 0, 0);
     right2->collisionEnabled = 1;
 
-    addTextToScene(gameMap, letterContent);
-
   
     //addGameObjectToScene(gameMap, letterContent);
 
@@ -316,7 +320,7 @@ int main() {
     sinopse = createScene(engine, NULL);
     sinopse->backgroundColor = al_map_rgb(20, 20, 20);
     lettersFont->size = 200;
-    sinopseTchau = createText("Final do jogo",
+    sinopseTchau = addText("Final do jogo",
         0, 0, engine->displayWidth, al_map_rgb(0, 0, 0), al_map_rgb(155, 122, 73), NULL, titleFont, 520, 550, sinopse);
 
 
