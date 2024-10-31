@@ -16,13 +16,17 @@ Scene* sinopse;
 GameObject* player;
 GameObject* ghostPlayerMenu;
 GameObject* baseObj;
+GameObject* map;
 GameObject* letterObj;
 GameObject* exitBase;
 GameObject* returnBase;
+GameObject* exitGameMap;
+GameObject* gridGameMap;
 GameObject* roomLC;
 GameObject* roomMC;
 GameObject* roomRC;
 GameObject* quartelobj;
+GameObject* exitQuartel;
 GameObject* roomLobj;
 GameObject* returnQuartelRoomL;
 GameObject* roomMobj;
@@ -70,13 +74,21 @@ void onOpenBase(Scene* scene) {
     changeScene(engine, insideBase);
 }
 void onOpenGameMap(Scene* scene) {
-    player->position = (Vector2){ baseObj->position.x + baseObj->width/2 - 18, baseObj->position.y + baseObj->height - 98 };
+    //player->position = (Vector2){ map->position.x + map->width  - 700, map->position.y + map->height - 98 };
+    player->position = (Vector2){ baseObj->position.x + baseObj->width / 2 - 18, baseObj->position.y + baseObj->height - 98 };
     gameMap->camera.offset = (Vector2){ player->position.x, player->position.y };
     changeScene(engine, gameMap);
 }
+
+void onOpenGameMapR(Scene* scene) {
+    player->position = (Vector2){ map->width  - 80, map->height - 360 };
+    gameMap->camera.offset = (Vector2){ player->position.x, player->position.y };
+    changeScene(engine, gameMap);
+}
+
 void onOpenQuartel(Scene* scene)
 {
-    player->position = (Vector2){ quartelobj->position.x + quartelobj->width / 2 - 100 ,  quartelobj->height - 60 };
+    player->position = (Vector2){ quartelobj->position.x + quartelobj->width / 2 - 120 ,  quartelobj->height - 60 };
     quartel->camera.offset = (Vector2){ player->position.x, player->position.y };
     changeScene(engine, quartel);
 
@@ -139,15 +151,19 @@ void onPlayerCollision(GameObject* self, GameObject* obj)
     onOpenGameMap(NULL);
     if (obj == returnBase)
     onOpenBase(NULL);
+    if (obj == exitGameMap)
+    onOpenQuartel(NULL);
+    if (obj == exitQuartel)
+    onOpenGameMapR(NULL); 
     if (obj == roomLC)
     onOpenRoomL(NULL);
     if (obj == roomMC)
     onOpenRoomM(NULL);
     if (obj == roomRC)
     onOpenRoomR(NULL);
-    if(obj == returnQuartelRoomL)
+    if (obj == returnQuartelRoomL)
     onOpenQuartelRL(NULL);
-    if(obj == returnQuartelRoomM)
+    if (obj == returnQuartelRoomM)
     onOpenQuartelRM(NULL);
     if (obj == returnQuartelRoomR)
     onOpenQuartelRR(NULL);
@@ -257,7 +273,7 @@ int main() {
     char* titleText = "Revolução Em Cartas";
     createText(titleText, engine->displayWidth / 2 - al_get_text_width(titleFont->font, titleText) / 2, 50, 0, al_map_rgb(255, 255, 255), al_map_rgba(0, 0, 0, 0), NULL, titleFont, 0, 0, mainMenu);
 
-    addButtonToScene(mainMenu, createButton(engine, engine->displayWidth / 2 - 75, engine->displayHeight / 2 - 25, 150, 50, al_map_rgb(217, 95, 54), al_map_rgb(255, 255, 255), "Jogar", "./assets/fonts/roboto.ttf", NULL, onOpenGameMap));
+    addButtonToScene(mainMenu, createButton(engine, engine->displayWidth / 2 - 75, engine->displayHeight / 2 - 25, 150, 50, al_map_rgb(217, 95, 54), al_map_rgb(255, 255, 255), "Jogar", "./assets/fonts/roboto.ttf", NULL, onOpenBase));
 
     mainMenu->backgroundColor = al_map_rgb(0, 0, 20);
 
@@ -344,16 +360,16 @@ int main() {
     gameMap->camera.minLimit.y = 0;
     //gameMap->camera.maxLimit.x = 200 * 16;
     //gameMap->camera.maxLimit.y = 100 * 16;
-    gameMap->camera.maxLimit.x = 7001;
-    gameMap->camera.maxLimit.y = 7001;
+    gameMap->camera.maxLimit.x = 5001;
+    gameMap->camera.maxLimit.y = 5001;
     gameMap->camera.zoom = 1;
     gameMap->camera.followTarget = player;
     //setupSceneWorld(gameMap, loadBitmap(engine, "./assets/images/map-sheet.png"), 16, 16);
     //loadMap("./map.CAE", gameMap);
-    setupSceneWorld(gameMap, loadBitmap(engine, "./assets/images/gamemap.png"), 7001, 7001);
+    setupSceneWorld(gameMap, loadBitmap(engine, "./assets/images/gamemap.png"), 5000, 5000);
     addWorldTile(gameMap, 0, 0, 0, 0);
-    GameObject* map = createGameObject(SOLID, 0, 0, 7001, 7001, gameMap);
-    //GameObject* map = createGameObject(SOLID, 0, 0, 200 * 16, 100 * 16, gameMap);
+    map = createGameObject(SOLID, 0, 0, 5000, 5000, gameMap);
+    //map = createGameObject(SOLID, 0, 0, 200 * 16, 100 * 16, gameMap);
     map->color = al_map_rgba(0, 0, 0, 0);
     map->collisionEnabled = 1;
     map->collisionType = COLLISION_RECT;
@@ -362,6 +378,9 @@ int main() {
     baseObj = createGameObject(SPRITE, 0, 0, 335, 330, gameMap);
     ALLEGRO_BITMAP* baseBitMap = loadBitmap(engine, "./assets/images/base.png");
     setGameObjectBitmap(baseObj, baseBitMap);
+    gridGameMap = createGameObject(SPRITE, map->width - 250, 0, 250, 5000, gameMap);
+    ALLEGRO_BITMAP* ExitGameMapBM = loadBitmap(engine, "./assets/images/grid.png");
+    setGameObjectBitmap(gridGameMap, ExitGameMapBM);
     baseObj->collisionEnabled = 1;
     baseObj->collisionType = COLLISION_RECT;
     baseObj->startCollisionOffset.x = 80;
@@ -375,7 +394,8 @@ int main() {
     returnBase = createGameObject(SOLID, baseObj->position.x+ 170, baseObj->position.y +245, 5, 2, gameMap);
     returnBase->color = al_map_rgba(0, 0, 0, 0);
     returnBase->collisionEnabled = 1;
-    GameObject* gridl1 = createGameObject(SOLID, baseObj->position.x + 79 , baseObj->position.y + 293, 55, 1, gameMap);
+
+    GameObject* gridl1 = createGameObject(SOLID, baseObj->position.x + 79, baseObj->position.y + 293, 55, 1, gameMap);
     gridl1->color = al_map_rgba(0, 0, 0, 0);
     gridl1->collisionEnabled = 1;
     GameObject* gridl2 = createGameObject(SOLID, baseObj->position.x + 79, baseObj->position.y + 280, 1, 10, gameMap);
@@ -388,6 +408,17 @@ int main() {
     gridr2->color = al_map_rgba(0, 0, 0, 0);
     gridr2->collisionEnabled = 1;
 
+    GameObject* treeGrid1 = createGameObject(SOLID, map->width - 215, 0, 230, 4600, gameMap);
+    treeGrid1->color = al_map_rgba(0, 0, 0, 0);
+    treeGrid1->collisionEnabled = 1;
+    GameObject* treeGrid3 = createGameObject(SOLID, map->width - 215, map->height - 220, 230, 370, gameMap);
+    treeGrid3->color = al_map_rgba(0, 0, 0, 0);
+    treeGrid3->collisionEnabled = 1;
+
+
+    exitGameMap = createGameObject(SOLID, map->width - 30, treeGrid1->height, 40, treeGrid3->position.y - treeGrid1->height, gameMap);
+    exitGameMap->color = al_map_rgba(0, 0, 0, 0);
+    exitGameMap->collisionEnabled = 1;
 
     //- - - QUARTEL - - -
     quartel = createScene(engine, gameSceneScript);
@@ -465,6 +496,8 @@ int main() {
     pondr5->color = al_map_rgba(0, 0, 0, 0);
     pondr5->collisionEnabled = 1;
     pondr5->collisionType = COLLISION_RECT;
+
+
 
     //QUARTEL
 
@@ -563,6 +596,12 @@ int main() {
     treeU->collisionEnabled = 1;
     treeU->collisionType = COLLISION_RECT;
 
+    exitQuartel = createGameObject(SOLID, treeD1->width, treeD1->position.y + 50, treeD2->position.x - treeD1->width, 10, quartel);
+    exitQuartel->color = al_map_rgba(0, 0, 0, 0);
+    exitQuartel->collisionEnabled = 1;
+    exitQuartel->collisionType = COLLISION_RECT;
+
+
     //- - - SALA_ESQ - - -
     roomL = createScene(engine, gameSceneScript);
     roomL->camera.minLimit.x = 0;
@@ -584,17 +623,17 @@ int main() {
     fundoRoomL->color = al_map_rgba(184, 118, 93, 255);
 
     GameObject* tableRoomL = createGameObject(SOLID, 70, 68, 260, 90, roomL);
-    tableRoomL->color = al_map_rgba(0, 0, 0, 150);
+    tableRoomL->color = al_map_rgba(0, 0, 0, 0);
     tableRoomL->collisionEnabled = 1;
     tableRoomL->collisionType = COLLISION_RECT;
 
     GameObject* benchRoomL = createGameObject(SOLID, 138, 25, 125, 28, roomL);
-    benchRoomL->color = al_map_rgba(0, 0, 0, 150);
+    benchRoomL->color = al_map_rgba(0, 0, 0, 0);
     benchRoomL->collisionEnabled = 1;
     benchRoomL->collisionType = COLLISION_RECT;
 
     returnQuartelRoomL = createGameObject(SOLID, 30, 478, 208, 28, roomL);
-    returnQuartelRoomL->color = al_map_rgba(0, 0, 0, 150);
+    returnQuartelRoomL->color = al_map_rgba(0, 0, 0, 0);
     returnQuartelRoomL->collisionEnabled = 1;
     returnQuartelRoomL->collisionType = COLLISION_RECT;
 
