@@ -9,6 +9,9 @@ Scene* mainMenu;
 Scene* insideBase;
 Scene* gameMap;
 Scene* quartel;
+Scene* roomL;
+Scene* roomM;
+Scene* roomR;
 Scene* sinopse;
 GameObject* player;
 GameObject* ghostPlayerMenu;
@@ -16,7 +19,16 @@ GameObject* baseObj;
 GameObject* letterObj;
 GameObject* exitBase;
 GameObject* returnBase;
+GameObject* roomLC;
+GameObject* roomMC;
+GameObject* roomRC;
 GameObject* quartelobj;
+GameObject* roomLobj;
+GameObject* returnQuartelRoomL;
+GameObject* roomMobj;
+GameObject* returnQuartelRoomM;
+GameObject* roomRobj;
+GameObject* returnQuartelRoomR;
 Font* lettersFont;
 Text* letterContent;
 Text* pressEMessage;
@@ -69,6 +81,54 @@ void onOpenQuartel(Scene* scene)
     changeScene(engine, quartel);
 
 }
+void onOpenQuartelRL(Scene* scene)
+{
+    player->position = (Vector2){ quartelobj->position.x + quartelobj->width / 2 - 300 ,  quartelobj->position.y + 930 };
+    quartel->camera.offset = (Vector2){ player->position.x, player->position.y };
+    changeScene(engine, quartel);
+
+}
+
+void onOpenQuartelRM(Scene* scene)
+{
+    player->position = (Vector2){ quartelobj->position.x + quartelobj->width / 2 + 70 ,  quartelobj->position.y + 930 };
+    quartel->camera.offset = (Vector2){ player->position.x, player->position.y };
+    changeScene(engine, quartel);
+
+}
+
+void onOpenQuartelRR(Scene* scene)
+{
+    player->position = (Vector2){ quartelobj->position.x + quartelobj->width / 2 + 440 ,  quartelobj->position.y + 930 };
+    quartel->camera.offset = (Vector2){ player->position.x, player->position.y };
+    changeScene(engine, quartel);
+
+}
+
+void onOpenRoomL(Scene* scene)
+{
+    player->position = (Vector2){ roomLobj->position.x + roomLobj->width / 2 - 100 ,  roomLobj->height - 60 };
+    roomL->camera.offset = (Vector2){ player->position.x, player->position.y };
+    changeScene(engine, roomL);
+
+}
+
+void onOpenRoomM(Scene* scene)
+{
+    player->position = (Vector2){ roomMobj->position.x + roomMobj->width / 2 - 10 ,  roomMobj->height - 60 };
+    roomM->camera.offset = (Vector2){ player->position.x, player->position.y };
+    changeScene(engine, roomM);
+
+}
+
+void onOpenRoomR(Scene* scene)
+{
+    player->position = (Vector2){ roomRobj->position.x + roomRobj->width / 2 + 130 ,  roomRobj->height - 60 };
+    roomR->camera.offset = (Vector2){ player->position.x, player->position.y };
+    changeScene(engine, roomR);
+
+}
+
 void onOpenSinopse(Scene* scene) {
     changeScene(engine, sinopse);
 }
@@ -79,6 +139,19 @@ void onPlayerCollision(GameObject* self, GameObject* obj)
     onOpenGameMap(NULL);
     if (obj == returnBase)
     onOpenBase(NULL);
+    if (obj == roomLC)
+    onOpenRoomL(NULL);
+    if (obj == roomMC)
+    onOpenRoomM(NULL);
+    if (obj == roomRC)
+    onOpenRoomR(NULL);
+    if(obj == returnQuartelRoomL)
+    onOpenQuartelRL(NULL);
+    if(obj == returnQuartelRoomM)
+    onOpenQuartelRM(NULL);
+    if (obj == returnQuartelRoomR)
+    onOpenQuartelRR(NULL);
+        
 
 }
 
@@ -184,7 +257,7 @@ int main() {
     char* titleText = "Revolução Em Cartas";
     createText(titleText, engine->displayWidth / 2 - al_get_text_width(titleFont->font, titleText) / 2, 50, 0, al_map_rgb(255, 255, 255), al_map_rgba(0, 0, 0, 0), NULL, titleFont, 0, 0, mainMenu);
 
-    addButtonToScene(mainMenu, createButton(engine, engine->displayWidth / 2 - 75, engine->displayHeight / 2 - 25, 150, 50, al_map_rgb(217, 95, 54), al_map_rgb(255, 255, 255), "Jogar", "./assets/fonts/roboto.ttf", NULL, onOpenQuartel));
+    addButtonToScene(mainMenu, createButton(engine, engine->displayWidth / 2 - 75, engine->displayHeight / 2 - 25, 150, 50, al_map_rgb(217, 95, 54), al_map_rgb(255, 255, 255), "Jogar", "./assets/fonts/roboto.ttf", NULL, onOpenGameMap));
 
     mainMenu->backgroundColor = al_map_rgb(0, 0, 20);
 
@@ -269,14 +342,18 @@ int main() {
     gameMap = createScene(engine, gameSceneScript);
     gameMap->camera.minLimit.x = 0;
     gameMap->camera.minLimit.y = 0;
-    gameMap->camera.maxLimit.x = 200 * 16;
-    gameMap->camera.maxLimit.y = 100 * 16;
-    gameMap->camera.zoom = 1.5;
+    //gameMap->camera.maxLimit.x = 200 * 16;
+    //gameMap->camera.maxLimit.y = 100 * 16;
+    gameMap->camera.maxLimit.x = 7001;
+    gameMap->camera.maxLimit.y = 7001;
+    gameMap->camera.zoom = 1;
     gameMap->camera.followTarget = player;
-    //setupSceneWorld(gameMap, loadBitmap(engine, "./assets/images/map.png"), 3840, 2560);
-    setupSceneWorld(gameMap, loadBitmap(engine, "./assets/images/map-sheet.png"), 16, 16);
-    loadMap("./map.CAE", gameMap);
-    GameObject* map = createGameObject(SOLID, 0, 0, 200 * 16, 100 * 16, gameMap);
+    //setupSceneWorld(gameMap, loadBitmap(engine, "./assets/images/map-sheet.png"), 16, 16);
+    //loadMap("./map.CAE", gameMap);
+    setupSceneWorld(gameMap, loadBitmap(engine, "./assets/images/gamemap.png"), 7001, 7001);
+    addWorldTile(gameMap, 0, 0, 0, 0);
+    GameObject* map = createGameObject(SOLID, 0, 0, 7001, 7001, gameMap);
+    //GameObject* map = createGameObject(SOLID, 0, 0, 200 * 16, 100 * 16, gameMap);
     map->color = al_map_rgba(0, 0, 0, 0);
     map->collisionEnabled = 1;
     map->collisionType = COLLISION_RECT;
@@ -443,7 +520,25 @@ int main() {
     wallU2->collisionEnabled = 1;
     wallU2->collisionType = COLLISION_RECT;
 
+    //ROOMS
+
+    roomLC = createGameObject(SOLID, 920, 940, 120, 10, quartel);
+    roomLC->color = al_map_rgba(0, 0, 0, 0);
+    roomLC->collisionEnabled = 1;
+    roomLC->collisionType = COLLISION_RECT;
+
+    roomMC = createGameObject(SOLID, 1290, 940, 130, 10, quartel);
+    roomMC->color = al_map_rgba(0, 0, 0, 0);
+    roomMC->collisionEnabled = 1;
+    roomMC->collisionType = COLLISION_RECT;
+
+    roomRC = createGameObject(SOLID, 1620, 940, 170, 10, quartel);
+    roomRC->color = al_map_rgba(0, 0, 0, 0);
+    roomRC->collisionEnabled = 1;
+    roomRC->collisionType = COLLISION_RECT;
+
     //FLORESTA
+
     GameObject* treeL = createGameObject(SOLID, 0,0, 60, 2500, quartel);
     treeL->color = al_map_rgba(0, 0, 0, 0);
     treeL->collisionEnabled = 1;
@@ -468,6 +563,130 @@ int main() {
     treeU->collisionEnabled = 1;
     treeU->collisionType = COLLISION_RECT;
 
+    //- - - SALA_ESQ - - -
+    roomL = createScene(engine, gameSceneScript);
+    roomL->camera.minLimit.x = 0;
+    roomL->camera.minLimit.y = 0;
+    roomL->camera.maxLimit.x = 1001;
+    roomL->camera.maxLimit.y = 501;
+    roomL->camera.zoom = 2.5;
+    roomL->camera.followTarget = player;
+    setupSceneWorld(roomL, loadBitmap(engine, "./assets/images/roomL.png"), 500, 500);
+    addWorldTile(roomL, 0, 0, 0, 0);
+    addGameObjectToScene(roomL, player);
+    roomLobj = createGameObject(SOLID, 12, 12, 448, 468, roomL);
+    roomLobj->color = al_map_rgba(0, 0, 0, 0);
+    roomLobj->collisionEnabled = 1;
+    roomLobj->collisionType = COLLISION_RECT;
+    roomLobj->invertedCollision = 1;
+
+    GameObject* fundoRoomL = createGameObject(SOLID, 500, 0, 1080, 1080, roomL);
+    fundoRoomL->color = al_map_rgba(184, 118, 93, 255);
+
+    GameObject* tableRoomL = createGameObject(SOLID, 70, 68, 260, 90, roomL);
+    tableRoomL->color = al_map_rgba(0, 0, 0, 150);
+    tableRoomL->collisionEnabled = 1;
+    tableRoomL->collisionType = COLLISION_RECT;
+
+    GameObject* benchRoomL = createGameObject(SOLID, 138, 25, 125, 28, roomL);
+    benchRoomL->color = al_map_rgba(0, 0, 0, 150);
+    benchRoomL->collisionEnabled = 1;
+    benchRoomL->collisionType = COLLISION_RECT;
+
+    returnQuartelRoomL = createGameObject(SOLID, 30, 478, 208, 28, roomL);
+    returnQuartelRoomL->color = al_map_rgba(0, 0, 0, 150);
+    returnQuartelRoomL->collisionEnabled = 1;
+    returnQuartelRoomL->collisionType = COLLISION_RECT;
+
+    //- - - SALA_M - - -
+    roomM = createScene(engine, gameSceneScript);
+    roomM->camera.minLimit.x = 0;
+    roomM->camera.minLimit.y = 0;
+    roomM->camera.maxLimit.x = 1001;
+    roomM->camera.maxLimit.y = 501;
+    roomM->camera.zoom = 2.5;
+    roomM->camera.followTarget = player;
+    setupSceneWorld(roomM, loadBitmap(engine, "./assets/images/roomM.png"), 500, 500);
+    addWorldTile(roomM, 0, 0, 0, 0);
+    addGameObjectToScene(roomM, player);
+    roomMobj = createGameObject(SOLID, 12, 12, 468, 468, roomM);
+    roomMobj->color = al_map_rgba(0, 0, 0, 0);
+    roomMobj->collisionEnabled = 1;
+    roomMobj->collisionType = COLLISION_RECT;
+    roomMobj->invertedCollision = 1;
+
+    GameObject* fundoRoomM = createGameObject(SOLID, 500, 0, 1080, 1080, roomM);
+    fundoRoomM->color = al_map_rgba(184, 118, 93, 255);
+
+    GameObject* bookCaseRM1 = createGameObject(SOLID, 40, 250, 20, 405, roomM);
+    bookCaseRM1->color = al_map_rgba(0, 0, 0, 0);
+    bookCaseRM1->collisionEnabled = 1;
+    bookCaseRM1->collisionType = COLLISION_RECT;
+
+    GameObject* bookCaseRM2 = createGameObject(SOLID, 460, 250, 20, 405, roomM);
+    bookCaseRM2->color = al_map_rgba(0, 0, 0, 0);
+    bookCaseRM2->collisionEnabled = 1;
+    bookCaseRM2->collisionType = COLLISION_RECT;
+
+    GameObject* tableRoomM = createGameObject(SOLID, 138, 68, 225, 65, roomM);
+    tableRoomM->color = al_map_rgba(0, 0, 0, 0);
+    tableRoomM->collisionEnabled = 1;
+    tableRoomM->collisionType = COLLISION_RECT;
+
+    GameObject* benchRoomM = createGameObject(SOLID, 170, 25, 160, 30, roomM);
+    benchRoomM->color = al_map_rgba(0, 0, 0, 0);
+    benchRoomM->collisionEnabled = 1;
+    benchRoomM->collisionType = COLLISION_RECT;
+
+    returnQuartelRoomM = createGameObject(SOLID, 140, 478, 208, 28, roomM);
+    returnQuartelRoomM->color = al_map_rgba(0, 0, 0, 0);
+    returnQuartelRoomM->collisionEnabled = 1;
+    returnQuartelRoomM->collisionType = COLLISION_RECT;
+
+    //- - - SALA_M - - -
+    roomR = createScene(engine, gameSceneScript);
+    roomR->camera.minLimit.x = 0;
+    roomR->camera.minLimit.y = 0;
+    roomR->camera.maxLimit.x = 1001;
+    roomR->camera.maxLimit.y = 501;
+    roomR->camera.zoom = 2.5;
+    roomR->camera.followTarget = player;
+    setupSceneWorld(roomR, loadBitmap(engine, "./assets/images/roomR.png"), 500, 500);
+    addWorldTile(roomR, 0, 0, 0, 0);
+    addGameObjectToScene(roomR, player);
+    roomRobj = createGameObject(SOLID, 12, 12, 468, 468, roomR);
+    roomRobj->color = al_map_rgba(0, 0, 0, 0);
+    roomRobj->collisionEnabled = 1;
+    roomRobj->collisionType = COLLISION_RECT;
+    roomRobj->invertedCollision = 1;
+
+    GameObject* fundoRoomR = createGameObject(SOLID, 500, 0, 1080, 1080, roomR);
+    fundoRoomR->color = al_map_rgba(184, 118, 93, 255);
+
+    GameObject* bookCaseRR1 = createGameObject(SOLID, 25, 25, 60, 30, roomR);
+    bookCaseRR1->color = al_map_rgba(0, 0, 0, 0);
+    bookCaseRR1->collisionEnabled = 1;
+    bookCaseRR1->collisionType = COLLISION_RECT;
+
+    GameObject* bookCaseRR2 = createGameObject(SOLID, 420, 25, 60, 30, roomR);
+    bookCaseRR2->color = al_map_rgba(0, 0, 0, 0);
+    bookCaseRR2->collisionEnabled = 1;
+    bookCaseRR2->collisionType = COLLISION_RECT;
+
+    GameObject* tableRoomR = createGameObject(SOLID, 138, 68, 225, 65, roomR);
+    tableRoomR->color = al_map_rgba(0, 0, 0, 0);
+    tableRoomR->collisionEnabled = 1;
+    tableRoomR->collisionType = COLLISION_RECT;
+
+    GameObject* benchRoomR = createGameObject(SOLID, 170, 25, 160, 30, roomR);
+    benchRoomR->color = al_map_rgba(0, 0, 0, 0);
+    benchRoomR->collisionEnabled = 1;
+    benchRoomR->collisionType = COLLISION_RECT;
+
+    returnQuartelRoomR = createGameObject(SOLID, 330, 478, 208, 28, roomR);
+    returnQuartelRoomR->color = al_map_rgba(0, 0, 0, 0);
+    returnQuartelRoomR->collisionEnabled = 1;
+    returnQuartelRoomR->collisionType = COLLISION_RECT;
 
 
 
