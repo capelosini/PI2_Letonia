@@ -3,7 +3,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
-
 CAEngine* engine;
 Scene* mainMenu;
 Scene* insideBase;
@@ -12,13 +11,29 @@ Scene* quartel;
 Scene* roomL;
 Scene* roomM;
 Scene* roomR;
-Scene* sinopse;
+Scene* sinopse;  
 GameObject* player;
+GameObject* friends[];
+GameObject* enemies[400];
+ALLEGRO_BITMAP* enemiesBM[400];
+int iSee = 0;
+int restart = 0;
+int test = 0;
+GameObject* constructions[110];
+GameObject* constructionsE[110];
+ALLEGRO_BITMAP* constructionsBM[110]; 
+GameObject* constructionsSub[110];
+ALLEGRO_BITMAP* constructionsBMSub[110];
+GameObject* way1[110];
+GameObject* way2[110];
+ALLEGRO_BITMAP* way1BM[110];
+ALLEGRO_BITMAP* way2BM[110];
 GameObject* ghostPlayerMenu;
 GameObject* baseObj;
 GameObject* map;
 GameObject* letterObj;
 GameObject* exitBase;
+int home = 0;
 GameObject* returnBase;
 GameObject* exitGameMap;
 GameObject* gridGameMap;
@@ -39,6 +54,7 @@ Text* pressEMessage;
 Text* sinopseTchau;
 bool letterPicked = false;
 float fallingLeafs[100][3];
+
 
 int walkIndex = 0;
 
@@ -73,6 +89,18 @@ void onOpenBase(Scene* scene) {
     }
     changeScene(engine, insideBase);
 }
+
+    void onOpenBaseR(Scene * scene) {
+        if (engine->currentScene == gameMap)
+        {
+            player->position.x = 450;
+            player->position.y = 300;
+            insideBase->camera.offset = (Vector2){ player->position.x, player->position.y };
+
+        }
+        changeScene(engine, insideBase);
+    }
+
 void onOpenGameMap(Scene* scene) {
     //player->position = (Vector2){ map->position.x + map->width  - 700, map->position.y + map->height - 98 };
     player->position = (Vector2){ baseObj->position.x + baseObj->width / 2 - 18, baseObj->position.y + baseObj->height - 98 };
@@ -166,9 +194,61 @@ void onPlayerCollision(GameObject* self, GameObject* obj)
     if (obj == returnQuartelRoomM)
     onOpenQuartelRM(NULL);
     if (obj == returnQuartelRoomR)
-    onOpenQuartelRR(NULL);
-        
+        onOpenQuartelRR(NULL);
+    
+    for (int i = 0; i < 50; i++)
+    {
+        if (obj == enemies[i] )
 
+        {
+            letterPicked = false;
+            letterObj->visible = 1;
+            pressEMessage->visible = 0;
+            onOpenBaseR(NULL); 
+        }
+    }        
+}
+void onenemiesCollision(GameObject* self, GameObject* obj)
+{
+   for (int i = 0; i < 50; i++)
+    {
+        if (self != enemies[i] && obj == enemies[i] && engine->currentScene==gameMap && restart==0) 
+        {
+
+
+            if (obj->position.x <= enemies[i]->position.x + enemies[i]->width/2)
+            {
+                enemies[i]->physics.acc.x -= 0.2;
+                enemies[i]->animation.direction.x = -1;
+                enemies[i]->position.x -= 0.2;
+                enemies[i]->animation.index.y = 0;
+            }
+            if (obj->position.x > enemies[i]->position.x + enemies[i]->width / 2)
+            {
+                enemies[i]->physics.acc.x += 0.2;
+                enemies[i]->animation.direction.x = 1;
+                enemies[i]->position.x += 0.2;
+                enemies[i]->animation.index.y = 0;
+            }
+
+            if (obj->position.y >= enemies[i]->position.y + enemies[i]->height /2)
+            {
+                enemies[i]->physics.acc.y += 0.2;
+                enemies[i]->animation.direction.y = 1;
+                enemies[i]->position.y += 0.2;
+                enemies[i]->animation.index.y = 0;
+            }
+            if (obj->position.y < enemies[i]->position.y + enemies[i]->height / 2)
+            {
+                enemies[i]->physics.acc.y -= 0.2;
+                enemies[i]->animation.direction.y = -1;
+                enemies[i]->position.y -= 0.2;
+                enemies[i]->animation.index.y = 2;
+            }
+        }
+        
+        
+    }
 }
 
 
@@ -185,7 +265,7 @@ void gameSceneScript(Scene* self) {
         player->physics.directions.y = mov.y;
         if (mov.y < 0) {
             walkIndex = 2;
-        }
+        } 
         else {
             walkIndex = 1;
         }
@@ -209,7 +289,293 @@ void gameSceneScript(Scene* self) {
             pressEMessage->visible = 0;
             letterContent->visible = 0;
         }
+
     }
+    float d;
+
+    for (int i = 0; i < 10; i++)
+    {
+        for (int j = 0; j < 10; j++)
+        {
+            d = dist(player->position.x, player->position.y, player->width, player->height, constructions[j + i * 10]->position.x, constructions[j + i * 10]->position.y, constructions[j + i * 10]->width, constructions[j + i * 10]->height);
+            if (d <= 90)
+            {
+                engine->currentScene->camera.zoom = 1.25;
+                constructions[j + i * 10]->visible = 0;
+                constructionsE[j + i * 10]->visible = 1;
+               
+                
+                home = 1;
+                i = 10;
+                j = 10;
+            }
+            else
+            {
+                if (engine->currentScene == gameMap)
+                {    
+                    engine->currentScene->camera.zoom = 1;
+                    {
+                        constructionsE[j + i * 10]->visible = 0;
+                        constructions[j + i * 10]->visible = 1;
+                    }
+
+
+                }
+ 
+                home = 0;
+            }
+        }
+    }
+
+
+
+            for (int e = 0; e < 50; e++)
+            {
+                d = dist(player->position.x, player->position.y, player->width, player->height, enemies[e]->position.x, enemies[e]->position.y, enemies[e]->width, enemies[e]->height);
+                if (((d <= 500 && home == 0) || d<100) && engine->currentScene == gameMap)
+                {
+                    iSee = 1;
+                    restart = 1;
+                }
+                else
+                {
+                    iSee = 0;
+                }
+
+                if (e % 100 < 10 && iSee == 0 && restart == 1)
+                {
+                    if (enemies[e]->position.y < 300 + 500 * 9 + (e % 2) * 70)
+                    {
+                        test = 1;
+                        enemies[e]->physics.acc.y += 2;
+                        enemies[e]->animation.direction.y = 1;
+                        enemies[e]->position.y += 2;
+                        enemies[e]->animation.index.y = 0;
+                    }
+                    if (enemies[e]->position.y > 300 + 500 * 9 + (e % 2) * 70)
+                    {
+                        test = 1;
+                        enemies[e]->physics.acc.y -= 2;
+                        enemies[e]->animation.direction.y = -1;
+                        enemies[e]->position.y -= 2;
+                        enemies[e]->animation.index.y = 0;
+                    }
+                    if (enemies[e]->position.x < 50 + 80 * e)
+                    {
+                        test = 1;
+                        enemies[e]->physics.acc.x += 2;
+                        enemies[e]->animation.direction.x = 1;
+                        enemies[e]->position.x += 2;
+                        enemies[e]->animation.index.y = 0;
+                    }
+                    if (enemies[e]->position.x > 50 + 80 * e)
+                    {
+                        test = 1;
+                        enemies[e]->physics.acc.x -= 2;
+                        enemies[e]->animation.direction.x = -1;
+                        enemies[e]->position.x -= 2;
+                        enemies[e]->animation.index.x = 2;
+                    }
+                }
+                    if (e % 100 < 20 && e % 100 >= 10 && iSee == 0 && restart == 1)
+                    {
+                        if (enemies[e]->position.y < 300 + 500 * 7 + (e % 2) * 70)
+                        {
+                            test = 1;
+                            enemies[e]->physics.acc.y += 1;
+                            enemies[e]->animation.direction.y = 1;
+                            enemies[e]->position.y += 1;
+                            enemies[e]->animation.index.y = 0;
+                        }
+                        if (enemies[e]->position.y > 300 + 500 * 7 + (e % 2) * 70)
+                        {
+                            test = 1;
+                            enemies[e]->physics.acc.y -= 1;
+                            enemies[e]->animation.direction.y = -1;
+                            enemies[e]->position.y -= 1;
+                            enemies[e]->animation.index.y = 0;
+                        }
+                        if (enemies[e]->position.x < 4500 + 80 * (e%10))
+                        {
+                            test = 1;
+                            enemies[e]->physics.acc.x += 1;
+                            enemies[e]->animation.direction.x = 1;
+                            enemies[e]->position.x += 1;
+                            enemies[e]->animation.index.y = 0;
+                        }
+                        if (enemies[e]->position.x > 4500 + 80 * (e % 10))
+                        {
+                            test = 1;
+                            enemies[e]->physics.acc.x -= 1;
+                            enemies[e]->animation.direction.x = -1;
+                            enemies[e]->position.x -= 1;
+                            enemies[e]->animation.index.x = 2;
+                        }
+                    }
+
+                    if (e % 100 < 30 && e % 100 >= 20 && iSee == 0 && restart == 1)
+                    {
+                        if (enemies[e]->position.y < 300 + 500 * 5 + (e % 2) * 70)
+                        {
+                            test = 1;
+                            enemies[e]->physics.acc.y += 1;
+                            enemies[e]->animation.direction.y = 1;
+                            enemies[e]->position.y += 1;
+                            enemies[e]->animation.index.y = 0;
+                        }
+                        if (enemies[e]->position.y > 300 + 500 * 5 + (e % 2) * 70)
+                        {
+                            test = 1;
+                            enemies[e]->physics.acc.y -= 1;
+                            enemies[e]->animation.direction.y = -1;
+                            enemies[e]->position.y -= 1;
+                            enemies[e]->animation.index.y = 0;
+                        }
+                        if (enemies[e]->position.x < 2500 + 80 * (e % 10))
+                        {
+                            test = 1;
+                            enemies[e]->physics.acc.x += 1;
+                            enemies[e]->animation.direction.x = 1;
+                            enemies[e]->position.x += 1;
+                            enemies[e]->animation.index.y = 0;
+                        }
+                        if (enemies[e]->position.x > 2500 + 80 * (e % 10))
+                        {
+                            test = 1;
+                            enemies[e]->physics.acc.x -= 1;
+                            enemies[e]->animation.direction.x = -1;
+                            enemies[e]->position.x -= 1;
+                            enemies[e]->animation.index.x = 2;
+                        }
+                    }
+
+                    if (e % 100 < 40 && e % 100 >= 30 && iSee == 0 && restart == 1)
+                    {
+                        if (enemies[e]->position.y < 300 + 500 * 3 + (e % 2) * 70)
+                        {
+                            test = 1;
+                            enemies[e]->physics.acc.y += 1;
+                            enemies[e]->animation.direction.y = 1;
+                            enemies[e]->position.y += 1;
+                            enemies[e]->animation.index.y = 0;
+                        }
+                        if (enemies[e]->position.y > 300 + 500 * 3 + (e % 2) * 70)
+                        {
+                            test = 1;
+                            enemies[e]->physics.acc.y -= 1;
+                            enemies[e]->animation.direction.y = -1;
+                            enemies[e]->position.y -= 1;
+                            enemies[e]->animation.index.y = 0;
+                        }
+                        if (enemies[e]->position.x < 50 + 80 * (e % 10))
+                        {
+                            test = 1;
+                            enemies[e]->physics.acc.x += 1;
+                            enemies[e]->animation.direction.x = 1;
+                            enemies[e]->position.x += 1;
+                            enemies[e]->animation.index.y = 0;
+                        }
+                        if (enemies[e]->position.x > 50 + 80 * (e % 10))
+                        {
+                            test = 1;
+                            enemies[e]->physics.acc.x -= 1;
+                            enemies[e]->animation.direction.y = -1;
+                            enemies[e]->position.x -= 1;
+                            enemies[e]->animation.index.x = 2;
+                        }
+                    }
+
+                    if (e % 100 < 50 && e % 100 >= 40 && iSee == 0 && restart == 1)
+                    {
+                        if (enemies[e]->position.y < 300 + 500 * 1 + (e % 2) * 70)
+                        {
+                            test = 1;
+                            enemies[e]->physics.acc.y += 1;
+                            enemies[e]->animation.direction.y = 1;
+                            enemies[e]->position.y += 1;
+                            enemies[e]->animation.index.y = 0;
+                        }
+                        if (enemies[e]->position.y > 300 + 500 * 1 + (e % 2) * 70)
+                        {
+                            test = 1;
+                            enemies[e]->physics.acc.y -= 1;
+                            enemies[e]->animation.direction.y = -1;
+                            enemies[e]->position.y -= 1;
+                            enemies[e]->animation.index.y = 0;
+                        }
+                        if (enemies[e]->position.x < 2500 + 80 * (e % 10))
+                        {
+                            test = 1;
+                            enemies[e]->physics.acc.x += 1;
+                            enemies[e]->animation.direction.x = 1;
+                            enemies[e]->position.x += 1;
+                            enemies[e]->animation.index.y = 0;
+                        }
+                        if (enemies[e]->position.x > 2500 + 80 * (e % 10))
+                        {
+                            test = 1;
+                            enemies[e]->physics.acc.x -= 1;
+                            enemies[e]->animation.direction.x = -1;
+                            enemies[e]->position.x -= 1;
+                            enemies[e]->animation.index.x = 2;
+                        }
+                    }
+
+             
+
+
+                if (enemies[e]->position.x < player->position.x  && iSee == 1)
+                {
+                    enemies[e]->physics.acc.x += 2;
+                    enemies[e]->animation.direction.x = 1;
+                    enemies[e]->position.x += 2;
+                    enemies[e]->animation.index.y = 0;
+                }
+
+
+                if (enemies[e]->position.x > player->position.x + player->width && iSee == 1)
+                {
+                    enemies[e]->physics.acc.x -= 2;
+                    enemies[e]->animation.direction.x = -1;
+                    enemies[e]->position.x -= 2;
+                    enemies[e]->animation.index.y = 0;
+                }
+
+
+                if (enemies[e]->position.y < player->position.y && iSee == 1)
+                {
+                    enemies[e]->physics.acc.y += 2;
+                    enemies[e]->animation.direction.y = 1;
+                    enemies[e]->position.y += 2;
+                    enemies[e]->animation.index.y = 0;
+                }
+                if (enemies[e]->position.y > player->position.y + player->height && iSee == 1)
+                {
+                    enemies[e]->physics.acc.y -= 2;
+                    enemies[e]->animation.direction.y = -1;
+                    enemies[e]->position.y -= 2;
+                    enemies[e]->animation.index.y = 2;
+                }
+
+
+
+                if (iSee == 0)
+                {
+                    enemies[e]->physics.acc.x = 0;
+                    enemies[e]->physics.acc.y = 0;
+
+                }
+            }
+            if (test == 0);
+            restart = 0;
+            if(test == 1)
+            restart = 1;
+
+            test = 0;
+        
+    
+
+    
 
 }
 
@@ -295,13 +661,13 @@ int main() {
     insideBase->camera.maxLimit.x = 1001;
     insideBase->camera.maxLimit.y = 1001;
     insideBase->camera.zoom = 2;
-    setupSceneWorld(insideBase, loadBitmap(engine, "./assets/images/map.png"),1000 , 1000);
+    setupSceneWorld(insideBase, loadBitmap(engine, "./assets/images/map.png"), 1000, 1000);
     addWorldTile(insideBase, 0, 0, 0, 0);
     GameObject* baseRoom = createGameObject(SOLID, 10, 0, 990, 990, insideBase);
     baseRoom->color = al_map_rgba(0, 0, 0, 0);
     baseRoom->collisionEnabled = 1;
     baseRoom->invertedCollision = 1;
-    
+
 
     letterObj = createGameObject(ANIMATED_SPRITE, 467, 280, 12, 12, insideBase);
     setGameObjectAnimation(letterObj, loadBitmap(engine, "./assets/images/letter-sheet.png"), 12, 12, 5, 16);
@@ -325,11 +691,12 @@ int main() {
     player->collisionType = COLLISION_RECT;
     player->startCollisionOffset.y = 35;
     player->onCollision = onPlayerCollision;
-    setGameObjectAnimation(player, loadBitmap(engine, "./assets/images/player-sprite-sheet.png"), 17, 20, 8, 15);
+    ALLEGRO_BITMAP* playerBitmap = loadBitmap(engine, "./assets/images/player-sprite-sheet.png");
+    setGameObjectAnimation(player, playerBitmap, 17, 20, 8, 15);
     insideBase->camera.followTarget = player;
-    GameObject*  boxl = createGameObject(SOLID, 20, 20, 78, 50, insideBase);
-    boxl ->color = al_map_rgba(0, 0, 0, 0);
-    boxl->collisionEnabled = 1 ;
+    GameObject* boxl = createGameObject(SOLID, 20, 20, 78, 50, insideBase);
+    boxl->color = al_map_rgba(0, 0, 0, 0);
+    boxl->collisionEnabled = 1;
     GameObject* benchl1 = createGameObject(SOLID, 20, 150, 17, 95, insideBase);
     benchl1->color = al_map_rgba(0, 0, 0, 0);
     benchl1->collisionEnabled = 1;
@@ -339,7 +706,7 @@ int main() {
     GameObject* table = createGameObject(SOLID, 340, 175, 300, 115, insideBase);
     table->color = al_map_rgba(0, 0, 0, 0);
     table->collisionEnabled = 1;
-    GameObject* boxr = createGameObject(SOLID, 940, 20, 30 , 125, insideBase);
+    GameObject* boxr = createGameObject(SOLID, 940, 20, 30, 125, insideBase);
     boxr->color = al_map_rgba(0, 0, 0, 0);
     boxr->collisionEnabled = 1;
     GameObject* benchr1 = createGameObject(SOLID, 960, 175, 30, 115, insideBase);
@@ -348,9 +715,9 @@ int main() {
     GameObject* benchr2 = createGameObject(SOLID, 960, 325, 30, 63, insideBase);
     benchr2->color = al_map_rgba(0, 0, 0, 0);
     benchr2->collisionEnabled = 1;
-    exitBase = createGameObject(SOLID, 350, 985, 275, 10, insideBase); 
-    exitBase->color = al_map_rgba(0, 0, 0, 0); 
-    exitBase->collisionEnabled = 1; 
+    exitBase = createGameObject(SOLID, 350, 985, 275, 10, insideBase);
+    exitBase->color = al_map_rgba(0, 0, 0, 0);
+    exitBase->collisionEnabled = 1;
 
 
 
@@ -362,7 +729,6 @@ int main() {
     //gameMap->camera.maxLimit.y = 100 * 16;
     gameMap->camera.maxLimit.x = 5001;
     gameMap->camera.maxLimit.y = 5001;
-    gameMap->camera.zoom = 1;
     gameMap->camera.followTarget = player;
     //setupSceneWorld(gameMap, loadBitmap(engine, "./assets/images/map-sheet.png"), 16, 16);
     //loadMap("./map.CAE", gameMap);
@@ -378,22 +744,285 @@ int main() {
     baseObj = createGameObject(SPRITE, 0, 0, 335, 330, gameMap);
     ALLEGRO_BITMAP* baseBitMap = loadBitmap(engine, "./assets/images/base.png");
     setGameObjectBitmap(baseObj, baseBitMap);
-    gridGameMap = createGameObject(SPRITE, map->width - 250, 0, 250, 5000, gameMap);
-    ALLEGRO_BITMAP* ExitGameMapBM = loadBitmap(engine, "./assets/images/grid.png");
-    setGameObjectBitmap(gridGameMap, ExitGameMapBM);
     baseObj->collisionEnabled = 1;
     baseObj->collisionType = COLLISION_RECT;
     baseObj->startCollisionOffset.x = 80;
     baseObj->startCollisionOffset.y = 210;
     baseObj->endCollisionOffset.x = -60;
     baseObj->endCollisionOffset.y = -85;
+    gridGameMap = createGameObject(SPRITE, map->width - 250, 0, 250, 5000, gameMap);
+    ALLEGRO_BITMAP* ExitGameMapBM = loadBitmap(engine, "./assets/images/grid.png");
+    setGameObjectBitmap(gridGameMap, ExitGameMapBM);
+    srand(time(NULL));
+    int r;
+    int i = 0;
+
+    // RUAS
+
+    while (i < 10)
+    {
+        for (int j = 0; j < 10; j++)
+        {
+            if (j == 0 && i < 1)
+            {
+                way1[0] = createGameObject(SPRITE, 320, 0, 166, 500, gameMap);
+                way1BM[0] = loadBitmap(engine, "./assets/images/estrada.png");
+                setGameObjectBitmap(way1[0], way1BM[0]);
+                way2[0] = createGameObject(SPRITE, -16, 320, 500, 166, gameMap);
+                way2BM[0] = loadBitmap(engine, "./assets/images/estradal.png");
+                setGameObjectBitmap(way2[0], way2BM[0]);
+
+
+            }
+
+
+            if (j < 8 && j>0 && i < 1)
+            {
+                way1[j + i * 10] = createGameObject(SPRITE, 500 * (j + 1) - 185, 0, 166, 500, gameMap);
+                way1BM[j + i * 10] = loadBitmap(engine, "./assets/images/estrada.png");
+                setGameObjectBitmap(way1[j + i * 10], way1BM[j + i * 10]);
+                way2[j + i * 10] = createGameObject(SPRITE, 500 * (j + 1) - 520, 320, 500, 166, gameMap);
+                way2BM[j + i * 10] = loadBitmap(engine, "./assets/images/estradal.png");
+                setGameObjectBitmap(way2[j + i * 10], way2BM[j + i * 10]);
+
+            }
+            if (j == 8 && i < 1)
+            {
+
+                way1[j + i * 10] = createGameObject(SPRITE, 500 * (j + 1) - 185, 0, 166, 500, gameMap);
+                way1BM[j + i * 10] = loadBitmap(engine, "./assets/images/estrada.png");
+                setGameObjectBitmap(way1[j + i * 10], way1BM[j + i * 10]);
+                way2[j + i * 10 + 1] = createGameObject(SPRITE, 500 * (j + 1) - 260, 320, 500, 166, gameMap);
+                way2BM[j + i * 10 + 1] = loadBitmap(engine, "./assets/images/estradal.png");
+                setGameObjectBitmap(way2[j + i * 10 + 1], way2BM[j + i * 10 + 1]);
+                way2[j + i * 10] = createGameObject(SPRITE, 500 * (j + 1) - 520, 320, 500, 166, gameMap);
+                way2BM[j + i * 10] = loadBitmap(engine, "./assets/images/estradal.png");
+                setGameObjectBitmap(way2[j + i * 10], way2BM[j + i * 10]);
+
+
+            }
+        
+
+            if (j < 9 && i>0)
+            {
+                way1[j + i * 10] = createGameObject(SPRITE, 0 + 500 * j - 185, 500 * i, 166, 500, gameMap);
+                way1BM[j + i * 10] = loadBitmap(engine, "./assets/images/estrada.png");
+                setGameObjectBitmap(way1[j + i * 10], way1BM[j + i * 10]);
+                way2[j + i * 10] = createGameObject(SPRITE, 0 + 500 * j - 520, 500 * i + 300 - 30, 500, 166, gameMap);
+                way2BM[j + i * 10] = loadBitmap(engine, "./assets/images/estradal.png");
+                setGameObjectBitmap(way2[j + i * 10], way2BM[j + i * 10]);
+
+            }
+
+            if (j == 9 && i > 0 )
+            {
+
+                way1[j + i * 10] = createGameObject(SPRITE, 0 + 500 * j - 185, 500 * i, 166, 500, gameMap);
+                way1BM[j + i * 10] = loadBitmap(engine, "./assets/images/estrada.png");
+                setGameObjectBitmap(way1[j + i * 10], way1BM[j + i * 10]);
+                way2[j + i * 10 + 1] = createGameObject(SPRITE, 0 + 500 * j - 260, 500 * i + 300  - 30, 500, 166, gameMap);
+                way2BM[j + i * 10 + 1] = loadBitmap(engine, "./assets/images/estradal.png");
+                setGameObjectBitmap(way2[j + i * 10 + 1], way2BM[j + i * 10 + 1]);
+                way2[j + i * 10] = createGameObject(SPRITE, 0 + 500 * j - 520, 500 * i + 300 - 30, 500, 166, gameMap);
+                way2BM[j + i * 10] = loadBitmap(engine, "./assets/images/estradal.png");
+                setGameObjectBitmap(way2[j + i * 10], way2BM[j + i * 10]);
+
+            }
+        }
+        i++;
+    }
+    // INIMIGOS
+
+    for (int i = 0; i < 50; i++)
+    {
+        enemies[i] = createGameObject(ANIMATED_SPRITE, 0, 0, 44, 50, gameMap);
+
+        if (i < 10)
+        {
+            r = 9;
+            enemies[i]->position.y = 300 + 500 * r + (i % 2 ) * 70;
+
+            enemies[i]->position.x = 50 + 80 * i ;
+            printf("%d=%f\n",r,enemies[i]->position.y); 
+        }
+        if (i >= 10 && i < 20)
+        {
+            r = 7;
+            enemies[i]->position.y = 300 + 500 * r  + (i % 2) * 70;
+
+            enemies[i]->position.x = 4500 + 80 * (i%10);
+            printf("%d=%f\n",r, enemies[i]->position.y);
+        }
+        if (i >= 20 && i < 30)
+        {
+            r = 5;
+            enemies[i]->position.y = 300 + 500 * r + (i % 2) * 70;
+
+            enemies[i]->position.x = 2500 +  80 * (i%10) ;
+            printf("%d=%f\n",r, enemies[i]->position.y);
+        }
+        if (i >= 30 && i < 40)
+        {
+            r = 3;
+            enemies[i]->position.y = 300 + 500 * r + (i % 2) * 70;
+
+            enemies[i]->position.x = 50  + 80 * (i%10) ;
+            printf("%d=%f\n",r, enemies[i]->position.y);
+        }
+        if (i >= 40 && i < 50)
+        {
+            r = 1;
+            enemies[i]->position.y = 300 + 500 * r + (i % 2) * 70;
+
+            enemies[i]->position.x = 2500 + 40 * (i % 10); 
+            printf("%d=%f\n",r, enemies[i]->position.y);
+        } 
+        enemies[i]->physics.enabled = 1;
+        enemies[i]->physics.friction = 0.4;
+        enemies[i]->physics.maxSpeed = 4;
+        enemies[i]->collisionEnabled = 1;
+        enemies[i]->collisionType = COLLISION_RECT;
+        enemies[i]->onCollision = onenemiesCollision; 
+        setGameObjectAnimation(enemies[i], loadBitmap(engine, "./assets/images/idle-soldier1-sheet.png"), 16, 20, 4, 15);
+    }
+
     addGameObjectToScene(gameMap, player);
+
+    //CONSTRUÇÕES
+    i = 0;
+    while (i < 10)
+    {
+
+        for (int j = 0; j < 10; j++)
+        {
+
+            if (i < 1)
+                constructions[j + i * 10] = createGameObject(SPRITE, 500 * (j + 1), 40, 300, 300, gameMap);
+                constructionsE[j + i * 10] = createGameObject(SOLID, 500 * (j + 1), 140, 300, 200, gameMap);
+                constructionsE[j + i * 10]->color = al_map_rgba(0, 0, 0, 150);
+                constructionsE[j + i * 10]->visible = 0;
+
+            if (i > 0)
+                constructions[j + i * 10] = createGameObject(SPRITE, 0 + 500 * j, 485 + 500 * (i-1), 300, 300, gameMap);
+            printf("1 == %f\n", constructions[j + i * 10]->position.x);
+                constructionsE[j + i * 10] = createGameObject(SOLID, 500 + 500 * j, 485 + 500 * (i-1)+100, 300, 200, gameMap);
+                printf("2 == %f\n", constructions[j + i * 10]->position.x);
+                constructionsE[j + i * 10]->color = al_map_rgba(0, 0, 0, 150);
+                constructionsE[j + i * 10]->visible = 0;
+
+            r = rand() % 5 + 1;
+            if (r ==1)
+            {
+                constructions[j + i * 10]->position.y -= 20;
+                constructionsBM[j + i * 10] = loadBitmap(engine, "./assets/images/c1.png");
+                setGameObjectBitmap(constructions[j + i * 10], constructionsBM[j + i * 10]);
+                constructions[j + i * 10]->collisionEnabled = 1;
+                constructions[j + i * 10]->collisionType = COLLISION_RECT;
+                 constructions[j + i * 10]->startCollisionOffset.x =  40;
+                 constructions[j + i * 10]->startCollisionOffset.y = 240;
+                 constructions[j + i * 10]->endCollisionOffset.y = 15;
+                 constructions[j + i * 10]->endCollisionOffset.x = -40;
+                 constructionsE[j + i * 10]->collisionEnabled = 1;
+                 constructionsE[j + i * 10]->collisionType = COLLISION_RECT;
+                 constructionsE[j + i * 10]->startCollisionOffset.x = 40;
+                 constructionsE[j + i * 10]->startCollisionOffset.y = 180;
+            }
+            if (r == 2)
+            {
+                constructionsBM[j + i * 10] = loadBitmap(engine, "./assets/images/c2.png");
+                setGameObjectBitmap(constructions[j + i * 10], constructionsBM[j + i * 10]);
+                constructions[j + i * 10]->collisionEnabled = 1;
+                constructions[j + i * 10]->collisionType = COLLISION_RECT;
+                constructions[j + i * 10]->startCollisionOffset.x = 60;
+                constructions[j + i * 10]->startCollisionOffset.y = 200;
+                constructions[j + i * 10]->endCollisionOffset.x = -50;
+                constructions[j + i * 10]->endCollisionOffset.y = -10;
+                constructionsE[j + i * 10]->collisionEnabled = 1;
+                constructionsE[j + i * 10]->collisionType = COLLISION_RECT;
+                constructionsE[j + i * 10]->startCollisionOffset.x = 60;
+                constructionsE[j + i * 10]->startCollisionOffset.y = 140;
+            }
+            if (r == 3)
+            {
+                constructionsBM[j + i * 10] = loadBitmap(engine, "./assets/images/c3.png");
+                setGameObjectBitmap(constructions[j + i * 10], constructionsBM[j + i * 10]);
+                constructions[j + i * 10]->collisionEnabled = 1;
+                constructions[j + i * 10]->collisionType = COLLISION_RECT;
+                constructions[j + i * 10]->startCollisionOffset.x = 60;
+                constructions[j + i * 10]->startCollisionOffset.y = 200;
+                constructions[j + i * 10]->endCollisionOffset.x = -50;
+                constructions[j + i * 10]->endCollisionOffset.y = -10;
+                constructionsE[j + i * 10]->collisionEnabled = 1;
+                constructionsE[j + i * 10]->collisionType = COLLISION_RECT;
+                constructionsE[j + i * 10]->startCollisionOffset.x = 60;
+                constructionsE[j + i * 10]->startCollisionOffset.y = 150;
+
+            }
+            if (r == 4)
+            {
+                constructions[j + i * 10]->position.y -= 10;
+                constructionsBM[j + i * 10] = loadBitmap(engine, "./assets/images/c5.png");
+                setGameObjectBitmap(constructions[j + i * 10], constructionsBM[j + i * 10]);
+                constructions[j + i * 10]->collisionEnabled = 1;
+                constructions[j + i * 10]->collisionType = COLLISION_RECT;
+                constructions[j + i * 10]->startCollisionOffset.x = 10;
+                constructions[j + i * 10]->startCollisionOffset.y = 200;
+                constructions[j + i * 10]->endCollisionOffset.y = 5;
+                constructionsE[j + i * 10]->collisionEnabled = 1;
+                constructionsE[j + i * 10]->collisionType = COLLISION_RECT;
+                constructionsE[j + i * 10]->startCollisionOffset.x = 10;
+                constructionsE[j + i * 10]->startCollisionOffset.y = 140;
+               
+            }
+            if (r ==5)
+            {
+                constructions[j + i * 10]->position.y -= 15;
+                constructionsBM[j + i * 10] = loadBitmap(engine, "./assets/images/c6.png");
+                setGameObjectBitmap(constructions[j + i * 10], constructionsBM[j + i * 10]);
+                constructions[j + i * 10]->collisionEnabled = 1;
+                constructions[j + i * 10]->collisionType = COLLISION_RECT;
+                constructions[j + i * 10]->startCollisionOffset.x = 30;
+                constructions[j + i * 10]->startCollisionOffset.y = 220;
+                constructions[j + i * 10]->endCollisionOffset.x = -30;
+                constructions[j + i * 10]->endCollisionOffset.y = 5;
+                constructionsE[j + i * 10]->collisionEnabled = 1;
+                constructionsE[j + i * 10]->collisionType = COLLISION_RECT;
+                constructionsE[j + i * 10]->startCollisionOffset.x = 30;
+                constructionsE[j + i * 10]->startCollisionOffset.y = 160;
+
+            }
+        }
+        i++;
+    }
+    way2[100]->visible = 0;
+    constructions[99]->visible = 0;
+    // bases inimigas
+    constructionsBM[90] = loadBitmap(engine, "./assets/images/c4.png");
+    setGameObjectBitmap(constructions[90], constructionsBM[90]);
+    constructionsBM[79] = loadBitmap(engine, "./assets/images/c4.png");
+    setGameObjectBitmap(constructions[79], constructionsBM[79]);
+    constructionsBM[55] = loadBitmap(engine, "./assets/images/c4.png");
+    setGameObjectBitmap(constructions[55], constructionsBM[50]);
+    constructionsBM[30] = loadBitmap(engine, "./assets/images/c4.png");
+    setGameObjectBitmap(constructions[30], constructionsBM[30]);
+    constructionsBM[15] = loadBitmap(engine, "./assets/images/c4.png");
+    setGameObjectBitmap(constructions[15], constructionsBM[15]);
+
+
+
+
+
+
+
+    
     addTextToScene(gameMap, letterContent);
     GameObject* houseTop = createGameObject(SPRITE, baseObj->position.x, baseObj->position.y-10, baseObj->width, baseObj->height/2 +70, gameMap);
     setGameObjectBitmap(houseTop, createSubBitmap(engine, baseBitMap,0,0,500,500/2 + 70));
     returnBase = createGameObject(SOLID, baseObj->position.x+ 170, baseObj->position.y +245, 5, 2, gameMap);
     returnBase->color = al_map_rgba(0, 0, 0, 0);
     returnBase->collisionEnabled = 1;
+
+
 
     GameObject* gridl1 = createGameObject(SOLID, baseObj->position.x + 79, baseObj->position.y + 293, 55, 1, gameMap);
     gridl1->color = al_map_rgba(0, 0, 0, 0);
@@ -414,7 +1043,6 @@ int main() {
     GameObject* treeGrid3 = createGameObject(SOLID, map->width - 215, map->height - 220, 230, 370, gameMap);
     treeGrid3->color = al_map_rgba(0, 0, 0, 0);
     treeGrid3->collisionEnabled = 1;
-
 
     exitGameMap = createGameObject(SOLID, map->width - 30, treeGrid1->height, 40, treeGrid3->position.y - treeGrid1->height, gameMap);
     exitGameMap->color = al_map_rgba(0, 0, 0, 0);
@@ -733,12 +1361,12 @@ int main() {
     sinopse = createScene(engine, NULL);
     sinopse->backgroundColor = al_map_rgb(20, 20, 20);
     lettersFont->size = 200;
-    sinopseTchau = createText("Final do jogo",
-        0, 0, engine->displayWidth, al_map_rgb(0, 0, 0), al_map_rgb(155, 122, 73), NULL, titleFont, 520, 550, sinopse);
-
+    sinopseTchau = createText("Final do jogo", 0, 0, engine->displayWidth, al_map_rgb(0, 0, 0), al_map_rgb(155, 122, 73), NULL, titleFont, 520, 550, sinopse);
 
     while (engine->isAlive) {
         render(engine);
+
+
     }
 
     freeEngine(engine);
