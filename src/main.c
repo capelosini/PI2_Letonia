@@ -32,6 +32,7 @@ GameObject* roomRobj;
 GameObject* returnQuartelRoomR;
 GameObject* enemies[20];
 GameObject* testBush;
+GameObject* timeGameMap;
 ALLEGRO_BITMAP* enemyBM1;
 ALLEGRO_BITMAP* enemyBM2;
 Font* lettersFont;
@@ -40,8 +41,18 @@ Text* pressEMessage;
 Text* sinopseTchau;
 bool letterPicked = false;
 float fallingLeafs[100][3];
+float timeSet = 0;
+char timeSetDir= 1;
 
 int walkIndex = 0;
+
+struct playerStatus{
+    unsigned char isHidden;
+    unsigned char carryingLetter;
+    unsigned char letterId;
+    int gameOverCount;
+};
+struct playerStatus playerStatus;
 
 //action handle on events
 void onEvent(ALLEGRO_EVENT event, Scene * scene, CAEngine * engine) {
@@ -65,6 +76,15 @@ void onEvent(ALLEGRO_EVENT event, Scene * scene, CAEngine * engine) {
 }
 
 
+void restartEnemiesPos(){
+    for (int i = 0; i < 20; i++)
+    {
+        enemies[i]->position.x = randInt(500, 1000);
+        enemies[i]->position.y = randInt(0, 700);
+    }
+}
+
+
 //stage change
 void onOpenBase(Scene* scene) {
     if (engine->currentScene == gameMap)
@@ -77,6 +97,7 @@ void onOpenBase(Scene* scene) {
 void onOpenGameMap(Scene* scene) {
     player->position = (Vector2){ baseObj->position.x + baseObj->width/2 - 18, baseObj->position.y + baseObj->height - 98 };
     gameMap->camera.offset = (Vector2){ player->position.x, player->position.y };
+    restartEnemiesPos();
     changeScene(engine, gameMap);
 }
 void onOpenQuartel(Scene* scene)
@@ -141,25 +162,34 @@ void onOpenSinopse(Scene* scene) {
 void onPlayerCollision(GameObject* self, GameObject* obj)
 {
     if(obj == exitBase)
-    onOpenGameMap(NULL);
-    if (obj == returnBase)
-    onOpenBase(NULL);
-    if (obj == roomLC)
-    onOpenRoomL(NULL);
-    if (obj == roomMC)
-    onOpenRoomM(NULL);
-    if (obj == roomRC)
-    onOpenRoomR(NULL);
-    if(obj == returnQuartelRoomL)
-    onOpenQuartelRL(NULL);
-    if(obj == returnQuartelRoomM)
-    onOpenQuartelRM(NULL);
-    if (obj == returnQuartelRoomR)
-    onOpenQuartelRR(NULL);
-        
-
+        onOpenGameMap(NULL);
+    else if (obj == returnBase)
+        onOpenBase(NULL);
+    else if (obj == roomLC)
+        onOpenRoomL(NULL);
+    else if (obj == roomMC)
+        onOpenRoomM(NULL);
+    else if (obj == roomRC)
+        onOpenRoomR(NULL);
+    else if(obj == returnQuartelRoomL)
+        onOpenQuartelRL(NULL);
+    else if(obj == returnQuartelRoomM)
+        onOpenQuartelRM(NULL);
+    else if (obj == returnQuartelRoomR)
+        onOpenQuartelRR(NULL);
 }
 
+void onEnemyCollision(GameObject* self, GameObject* obj)
+{
+    if (obj == player)
+    {
+        if (playerStatus.isHidden == 0)
+        {
+            playerStatus.gameOverCount++;
+            onOpenBase(NULL);
+        }
+    }
+}
 
 //character movement and letter handling
 void gameSceneScript(Scene* self) {
@@ -205,9 +235,9 @@ void gameSceneScript(Scene* self) {
         if (dist(enemies[i]->position.x, enemies[i]->position.y, enemies[i]->width, enemies[i]->height, player->position.x, player->position.y, player->width, player->height) <= 200){
             double hy = hypot(player->position.x-enemies[i]->position.x, player->position.y-enemies[i]->position.y);
             // find angle by cos formula
-            enemies[i]->physics.acc.x=fabs(player->position.x-enemies[i]->position.x)/hy*2;
+            enemies[i]->physics.acc.x=fabs(player->position.x-enemies[i]->position.x)/hy;
             // find angle by sin formula
-            enemies[i]->physics.acc.y=fabs(player->position.y-enemies[i]->position.y)/hy*2;
+            enemies[i]->physics.acc.y=fabs(player->position.y-enemies[i]->position.y)/hy;
             if (enemies[i]->position.x < player->position.x) {
                 enemies[i]->physics.directions.x = 1;
                 enemies[i]->animation.direction.x = 1;
@@ -231,10 +261,18 @@ void gameSceneScript(Scene* self) {
     // invisible bush test
     if (checkCollisionRect(player->position.x, player->position.y, player->width, player->height, testBush->position.x, testBush->position.y, testBush->width,  testBush->height)){
         testBush->animation.index.y = 1;
+        playerStatus.isHidden = 1;
     } else{
         testBush->animation.index.y = 0;
+        playerStatus.isHidden = 0;
     }
 
+
+    if (timeSet > 140 || timeSet < 0){
+        timeSetDir *= -1;
+    }
+    timeSet+=0.05*timeSetDir;
+    timeGameMap->color = al_map_rgba(0,0,30/140*timeSet,(int)timeSet);
 }
 
 
@@ -284,6 +322,12 @@ int main() {
     // loading the enemies sprite sheets
     enemyBM1= loadBitmap(engine, "./assets/images/idle-soldier1-sheet.png");
     enemyBM2= loadBitmap(engine, "./assets/images/idle-soldier2-sheet.png");
+
+    // set playerStatus to default
+    playerStatus.isHidden = 0;
+    playerStatus.carryingLetter = 0;
+    playerStatus.letterId = 0;
+    playerStatus.gameOverCount = 0;
 
     // - - - MENU - - -
     mainMenu = createScene(engine, mainMenuScript);
@@ -383,13 +427,15 @@ int main() {
 
     // create enemies
     for (int i=0; i<20; i++){
-        enemies[i]=createGameObject(ANIMATED_SPRITE, randInt(500, 1280), randInt(300, 720), 36, 40, gameMap);
+        enemies[i]=createGameObject(ANIMATED_SPRITE, 0, 0, 36, 40, gameMap);
         setGameObjectAnimation(enemies[i], enemyBM2, 16, 20, 4, 15);
         enemies[i]->physics.enabled=1;
         enemies[i]->physics.friction=0.4;
-        enemies[i]->physics.maxSpeed=2;
+        enemies[i]->physics.maxSpeed=3;
         enemies[i]->collisionEnabled=1;
+        setOnGameObjectCollisionFunction(enemies[i], onEnemyCollision);
     }
+    restartEnemiesPos();
 
     player = createGameObject(ANIMATED_SPRITE, 700, 50, 44, 50, insideBase);
     player->position.x = 450;
@@ -407,9 +453,9 @@ int main() {
     gameMap->camera.followTarget = player;
     //setupSceneWorld(gameMap, loadBitmap(engine, "./assets/images/map-sheet.png"), 16, 16);
     //loadMap("./map.CAE", gameMap);
-    setupSceneWorld(gameMap, loadBitmap(engine, "./assets/images/gamemap.png"), 7001, 7001);
+    setupSceneWorld(gameMap, loadBitmap(engine, "./assets/images/gamemap.png"), 7000, 7000);
     addWorldTile(gameMap, 0, 0, 0, 0);
-    GameObject* map = createGameObject(SOLID, 0, 0, 7001, 7001, gameMap);
+    GameObject* map = createGameObject(SOLID, 0, 0, 7000, 7000, gameMap);
     //GameObject* map = createGameObject(SOLID, 0, 0, 200 * 16, 100 * 16, gameMap);
     map->color = al_map_rgba(0, 0, 0, 0);
     map->collisionEnabled = 1;
@@ -447,6 +493,8 @@ int main() {
 
     testBush=createGameObject(ANIMATED_SPRITE, 1000, 1000, 65, 65, gameMap);
     setGameObjectAnimation(testBush, loadBitmap(engine, "./assets/images/bush-sheet.png"), 16, 16, 4, 10);
+
+    timeGameMap=createGameObject(SOLID, 0, 0, map->width, map->height, gameMap);
 
 
     //- - - QUARTEL - - -
