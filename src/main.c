@@ -30,37 +30,68 @@ GameObject* roomMobj;
 GameObject* returnQuartelRoomM;
 GameObject* roomRobj;
 GameObject* returnQuartelRoomR;
-GameObject* enemies[20];
+// enemiesCount and enemies[] length needs be equal
+int enemiesCount=50;
+GameObject* enemies[50];
 GameObject* testBush;
+GameObject* timeGameMap;
 ALLEGRO_BITMAP* enemyBM1;
 ALLEGRO_BITMAP* enemyBM2;
 Font* lettersFont;
 Text* letterContent;
 Text* pressEMessage;
 Text* sinopseTchau;
-bool letterPicked = false;
+Text* gameOverText;
 float fallingLeafs[100][3];
+float timeSet = 0;
+char timeSetDir= 1;
+char* lettersTexts[3]= {
+    "Senhor .., Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut ut tincidunt elit. Nunc a magna at nulla tempor iaculis. Curabitur at enim sollicitudin, varius nisi vel, viverra odio. Ut porta metus sed metus gravida elementum. Pellentesque ut mi id quam euismod convallis. Duis vulputate tempus sagittis. Quisque aliquam justo justo, eget lobortis neque tempor non.Integer porta volutpat turpis, nec venenatis ante volutpat sit amet. Proin condimentum vitae augue id tincidunt. Donec tristique lectus non dui pellentesque tincidunt. In sit amet leo suscipit, feugiat leo id, condimentum tellus. Proin vel tempor metus. Mauris in auctor velit. Donec justo justo, iaculis eget pellentesque eget, interdum a nibh. Aenean tincidunt tempor sem. Integer eget elementum metus. Suspendisse non fringilla nunc, sit amet suscipit diam.Suspendisse a justo lorem. Phasellus ac nulla sed arcu fermentum sollicitudin.",
+    "Letter content 2",
+    "Letter content 3"
+};
 
 int walkIndex = 0;
+
+struct playerStatus{
+    unsigned char isHidden; // ele esta escondido?
+    unsigned char carryingLetter; // carregando uma carta?
+    int letterId; // qual conteudo da carta que ele esta levando
+    int closeLetterId; // a carta que ele esta proximo, ou que vai pegar
+    int gameOverCount; // quantas vezes ele foi pego
+};
+struct playerStatus playerStatus;
 
 //action handle on events
 void onEvent(ALLEGRO_EVENT event, Scene * scene, CAEngine * engine) {
     if (event.type == ALLEGRO_EVENT_KEY_DOWN) {
+        gameOverText->visible=0;
         if (event.keyboard.keycode == ALLEGRO_KEY_ESCAPE) {
             engine->isAlive = 0;
         }
     }
     else if (event.type == ALLEGRO_EVENT_KEY_UP) {
         if (event.keyboard.keycode == ALLEGRO_KEY_E) {
-            if (!(letterPicked) && pressEMessage->visible) {
-                letterPicked = true;
+            if (!(playerStatus.carryingLetter) && pressEMessage->visible) {
+                playerStatus.carryingLetter=1;
+                playerStatus.letterId = playerStatus.closeLetterId;
+                changeText(letterContent, lettersTexts[playerStatus.letterId]);
                 letterObj->visible = 0;
                 pressEMessage->visible = 0;
             }
-            else if (letterPicked ) {
+            else if (playerStatus.carryingLetter) {
                 letterContent->visible = !letterContent->visible;
             }
         }
+    }
+}
+
+
+void restartEnemiesPos(){
+    for (int i = 0; i < enemiesCount; i++)
+    {
+        enemies[i]->position.x = randInt(500, 6000);
+        enemies[i]->position.y = randInt(0, 6000);
     }
 }
 
@@ -77,6 +108,7 @@ void onOpenBase(Scene* scene) {
 void onOpenGameMap(Scene* scene) {
     player->position = (Vector2){ baseObj->position.x + baseObj->width/2 - 18, baseObj->position.y + baseObj->height - 98 };
     gameMap->camera.offset = (Vector2){ player->position.x, player->position.y };
+    restartEnemiesPos();
     changeScene(engine, gameMap);
 }
 void onOpenQuartel(Scene* scene)
@@ -131,7 +163,6 @@ void onOpenRoomR(Scene* scene)
     player->position = (Vector2){ roomRobj->position.x + roomRobj->width / 2 + 130 ,  roomRobj->height - 60 };
     roomR->camera.offset = (Vector2){ player->position.x, player->position.y };
     changeScene(engine, roomR);
-
 }
 
 void onOpenSinopse(Scene* scene) {
@@ -141,25 +172,35 @@ void onOpenSinopse(Scene* scene) {
 void onPlayerCollision(GameObject* self, GameObject* obj)
 {
     if(obj == exitBase)
-    onOpenGameMap(NULL);
-    if (obj == returnBase)
-    onOpenBase(NULL);
-    if (obj == roomLC)
-    onOpenRoomL(NULL);
-    if (obj == roomMC)
-    onOpenRoomM(NULL);
-    if (obj == roomRC)
-    onOpenRoomR(NULL);
-    if(obj == returnQuartelRoomL)
-    onOpenQuartelRL(NULL);
-    if(obj == returnQuartelRoomM)
-    onOpenQuartelRM(NULL);
-    if (obj == returnQuartelRoomR)
-    onOpenQuartelRR(NULL);
-        
-
+        onOpenGameMap(NULL);
+    else if (obj == returnBase)
+        onOpenBase(NULL);
+    else if (obj == roomLC)
+        onOpenRoomL(NULL);
+    else if (obj == roomMC)
+        onOpenRoomM(NULL);
+    else if (obj == roomRC)
+        onOpenRoomR(NULL);
+    else if(obj == returnQuartelRoomL)
+        onOpenQuartelRL(NULL);
+    else if(obj == returnQuartelRoomM)
+        onOpenQuartelRM(NULL);
+    else if (obj == returnQuartelRoomR)
+        onOpenQuartelRR(NULL);
 }
 
+void onEnemyCollision(GameObject* self, GameObject* obj)
+{
+    if (obj == player)
+    {
+        if (playerStatus.isHidden == 0)
+        {
+            playerStatus.gameOverCount++;
+            gameOverText->visible=1;
+            onOpenBase(NULL);
+        }
+    }
+}
 
 //character movement and letter handling
 void gameSceneScript(Scene* self) {
@@ -189,9 +230,10 @@ void gameSceneScript(Scene* self) {
     if (!(mov.x || mov.y))
         player->animation.index.y = walkIndex;
 
-    if (!letterPicked) {
+    if (!playerStatus.carryingLetter) {
         if (dist(player->position.x, player->position.y, player->width, player->height, letterObj->position.x, letterObj->position.y, letterObj->width, letterObj->height)
             <= 60) {
+            playerStatus.closeLetterId = 0;
             pressEMessage->visible = 1;
         }
         else {
@@ -201,13 +243,14 @@ void gameSceneScript(Scene* self) {
     }
 
     // enemies movement
-    for (int i = 0; i < 20; i++) {
+    for (int i = 0; i < enemiesCount; i++) {
         if (dist(enemies[i]->position.x, enemies[i]->position.y, enemies[i]->width, enemies[i]->height, player->position.x, player->position.y, player->width, player->height) <= 200){
             double hy = hypot(player->position.x-enemies[i]->position.x, player->position.y-enemies[i]->position.y);
             // find angle by cos formula
-            enemies[i]->physics.acc.x=fabs(player->position.x-enemies[i]->position.x)/hy*2;
+            enemies[i]->physics.acc.x=fabs(player->position.x-enemies[i]->position.x)/hy;
             // find angle by sin formula
-            enemies[i]->physics.acc.y=fabs(player->position.y-enemies[i]->position.y)/hy*2;
+            enemies[i]->physics.acc.y=fabs(player->position.y-enemies[i]->position.y)/hy;
+            
             if (enemies[i]->position.x < player->position.x) {
                 enemies[i]->physics.directions.x = 1;
                 enemies[i]->animation.direction.x = 1;
@@ -222,6 +265,14 @@ void gameSceneScript(Scene* self) {
             else {
                 enemies[i]->physics.directions.y = -1;
             }
+
+            if (playerStatus.isHidden)
+            {
+                enemies[i]->physics.directions.x*=-1;
+                enemies[i]->physics.directions.y*=-1;
+                enemies[i]->animation.direction.x *= -1;
+            }
+
         } else{
             enemies[i]->physics.acc.x=0;
             enemies[i]->physics.acc.y=0;
@@ -231,10 +282,18 @@ void gameSceneScript(Scene* self) {
     // invisible bush test
     if (checkCollisionRect(player->position.x, player->position.y, player->width, player->height, testBush->position.x, testBush->position.y, testBush->width,  testBush->height)){
         testBush->animation.index.y = 1;
+        playerStatus.isHidden = 1;
     } else{
         testBush->animation.index.y = 0;
+        playerStatus.isHidden = 0;
     }
 
+
+    if (timeSet > 140 || timeSet < 0){
+        timeSetDir *= -1;
+    }
+    timeSet+=0.05*timeSetDir;
+    timeGameMap->color = al_map_rgba(0,0,30/140*timeSet,(int)timeSet);
 }
 
 
@@ -285,6 +344,13 @@ int main() {
     enemyBM1= loadBitmap(engine, "./assets/images/idle-soldier1-sheet.png");
     enemyBM2= loadBitmap(engine, "./assets/images/idle-soldier2-sheet.png");
 
+    // set playerStatus to default
+    playerStatus.isHidden = 0;
+    playerStatus.carryingLetter = 0;
+    playerStatus.letterId = 0;
+    playerStatus.closeLetterId = 0;
+    playerStatus.gameOverCount = 0;
+
     // - - - MENU - - -
     mainMenu = createScene(engine, mainMenuScript);
 
@@ -296,7 +362,7 @@ int main() {
 
     Font* titleFont = loadTTF(engine, "./assets/fonts/kalam-bold.ttf", 80);
     Font* stdMessageFont = loadTTF(engine, "./assets/fonts/kalam.ttf", 17);
-    lettersFont = loadTTF(engine, "./assets/fonts/kalam.ttf", 10);
+    lettersFont = loadTTF(engine, "./assets/fonts/kalam.ttf", 18);
     char* titleText = "Revolução Em Cartas";
     createText(titleText, engine->displayWidth / 2 - al_get_text_width(titleFont->font, titleText) / 2, 50, 0, al_map_rgb(255, 255, 255), al_map_rgba(0, 0, 0, 0), NULL, titleFont, 0, 0, mainMenu);
 
@@ -328,14 +394,18 @@ int main() {
     baseRoom->color = al_map_rgba(0, 0, 0, 0);
     baseRoom->collisionEnabled = 1;
     baseRoom->invertedCollision = 1;
+
+    gameOverText=createText("Você foi pego!", 0, 0, 0, al_map_rgb(210, 10, 10), al_map_rgba(0, 0, 0, 20), NULL, titleFont, 20, 20, insideBase);
+    gameOverText->position = (Vector2){engine->displayWidth/2-al_get_text_width(titleFont->font, gameOverText->text)/2, engine->displayHeight/2-al_get_font_line_height(titleFont->font)/2};
+    gameOverText->visible=0;
     
 
     letterObj = createGameObject(ANIMATED_SPRITE, 467, 280, 12, 12, insideBase);
     setGameObjectAnimation(letterObj, loadBitmap(engine, "./assets/images/letter-sheet.png"), 12, 12, 5, 16);
     //como o letterContent tá sendo passado para >base, quando tenta abrir a carta em >gameMap ele não abre já que não está nessa cena e não dá pra incluir letterContent em >gameMap pq o addGameObjectToScene() não aceita parâmetro do tipo Text*
     //dependendo da resolução vai precisar mudar dentro de gameSceneScript que é onde gerencia a visibilidade da carta 
-    letterContent = createText("Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut ut tincidunt elit. Nunc a magna at nulla tempor iaculis. Curabitur at enim sollicitudin, varius nisi vel, viverra odio. Ut porta metus sed metus gravida elementum. Pellentesque ut mi id quam euismod convallis. Duis vulputate tempus sagittis. Quisque aliquam justo justo, eget lobortis neque tempor non.Integer porta volutpat turpis, nec venenatis ante volutpat sit amet. Proin condimentum vitae augue id tincidunt. Donec tristique lectus non dui pellentesque tincidunt. In sit amet leo suscipit, feugiat leo id, condimentum tellus. Proin vel tempor metus. Mauris in auctor velit. Donec justo justo, iaculis eget pellentesque eget, interdum a nibh. Aenean tincidunt tempor sem. Integer eget elementum metus. Suspendisse non fringilla nunc, sit amet suscipit diam.Suspendisse a justo lorem. Phasellus ac nulla sed arcu fermentum sollicitudin.",
-        300, 200, 250, al_map_rgb(0, 0, 0), al_map_rgba(155, 122, 73, 200), NULL, lettersFont, 40, 20, insideBase);
+    letterContent = createText("",
+        300, 200, 400, al_map_rgb(0, 0, 0), al_map_rgba(155, 122, 73, 200), NULL, lettersFont, 40, 20, insideBase);
     letterContent->visible = 0;
 
     pressEMessage = createText("Pressione E para pegar a carta", engine->displayWidth / 2, 200, 0, al_map_rgb(255, 255, 255), al_map_rgba(0, 0, 0, 100), NULL, stdMessageFont, 40, 20, insideBase);
@@ -379,17 +449,19 @@ int main() {
     //gameMap->camera.maxLimit.y = 100 * 16;
     gameMap->camera.maxLimit.x = 7001;
     gameMap->camera.maxLimit.y = 7001;
-    gameMap->camera.zoom = 1;
+    gameMap->camera.zoom = 1.5;
 
     // create enemies
-    for (int i=0; i<20; i++){
-        enemies[i]=createGameObject(ANIMATED_SPRITE, randInt(500, 1280), randInt(300, 720), 36, 40, gameMap);
+    for (int i=0; i<enemiesCount; i++){
+        enemies[i]=createGameObject(ANIMATED_SPRITE, 0, 0, 36, 40, gameMap);
         setGameObjectAnimation(enemies[i], enemyBM2, 16, 20, 4, 15);
         enemies[i]->physics.enabled=1;
         enemies[i]->physics.friction=0.4;
-        enemies[i]->physics.maxSpeed=2;
+        enemies[i]->physics.maxSpeed=4;
         enemies[i]->collisionEnabled=1;
+        setOnGameObjectCollisionFunction(enemies[i], onEnemyCollision);
     }
+    restartEnemiesPos();
 
     player = createGameObject(ANIMATED_SPRITE, 700, 50, 44, 50, insideBase);
     player->position.x = 450;
@@ -407,9 +479,9 @@ int main() {
     gameMap->camera.followTarget = player;
     //setupSceneWorld(gameMap, loadBitmap(engine, "./assets/images/map-sheet.png"), 16, 16);
     //loadMap("./map.CAE", gameMap);
-    setupSceneWorld(gameMap, loadBitmap(engine, "./assets/images/gamemap.png"), 7001, 7001);
+    setupSceneWorld(gameMap, loadBitmap(engine, "./assets/images/gamemap.png"), 7000, 7000);
     addWorldTile(gameMap, 0, 0, 0, 0);
-    GameObject* map = createGameObject(SOLID, 0, 0, 7001, 7001, gameMap);
+    GameObject* map = createGameObject(SOLID, 0, 0, 7000, 7000, gameMap);
     //GameObject* map = createGameObject(SOLID, 0, 0, 200 * 16, 100 * 16, gameMap);
     map->color = al_map_rgba(0, 0, 0, 0);
     map->collisionEnabled = 1;
@@ -447,6 +519,8 @@ int main() {
 
     testBush=createGameObject(ANIMATED_SPRITE, 1000, 1000, 65, 65, gameMap);
     setGameObjectAnimation(testBush, loadBitmap(engine, "./assets/images/bush-sheet.png"), 16, 16, 4, 10);
+
+    timeGameMap=createGameObject(SOLID, 0, 0, map->width, map->height, gameMap);
 
 
     //- - - QUARTEL - - -
