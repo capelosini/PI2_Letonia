@@ -30,7 +30,9 @@ GameObject* roomMobj;
 GameObject* returnQuartelRoomM;
 GameObject* roomRobj;
 GameObject* returnQuartelRoomR;
-GameObject* enemies[20];
+// enemiesCount and enemies[] length needs be equal
+int enemiesCount=50;
+GameObject* enemies[50];
 GameObject* testBush;
 GameObject* timeGameMap;
 ALLEGRO_BITMAP* enemyBM1;
@@ -39,36 +41,45 @@ Font* lettersFont;
 Text* letterContent;
 Text* pressEMessage;
 Text* sinopseTchau;
-bool letterPicked = false;
+Text* gameOverText;
 float fallingLeafs[100][3];
 float timeSet = 0;
 char timeSetDir= 1;
+char* lettersTexts[3]= {
+    "Senhor .., Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut ut tincidunt elit. Nunc a magna at nulla tempor iaculis. Curabitur at enim sollicitudin, varius nisi vel, viverra odio. Ut porta metus sed metus gravida elementum. Pellentesque ut mi id quam euismod convallis. Duis vulputate tempus sagittis. Quisque aliquam justo justo, eget lobortis neque tempor non.Integer porta volutpat turpis, nec venenatis ante volutpat sit amet. Proin condimentum vitae augue id tincidunt. Donec tristique lectus non dui pellentesque tincidunt. In sit amet leo suscipit, feugiat leo id, condimentum tellus. Proin vel tempor metus. Mauris in auctor velit. Donec justo justo, iaculis eget pellentesque eget, interdum a nibh. Aenean tincidunt tempor sem. Integer eget elementum metus. Suspendisse non fringilla nunc, sit amet suscipit diam.Suspendisse a justo lorem. Phasellus ac nulla sed arcu fermentum sollicitudin.",
+    "Letter content 2",
+    "Letter content 3"
+};
 
 int walkIndex = 0;
 
 struct playerStatus{
-    unsigned char isHidden;
-    unsigned char carryingLetter;
-    unsigned char letterId;
-    int gameOverCount;
+    unsigned char isHidden; // ele esta escondido?
+    unsigned char carryingLetter; // carregando uma carta?
+    int letterId; // qual conteudo da carta que ele esta levando
+    int closeLetterId; // a carta que ele esta proximo, ou que vai pegar
+    int gameOverCount; // quantas vezes ele foi pego
 };
 struct playerStatus playerStatus;
 
 //action handle on events
 void onEvent(ALLEGRO_EVENT event, Scene * scene, CAEngine * engine) {
     if (event.type == ALLEGRO_EVENT_KEY_DOWN) {
+        gameOverText->visible=0;
         if (event.keyboard.keycode == ALLEGRO_KEY_ESCAPE) {
             engine->isAlive = 0;
         }
     }
     else if (event.type == ALLEGRO_EVENT_KEY_UP) {
         if (event.keyboard.keycode == ALLEGRO_KEY_E) {
-            if (!(letterPicked) && pressEMessage->visible) {
-                letterPicked = true;
+            if (!(playerStatus.carryingLetter) && pressEMessage->visible) {
+                playerStatus.carryingLetter=1;
+                playerStatus.letterId = playerStatus.closeLetterId;
+                changeText(letterContent, lettersTexts[playerStatus.letterId]);
                 letterObj->visible = 0;
                 pressEMessage->visible = 0;
             }
-            else if (letterPicked ) {
+            else if (playerStatus.carryingLetter) {
                 letterContent->visible = !letterContent->visible;
             }
         }
@@ -77,10 +88,10 @@ void onEvent(ALLEGRO_EVENT event, Scene * scene, CAEngine * engine) {
 
 
 void restartEnemiesPos(){
-    for (int i = 0; i < 20; i++)
+    for (int i = 0; i < enemiesCount; i++)
     {
-        enemies[i]->position.x = randInt(500, 1000);
-        enemies[i]->position.y = randInt(0, 700);
+        enemies[i]->position.x = randInt(500, 6000);
+        enemies[i]->position.y = randInt(0, 6000);
     }
 }
 
@@ -152,7 +163,6 @@ void onOpenRoomR(Scene* scene)
     player->position = (Vector2){ roomRobj->position.x + roomRobj->width / 2 + 130 ,  roomRobj->height - 60 };
     roomR->camera.offset = (Vector2){ player->position.x, player->position.y };
     changeScene(engine, roomR);
-
 }
 
 void onOpenSinopse(Scene* scene) {
@@ -186,6 +196,7 @@ void onEnemyCollision(GameObject* self, GameObject* obj)
         if (playerStatus.isHidden == 0)
         {
             playerStatus.gameOverCount++;
+            gameOverText->visible=1;
             onOpenBase(NULL);
         }
     }
@@ -219,9 +230,10 @@ void gameSceneScript(Scene* self) {
     if (!(mov.x || mov.y))
         player->animation.index.y = walkIndex;
 
-    if (!letterPicked) {
+    if (!playerStatus.carryingLetter) {
         if (dist(player->position.x, player->position.y, player->width, player->height, letterObj->position.x, letterObj->position.y, letterObj->width, letterObj->height)
             <= 60) {
+            playerStatus.closeLetterId = 0;
             pressEMessage->visible = 1;
         }
         else {
@@ -231,13 +243,14 @@ void gameSceneScript(Scene* self) {
     }
 
     // enemies movement
-    for (int i = 0; i < 20; i++) {
+    for (int i = 0; i < enemiesCount; i++) {
         if (dist(enemies[i]->position.x, enemies[i]->position.y, enemies[i]->width, enemies[i]->height, player->position.x, player->position.y, player->width, player->height) <= 200){
             double hy = hypot(player->position.x-enemies[i]->position.x, player->position.y-enemies[i]->position.y);
             // find angle by cos formula
             enemies[i]->physics.acc.x=fabs(player->position.x-enemies[i]->position.x)/hy;
             // find angle by sin formula
             enemies[i]->physics.acc.y=fabs(player->position.y-enemies[i]->position.y)/hy;
+            
             if (enemies[i]->position.x < player->position.x) {
                 enemies[i]->physics.directions.x = 1;
                 enemies[i]->animation.direction.x = 1;
@@ -252,6 +265,14 @@ void gameSceneScript(Scene* self) {
             else {
                 enemies[i]->physics.directions.y = -1;
             }
+
+            if (playerStatus.isHidden)
+            {
+                enemies[i]->physics.directions.x*=-1;
+                enemies[i]->physics.directions.y*=-1;
+                enemies[i]->animation.direction.x *= -1;
+            }
+
         } else{
             enemies[i]->physics.acc.x=0;
             enemies[i]->physics.acc.y=0;
@@ -327,6 +348,7 @@ int main() {
     playerStatus.isHidden = 0;
     playerStatus.carryingLetter = 0;
     playerStatus.letterId = 0;
+    playerStatus.closeLetterId = 0;
     playerStatus.gameOverCount = 0;
 
     // - - - MENU - - -
@@ -340,7 +362,7 @@ int main() {
 
     Font* titleFont = loadTTF(engine, "./assets/fonts/kalam-bold.ttf", 80);
     Font* stdMessageFont = loadTTF(engine, "./assets/fonts/kalam.ttf", 17);
-    lettersFont = loadTTF(engine, "./assets/fonts/kalam.ttf", 10);
+    lettersFont = loadTTF(engine, "./assets/fonts/kalam.ttf", 18);
     char* titleText = "Revolução Em Cartas";
     createText(titleText, engine->displayWidth / 2 - al_get_text_width(titleFont->font, titleText) / 2, 50, 0, al_map_rgb(255, 255, 255), al_map_rgba(0, 0, 0, 0), NULL, titleFont, 0, 0, mainMenu);
 
@@ -372,14 +394,18 @@ int main() {
     baseRoom->color = al_map_rgba(0, 0, 0, 0);
     baseRoom->collisionEnabled = 1;
     baseRoom->invertedCollision = 1;
+
+    gameOverText=createText("Você foi pego!", 0, 0, 0, al_map_rgb(210, 10, 10), al_map_rgba(0, 0, 0, 20), NULL, titleFont, 20, 20, insideBase);
+    gameOverText->position = (Vector2){engine->displayWidth/2-al_get_text_width(titleFont->font, gameOverText->text)/2, engine->displayHeight/2-al_get_font_line_height(titleFont->font)/2};
+    gameOverText->visible=0;
     
 
     letterObj = createGameObject(ANIMATED_SPRITE, 467, 280, 12, 12, insideBase);
     setGameObjectAnimation(letterObj, loadBitmap(engine, "./assets/images/letter-sheet.png"), 12, 12, 5, 16);
     //como o letterContent tá sendo passado para >base, quando tenta abrir a carta em >gameMap ele não abre já que não está nessa cena e não dá pra incluir letterContent em >gameMap pq o addGameObjectToScene() não aceita parâmetro do tipo Text*
     //dependendo da resolução vai precisar mudar dentro de gameSceneScript que é onde gerencia a visibilidade da carta 
-    letterContent = createText("Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut ut tincidunt elit. Nunc a magna at nulla tempor iaculis. Curabitur at enim sollicitudin, varius nisi vel, viverra odio. Ut porta metus sed metus gravida elementum. Pellentesque ut mi id quam euismod convallis. Duis vulputate tempus sagittis. Quisque aliquam justo justo, eget lobortis neque tempor non.Integer porta volutpat turpis, nec venenatis ante volutpat sit amet. Proin condimentum vitae augue id tincidunt. Donec tristique lectus non dui pellentesque tincidunt. In sit amet leo suscipit, feugiat leo id, condimentum tellus. Proin vel tempor metus. Mauris in auctor velit. Donec justo justo, iaculis eget pellentesque eget, interdum a nibh. Aenean tincidunt tempor sem. Integer eget elementum metus. Suspendisse non fringilla nunc, sit amet suscipit diam.Suspendisse a justo lorem. Phasellus ac nulla sed arcu fermentum sollicitudin.",
-        300, 200, 250, al_map_rgb(0, 0, 0), al_map_rgba(155, 122, 73, 200), NULL, lettersFont, 40, 20, insideBase);
+    letterContent = createText("",
+        300, 200, 400, al_map_rgb(0, 0, 0), al_map_rgba(155, 122, 73, 200), NULL, lettersFont, 40, 20, insideBase);
     letterContent->visible = 0;
 
     pressEMessage = createText("Pressione E para pegar a carta", engine->displayWidth / 2, 200, 0, al_map_rgb(255, 255, 255), al_map_rgba(0, 0, 0, 100), NULL, stdMessageFont, 40, 20, insideBase);
@@ -423,15 +449,15 @@ int main() {
     //gameMap->camera.maxLimit.y = 100 * 16;
     gameMap->camera.maxLimit.x = 7001;
     gameMap->camera.maxLimit.y = 7001;
-    gameMap->camera.zoom = 1;
+    gameMap->camera.zoom = 1.5;
 
     // create enemies
-    for (int i=0; i<20; i++){
+    for (int i=0; i<enemiesCount; i++){
         enemies[i]=createGameObject(ANIMATED_SPRITE, 0, 0, 36, 40, gameMap);
         setGameObjectAnimation(enemies[i], enemyBM2, 16, 20, 4, 15);
         enemies[i]->physics.enabled=1;
         enemies[i]->physics.friction=0.4;
-        enemies[i]->physics.maxSpeed=3;
+        enemies[i]->physics.maxSpeed=4;
         enemies[i]->collisionEnabled=1;
         setOnGameObjectCollisionFunction(enemies[i], onEnemyCollision);
     }
