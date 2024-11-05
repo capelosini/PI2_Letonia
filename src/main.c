@@ -32,6 +32,8 @@ GameObject* returnQuartelRoomM;
 GameObject* roomRobj;
 GameObject* returnQuartelRoomR;
 GameObject* gridGameMap;
+GameObject* map;
+GameObject* exitQuartel;
 // enemiesCount and enemies[] length needs be equal
 int enemiesCount=50;
 GameObject* enemies[50];
@@ -39,6 +41,9 @@ GameObject* testBush;
 GameObject* timeGameMap;
 ALLEGRO_BITMAP* enemyBM1;
 ALLEGRO_BITMAP* enemyBM2;
+ALLEGRO_BITMAP* housesBM[6];
+ALLEGRO_BITMAP* roadH;
+ALLEGRO_BITMAP* roadV;
 Font* lettersFont;
 Text* letterContent;
 Text* pressEMessage;
@@ -97,6 +102,26 @@ void restartEnemiesPos(){
     }
 }
 
+// verify if object is on road
+unsigned char isOnRoad(GameObject* obj){
+    double deltaY=obj->position.y / 500;
+    deltaY -=(int)deltaY;
+
+    double deltaX=obj->position.x / 500;
+    deltaX -=(int)deltaX;
+
+    double minY = 500./500;
+    minY -= (int)minY;
+    double maxY = (500.+166-obj->height)/500;
+    maxY -= (int)maxY;
+
+    double minX = 837./500;
+    minX -= (int)minX;
+    double maxX = (837.+166-obj->width)/500;
+    maxX -= (int)maxX;
+
+    return (deltaY > minY && deltaY < maxY ) || ( deltaX > minX && deltaX < maxX);
+}
 
 //stage change
 void onOpenBase(Scene* scene) {
@@ -113,6 +138,13 @@ void onOpenGameMap(Scene* scene) {
     restartEnemiesPos();
     changeScene(engine, gameMap);
 }
+
+void onOpenGameMapR(Scene* scene) {
+    player->position = (Vector2){ map->width  - 80, map->height - 360 };
+    gameMap->camera.offset = (Vector2){ player->position.x, player->position.y };
+    changeScene(engine, gameMap);
+}
+
 void onOpenQuartel(Scene* scene)
 {
     player->position = (Vector2){ quartelobj->position.x + quartelobj->width / 2 - 100 ,  quartelobj->height - 60 };
@@ -191,6 +223,8 @@ void onPlayerCollision(GameObject* self, GameObject* obj)
         onOpenQuartelRM(NULL);
     else if (obj == returnQuartelRoomR)
         onOpenQuartelRR(NULL);
+    else if (obj == exitQuartel)
+        onOpenGameMapR(NULL);
 }
 
 void onEnemyCollision(GameObject* self, GameObject* obj)
@@ -356,6 +390,17 @@ int main() {
     enemyBM1= loadBitmap(engine, "./assets/images/idle-soldier1-sheet.png");
     enemyBM2= loadBitmap(engine, "./assets/images/idle-soldier2-sheet.png");
 
+    // loading houses bitmaps
+    for (int i=0; i<6; i++){
+        char str[23] = "";
+        sprintf(str, "./assets/images/c%d.png", i+1);
+        housesBM[i] = loadBitmap(engine, str);
+    }
+
+    // loading roads bitmaps
+    roadH = loadBitmap(engine, "./assets/images/estradal.png");
+    roadV = loadBitmap(engine, "./assets/images/estrada.png");
+
     // set playerStatus to default
     playerStatus.isHidden = 0;
     playerStatus.carryingLetter = 0;
@@ -463,12 +508,28 @@ int main() {
     gameMap->camera.maxLimit.y = 5000;
     gameMap->camera.zoom = 1.5;
 
-    GameObject* map = createGameObject(SOLID, 0, 0, 5000, 5000, gameMap);
+    map = createGameObject(SOLID, 0, 0, 5000, 5000, gameMap);
     //GameObject* map = createGameObject(SOLID, 0, 0, 200 * 16, 100 * 16, gameMap);
     map->color = al_map_rgba(0, 0, 0, 0);
     map->collisionEnabled = 1;
     map->collisionType = COLLISION_RECT;
     map->invertedCollision = 1;
+
+    // creating the vertical roads
+    for (int j=0; j<map->height/500; j++){
+        for (int i=0; i<map->width/500; i++){
+            GameObject* t = createGameObject(SPRITE, 337+i*500, j*500, 166, 500, gameMap);
+            setGameObjectBitmap(t, roadV);
+        }
+    }
+
+    // creating the horizontal roads
+    for (int j=1; j<map->height/500; j++){
+        for (int i=0; i<map->width/500; i++){
+            GameObject* t = createGameObject(SPRITE, i*500, j*500, 500, 166, gameMap);
+            setGameObjectBitmap(t, roadH);
+        }
+    }
 
     // quartel entry
     gridGameMap = createGameObject(SPRITE, map->width - 250, 0, 250, 5000, gameMap);
@@ -550,8 +611,15 @@ int main() {
     testBush=createGameObject(ANIMATED_SPRITE, 1000, 1000, 65, 65, gameMap);
     setGameObjectAnimation(testBush, loadBitmap(engine, "./assets/images/bush-sheet.png"), 16, 16, 4, 10);
 
+    GameObject* testecasatemp = createGameObject(SPRITE, 500, 100, 300, 300, gameMap);
+    testecasatemp->collisionEnabled=1;
+    setGameObjectBitmap(testecasatemp, housesBM[0]);
+    testecasatemp->startCollisionOffset.x=40;
+    testecasatemp->endCollisionOffset.x=-40;
+    testecasatemp->startCollisionOffset.y=200;
+    testecasatemp->endCollisionOffset.y=15;
 
-    timeGameMap=createGameObject(SOLID, 0, 0, map->width, map->height, gameMap);
+     timeGameMap=createGameObject(SOLID, 0, 0, map->width, map->height, gameMap);
 
     //- - - QUARTEL - - -
     quartel = createScene(engine, gameSceneScript);
@@ -727,6 +795,11 @@ int main() {
     treeU->collisionEnabled = 1;
     treeU->collisionType = COLLISION_RECT;
 
+    exitQuartel = createGameObject(SOLID, treeD1->width, treeD1->position.y + 50, treeD2->position.x - treeD1->width, 10, quartel);
+    exitQuartel->color = al_map_rgba(0, 0, 0, 0);
+    exitQuartel->collisionEnabled = 1;
+    exitQuartel->collisionType = COLLISION_RECT;
+
     //- - - SALA_ESQ - - -
     roomL = createScene(engine, gameSceneScript);
     roomL->camera.minLimit.x = 0;
@@ -748,17 +821,17 @@ int main() {
     fundoRoomL->color = al_map_rgba(184, 118, 93, 255);
 
     GameObject* tableRoomL = createGameObject(SOLID, 70, 68, 260, 90, roomL);
-    tableRoomL->color = al_map_rgba(0, 0, 0, 150);
+    tableRoomL->color = al_map_rgba(0, 0, 0, 0);
     tableRoomL->collisionEnabled = 1;
     tableRoomL->collisionType = COLLISION_RECT;
 
     GameObject* benchRoomL = createGameObject(SOLID, 138, 25, 125, 28, roomL);
-    benchRoomL->color = al_map_rgba(0, 0, 0, 150);
+    benchRoomL->color = al_map_rgba(0, 0, 0, 0);
     benchRoomL->collisionEnabled = 1;
     benchRoomL->collisionType = COLLISION_RECT;
 
     returnQuartelRoomL = createGameObject(SOLID, 30, 478, 208, 28, roomL);
-    returnQuartelRoomL->color = al_map_rgba(0, 0, 0, 150);
+    returnQuartelRoomL->color = al_map_rgba(0, 0, 0, 0);
     returnQuartelRoomL->collisionEnabled = 1;
     returnQuartelRoomL->collisionType = COLLISION_RECT;
 
