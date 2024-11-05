@@ -20,6 +20,7 @@ GameObject* baseObj;
 GameObject* letterObj;
 GameObject* exitBase;
 GameObject* returnBase;
+GameObject* exitGameMap;
 GameObject* roomLC;
 GameObject* roomMC;
 GameObject* roomRC;
@@ -30,6 +31,7 @@ GameObject* roomMobj;
 GameObject* returnQuartelRoomM;
 GameObject* roomRobj;
 GameObject* returnQuartelRoomR;
+GameObject* gridGameMap;
 // enemiesCount and enemies[] length needs be equal
 int enemiesCount=50;
 GameObject* enemies[50];
@@ -90,8 +92,8 @@ void onEvent(ALLEGRO_EVENT event, Scene * scene, CAEngine * engine) {
 void restartEnemiesPos(){
     for (int i = 0; i < enemiesCount; i++)
     {
-        enemies[i]->position.x = randInt(500, 6000);
-        enemies[i]->position.y = randInt(0, 6000);
+        enemies[i]->position.x = randInt(500, 4000);
+        enemies[i]->position.y = randInt(0, 4000);
     }
 }
 
@@ -177,6 +179,8 @@ void onPlayerCollision(GameObject* self, GameObject* obj)
         onOpenBase(NULL);
     else if (obj == roomLC)
         onOpenRoomL(NULL);
+    else if (obj == exitGameMap)
+        onOpenQuartel(NULL);
     else if (obj == roomMC)
         onOpenRoomM(NULL);
     else if (obj == roomRC)
@@ -250,7 +254,7 @@ void gameSceneScript(Scene* self) {
             enemies[i]->physics.acc.x=fabs(player->position.x-enemies[i]->position.x)/hy;
             // find angle by sin formula
             enemies[i]->physics.acc.y=fabs(player->position.y-enemies[i]->position.y)/hy;
-            
+
             if (enemies[i]->position.x < player->position.x) {
                 enemies[i]->physics.directions.x = 1;
                 enemies[i]->animation.direction.x = 1;
@@ -261,10 +265,18 @@ void gameSceneScript(Scene* self) {
             }
             if (enemies[i]->position.y < player->position.y) {
                 enemies[i]->physics.directions.y = 1;
+                if (enemies[i]->physics.acc.x < 0.20){
+                    enemies[i]->animation.index.y=1;
+                }
             }
             else {
                 enemies[i]->physics.directions.y = -1;
+                if (enemies[i]->physics.acc.x < 0.20){
+                    enemies[i]->animation.index.y=2;
+                }
             }
+            if (enemies[i]->physics.acc.x >= 0.20)
+                enemies[i]->animation.index.y=0;
 
             if (playerStatus.isHidden)
             {
@@ -398,12 +410,12 @@ int main() {
     gameOverText=createText("Você foi pego!", 0, 0, 0, al_map_rgb(210, 10, 10), al_map_rgba(0, 0, 0, 20), NULL, titleFont, 20, 20, insideBase);
     gameOverText->position = (Vector2){engine->displayWidth/2-al_get_text_width(titleFont->font, gameOverText->text)/2, engine->displayHeight/2-al_get_font_line_height(titleFont->font)/2};
     gameOverText->visible=0;
-    
+
 
     letterObj = createGameObject(ANIMATED_SPRITE, 467, 280, 12, 12, insideBase);
     setGameObjectAnimation(letterObj, loadBitmap(engine, "./assets/images/letter-sheet.png"), 12, 12, 5, 16);
     //como o letterContent tá sendo passado para >base, quando tenta abrir a carta em >gameMap ele não abre já que não está nessa cena e não dá pra incluir letterContent em >gameMap pq o addGameObjectToScene() não aceita parâmetro do tipo Text*
-    //dependendo da resolução vai precisar mudar dentro de gameSceneScript que é onde gerencia a visibilidade da carta 
+    //dependendo da resolução vai precisar mudar dentro de gameSceneScript que é onde gerencia a visibilidade da carta
     letterContent = createText("",
         300, 200, 400, al_map_rgb(0, 0, 0), al_map_rgba(155, 122, 73, 200), NULL, lettersFont, 40, 20, insideBase);
     letterContent->visible = 0;
@@ -434,9 +446,9 @@ int main() {
     GameObject* benchr2 = createGameObject(SOLID, 960, 325, 30, 63, insideBase);
     benchr2->color = al_map_rgba(0, 0, 0, 0);
     benchr2->collisionEnabled = 1;
-    exitBase = createGameObject(SOLID, 350, 985, 275, 10, insideBase); 
-    exitBase->color = al_map_rgba(0, 0, 0, 0); 
-    exitBase->collisionEnabled = 1; 
+    exitBase = createGameObject(SOLID, 350, 985, 275, 10, insideBase);
+    exitBase->color = al_map_rgba(0, 0, 0, 0);
+    exitBase->collisionEnabled = 1;
 
 
 
@@ -447,9 +459,32 @@ int main() {
     gameMap->camera.minLimit.y = 0;
     //gameMap->camera.maxLimit.x = 200 * 16;
     //gameMap->camera.maxLimit.y = 100 * 16;
-    gameMap->camera.maxLimit.x = 7001;
-    gameMap->camera.maxLimit.y = 7001;
+    gameMap->camera.maxLimit.x = 5000;
+    gameMap->camera.maxLimit.y = 5000;
     gameMap->camera.zoom = 1.5;
+
+    GameObject* map = createGameObject(SOLID, 0, 0, 5000, 5000, gameMap);
+    //GameObject* map = createGameObject(SOLID, 0, 0, 200 * 16, 100 * 16, gameMap);
+    map->color = al_map_rgba(0, 0, 0, 0);
+    map->collisionEnabled = 1;
+    map->collisionType = COLLISION_RECT;
+    map->invertedCollision = 1;
+
+    // quartel entry
+    gridGameMap = createGameObject(SPRITE, map->width - 250, 0, 250, 5000, gameMap);
+    ALLEGRO_BITMAP* ExitGameMapBM = loadBitmap(engine, "./assets/images/grid.png");
+    setGameObjectBitmap(gridGameMap, ExitGameMapBM);
+
+    GameObject* treeGrid1 = createGameObject(SOLID, map->width - 215, 0, 230, 4600, gameMap);
+    treeGrid1->color = al_map_rgba(0, 0, 0, 0);
+    treeGrid1->collisionEnabled = 1;
+    GameObject* treeGrid3 = createGameObject(SOLID, map->width - 215, map->height - 220, 230, 370, gameMap);
+    treeGrid3->color = al_map_rgba(0, 0, 0, 0);
+    treeGrid3->collisionEnabled = 1;
+
+    exitGameMap = createGameObject(SOLID, map->width - 30, treeGrid1->height, 40, treeGrid3->position.y - treeGrid1->height, gameMap);
+    exitGameMap->color = al_map_rgba(0, 0, 0, 0);
+    exitGameMap->collisionEnabled = 1;
 
     // create enemies
     for (int i=0; i<enemiesCount; i++){
@@ -462,6 +497,7 @@ int main() {
         setOnGameObjectCollisionFunction(enemies[i], onEnemyCollision);
     }
     restartEnemiesPos();
+
 
     player = createGameObject(ANIMATED_SPRITE, 700, 50, 44, 50, insideBase);
     player->position.x = 450;
@@ -479,14 +515,8 @@ int main() {
     gameMap->camera.followTarget = player;
     //setupSceneWorld(gameMap, loadBitmap(engine, "./assets/images/map-sheet.png"), 16, 16);
     //loadMap("./map.CAE", gameMap);
-    setupSceneWorld(gameMap, loadBitmap(engine, "./assets/images/gamemap.png"), 7000, 7000);
+    setupSceneWorld(gameMap, loadBitmap(engine, "./assets/images/gamemap.png"), 5000, 5000);
     addWorldTile(gameMap, 0, 0, 0, 0);
-    GameObject* map = createGameObject(SOLID, 0, 0, 7000, 7000, gameMap);
-    //GameObject* map = createGameObject(SOLID, 0, 0, 200 * 16, 100 * 16, gameMap);
-    map->color = al_map_rgba(0, 0, 0, 0);
-    map->collisionEnabled = 1;
-    map->collisionType = COLLISION_RECT;
-    map->invertedCollision = 1;
 
     baseObj = createGameObject(SPRITE, 0, 0, 335, 330, gameMap);
     ALLEGRO_BITMAP* baseBitMap = loadBitmap(engine, "./assets/images/base.png");
@@ -520,8 +550,8 @@ int main() {
     testBush=createGameObject(ANIMATED_SPRITE, 1000, 1000, 65, 65, gameMap);
     setGameObjectAnimation(testBush, loadBitmap(engine, "./assets/images/bush-sheet.png"), 16, 16, 4, 10);
 
-    timeGameMap=createGameObject(SOLID, 0, 0, map->width, map->height, gameMap);
 
+    timeGameMap=createGameObject(SOLID, 0, 0, map->width, map->height, gameMap);
 
     //- - - QUARTEL - - -
     quartel = createScene(engine, gameSceneScript);
