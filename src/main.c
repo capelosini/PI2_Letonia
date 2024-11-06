@@ -45,15 +45,16 @@ ALLEGRO_BITMAP* housesBM[6];
 ALLEGRO_BITMAP* roadH;
 ALLEGRO_BITMAP* roadV;
 Font* lettersFont;
-Text* letterContent;
+Text* tutorialLetterContent;
 Text* pressEMessage;
 Text* sinopseTchau;
 Text* gameOverText;
 float fallingLeafs[100][3];
 float timeSet = 0;
 char timeSetDir= 1;
+// FIRST IS TUTORIAL
 char* lettersTexts[3]= {
-    "Senhor .., Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut ut tincidunt elit. Nunc a magna at nulla tempor iaculis. Curabitur at enim sollicitudin, varius nisi vel, viverra odio. Ut porta metus sed metus gravida elementum. Pellentesque ut mi id quam euismod convallis. Duis vulputate tempus sagittis. Quisque aliquam justo justo, eget lobortis neque tempor non.Integer porta volutpat turpis, nec venenatis ante volutpat sit amet. Proin condimentum vitae augue id tincidunt. Donec tristique lectus non dui pellentesque tincidunt. In sit amet leo suscipit, feugiat leo id, condimentum tellus. Proin vel tempor metus. Mauris in auctor velit. Donec justo justo, iaculis eget pellentesque eget, interdum a nibh. Aenean tincidunt tempor sem. Integer eget elementum metus. Suspendisse non fringilla nunc, sit amet suscipit diam.Suspendisse a justo lorem. Phasellus ac nulla sed arcu fermentum sollicitudin.",
+    "Aldo, sua missão como escoteiro será ajudar os aliados pró-revolução e entregar as cartas para deixar todos no quartel informados, mas cuidado, pois alguns soldados estão pelas ruas querendo prender qualquer sujeito que tente ajudar a revolução.",
     "Letter content 2",
     "Letter content 3"
 };
@@ -63,6 +64,8 @@ int walkIndex = 0;
 struct playerStatus{
     unsigned char isHidden; // ele esta escondido?
     unsigned char carryingLetter; // carregando uma carta?
+    unsigned char firstZoomIn; // ja vez o primeiro zoom in?
+    unsigned char tutorialLetter; // ja pegou a carta tutorial?
     int letterId; // qual conteudo da carta que ele esta levando
     int closeLetterId; // a carta que ele esta proximo, ou que vai pegar
     int gameOverCount; // quantas vezes ele foi pego
@@ -80,25 +83,20 @@ void onEvent(ALLEGRO_EVENT event, Scene * scene, CAEngine * engine) {
     else if (event.type == ALLEGRO_EVENT_KEY_UP) {
         if (event.keyboard.keycode == ALLEGRO_KEY_E) {
             if (!(playerStatus.carryingLetter) && pressEMessage->visible) {
-                playerStatus.carryingLetter=1;
-                playerStatus.letterId = playerStatus.closeLetterId;
-                changeText(letterContent, lettersTexts[playerStatus.letterId]);
+                // if letter is tutorial
+                if (playerStatus.closeLetterId == 0){
+                    playerStatus.tutorialLetter=1;
+                } else{
+                    playerStatus.letterId = playerStatus.closeLetterId;
+                    playerStatus.carryingLetter=1;
+                }
                 letterObj->visible = 0;
                 pressEMessage->visible = 0;
             }
-            else if (playerStatus.carryingLetter) {
-                letterContent->visible = !letterContent->visible;
+            else if (playerStatus.tutorialLetter) {
+                tutorialLetterContent->visible = !tutorialLetterContent->visible;
             }
         }
-    }
-}
-
-
-void restartEnemiesPos(){
-    for (int i = 0; i < enemiesCount; i++)
-    {
-        enemies[i]->position.x = randInt(500, 4000);
-        enemies[i]->position.y = randInt(0, 4000);
     }
 }
 
@@ -123,6 +121,21 @@ unsigned char isOnRoad(GameObject* obj){
     return (deltaY > minY && deltaY < maxY ) || ( deltaX > minX && deltaX < maxX);
 }
 
+void restartEnemiesPos(){
+    for (int i = 0; i < enemiesCount; i++)
+    {
+
+        do {
+            enemies[i]->position.x = randInt(500, 4500);
+            enemies[i]->position.y = randInt(500, 4500);
+        } while(!isOnRoad(enemies[i]));
+    }
+}
+
+void onGameExit(Scene* scene){
+    engine->isAlive=0;
+}
+
 //stage change
 void onOpenBase(Scene* scene) {
     if (engine->currentScene == gameMap)
@@ -133,8 +146,14 @@ void onOpenBase(Scene* scene) {
     changeScene(engine, insideBase);
 }
 void onOpenGameMap(Scene* scene) {
+    if (!playerStatus.tutorialLetter)
+        return;
     player->position = (Vector2){ baseObj->position.x + baseObj->width/2 - 18, baseObj->position.y + baseObj->height - 98 };
     gameMap->camera.offset = (Vector2){ player->position.x, player->position.y };
+    if (!playerStatus.firstZoomIn){
+        gameMap->camera.zoom=0.2;
+        playerStatus.firstZoomIn=1;
+    }
     restartEnemiesPos();
     changeScene(engine, gameMap);
 }
@@ -268,7 +287,7 @@ void gameSceneScript(Scene* self) {
     if (!(mov.x || mov.y))
         player->animation.index.y = walkIndex;
 
-    if (!playerStatus.carryingLetter) {
+    if (!playerStatus.tutorialLetter) {
         if (dist(player->position.x, player->position.y, player->width, player->height, letterObj->position.x, letterObj->position.y, letterObj->width, letterObj->height)
             <= 60) {
             playerStatus.closeLetterId = 0;
@@ -276,7 +295,7 @@ void gameSceneScript(Scene* self) {
         }
         else {
             pressEMessage->visible = 0;
-            letterContent->visible = 0;
+            tutorialLetterContent->visible = 0;
         }
     }
 
@@ -340,6 +359,12 @@ void gameSceneScript(Scene* self) {
     }
     timeSet+=0.05*timeSetDir;
     timeGameMap->color = al_map_rgba(0,0,30/140*timeSet,(int)timeSet);
+
+    if (engine->currentScene == gameMap && gameMap->camera.zoom < 1.5){
+        gameMap->camera.zoom+=0.01;
+        player->physics.acc.x=0;
+        player->physics.acc.y=0;
+    }
 }
 
 
@@ -404,6 +429,7 @@ int main() {
     // set playerStatus to default
     playerStatus.isHidden = 0;
     playerStatus.carryingLetter = 0;
+    playerStatus.firstZoomIn = 0;
     playerStatus.letterId = 0;
     playerStatus.closeLetterId = 0;
     playerStatus.gameOverCount = 0;
@@ -423,8 +449,8 @@ int main() {
     char* titleText = "Revolução Em Cartas";
     createText(titleText, engine->displayWidth / 2 - al_get_text_width(titleFont->font, titleText) / 2, 50, 0, al_map_rgb(255, 255, 255), al_map_rgba(0, 0, 0, 0), NULL, titleFont, 0, 0, mainMenu);
 
-    addButtonToScene(mainMenu, createButton(engine, engine->displayWidth / 2 - 75, engine->displayHeight / 2 - 25, 150, 50, al_map_rgb(217, 95, 54), al_map_rgb(255, 255, 255), "Jogar", "./assets/fonts/roboto.ttf", NULL, onOpenGameMap));
-
+    addButtonToScene(mainMenu, createButton(engine, engine->displayWidth / 2 - 200./2, engine->displayHeight / 2 - 25, 200, 50, al_map_rgb(217, 95, 54), al_map_rgb(255, 255, 255), "Jogar", "./assets/fonts/roboto.ttf", NULL, onOpenBase));
+    addButtonToScene(mainMenu, createButton(engine, engine->displayWidth / 2 - 75, engine->displayHeight / 2 + 55, 150, 40, al_map_rgb(210, 20, 20), al_map_rgb(255, 255, 255), "Sair", "./assets/fonts/roboto.ttf", NULL, onGameExit));
     mainMenu->backgroundColor = al_map_rgb(0, 0, 20);
 
     ghostPlayerMenu = createGameObject(ANIMATED_SPRITE, -60, engine->displayHeight - 200, 45, 40, mainMenu);
@@ -461,9 +487,9 @@ int main() {
     setGameObjectAnimation(letterObj, loadBitmap(engine, "./assets/images/letter-sheet.png"), 12, 12, 5, 16);
     //como o letterContent tá sendo passado para >base, quando tenta abrir a carta em >gameMap ele não abre já que não está nessa cena e não dá pra incluir letterContent em >gameMap pq o addGameObjectToScene() não aceita parâmetro do tipo Text*
     //dependendo da resolução vai precisar mudar dentro de gameSceneScript que é onde gerencia a visibilidade da carta
-    letterContent = createText("",
-        300, 200, 400, al_map_rgb(0, 0, 0), al_map_rgba(155, 122, 73, 200), NULL, lettersFont, 40, 20, insideBase);
-    letterContent->visible = 0;
+    tutorialLetterContent = createText(lettersTexts[0],
+        10, 200, 400, al_map_rgb(0, 0, 0), al_map_rgba(165, 132, 83, 245), NULL, lettersFont, 40, 20, insideBase);
+    tutorialLetterContent->visible = 0;
 
     pressEMessage = createText("Pressione E para pegar a carta", engine->displayWidth / 2, 200, 0, al_map_rgb(255, 255, 255), al_map_rgba(0, 0, 0, 100), NULL, stdMessageFont, 40, 20, insideBase);
     pressEMessage->position.x -= al_get_text_width(stdMessageFont->font, pressEMessage->text) / 2;
@@ -572,8 +598,8 @@ int main() {
     player->onCollision = onPlayerCollision;
     setGameObjectAnimation(player, loadBitmap(engine, "./assets/images/player-sprite-sheet.png"), 17, 20, 8, 15);
     insideBase->camera.followTarget = player;
-
     gameMap->camera.followTarget = player;
+
     //setupSceneWorld(gameMap, loadBitmap(engine, "./assets/images/map-sheet.png"), 16, 16);
     //loadMap("./map.CAE", gameMap);
     setupSceneWorld(gameMap, loadBitmap(engine, "./assets/images/gamemap.png"), 5000, 5000);
@@ -588,8 +614,33 @@ int main() {
     baseObj->startCollisionOffset.y = 210;
     baseObj->endCollisionOffset.x = -60;
     baseObj->endCollisionOffset.y = -85;
+
+    // add player to gamemap
     addGameObjectToScene(gameMap, player);
-    addTextToScene(gameMap, letterContent);
+
+
+    // houses generation
+    for (int i=0; i<map->width/500; i++){
+        for (int j=0; j<map->height/500; j++){
+            if (i == 0 && j == 0){ continue; }
+            GameObject* h = createGameObject(SPRITE, 30+i*500, 170+j*500, 300, 300, gameMap);
+            int houseId = randInt(0, 5);
+            setGameObjectBitmap(h, housesBM[houseId]);
+            h->collisionEnabled=1;
+            h->startCollisionOffset.y = 150;
+            h->endCollisionOffset.y=10;
+            h->startCollisionOffset.x = 50;
+            h->endCollisionOffset.x = -50;
+
+            if (houseId == 3 || houseId == 4){
+                h->startCollisionOffset.x = 20;
+                h->endCollisionOffset.x = -20;
+            }
+
+        }
+    }
+
+    addTextToScene(gameMap, tutorialLetterContent);
     GameObject* houseTop = createGameObject(SPRITE, baseObj->position.x, baseObj->position.y-10, baseObj->width, baseObj->height/2 +70, gameMap);
     setGameObjectBitmap(houseTop, createSubBitmap(engine, baseBitMap,0,0,500,500/2 + 70));
     returnBase = createGameObject(SOLID, baseObj->position.x+ 170, baseObj->position.y +255, 5, 2, gameMap);
@@ -610,14 +661,6 @@ int main() {
 
     testBush=createGameObject(ANIMATED_SPRITE, 1000, 1000, 65, 65, gameMap);
     setGameObjectAnimation(testBush, loadBitmap(engine, "./assets/images/bush-sheet.png"), 16, 16, 4, 10);
-
-    GameObject* testecasatemp = createGameObject(SPRITE, 500, 100, 300, 300, gameMap);
-    testecasatemp->collisionEnabled=1;
-    setGameObjectBitmap(testecasatemp, housesBM[0]);
-    testecasatemp->startCollisionOffset.x=40;
-    testecasatemp->endCollisionOffset.x=-40;
-    testecasatemp->startCollisionOffset.y=200;
-    testecasatemp->endCollisionOffset.y=15;
 
      timeGameMap=createGameObject(SOLID, 0, 0, map->width, map->height, gameMap);
 
