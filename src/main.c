@@ -7,6 +7,7 @@
 
 CAEngine* engine;
 Scene* mainMenu;
+Scene* restart;
 Scene* insideBase;
 Scene* gameMap;
 Scene* quartel;
@@ -72,12 +73,24 @@ struct playerStatus{
 };
 struct playerStatus playerStatus;
 
+void onOpenMenu(Scene* scene)
+{
+    restart = engine->currentScene;
+    changeScene(engine, mainMenu);
+}
+
+void onOpenRestart(Scene* scene)
+{
+    changeScene(engine, restart);
+}
+
 //action handle on events
 void onEvent(ALLEGRO_EVENT event, Scene * scene, CAEngine * engine) {
     if (event.type == ALLEGRO_EVENT_KEY_DOWN) {
         gameOverText->visible=0;
         if (event.keyboard.keycode == ALLEGRO_KEY_ESCAPE) {
-            engine->isAlive = 0;
+            if(engine->currentScene != mainMenu)
+            onOpenMenu(NULL);
         }
     }
     else if (event.type == ALLEGRO_EVENT_KEY_UP) {
@@ -101,25 +114,26 @@ void onEvent(ALLEGRO_EVENT event, Scene * scene, CAEngine * engine) {
 }
 
 // verify if object is on road
-unsigned char isOnRoad(GameObject* obj){
-    double deltaY=obj->position.y / 500;
-    deltaY -=(int)deltaY;
+unsigned char isOnRoad(GameObject* obj) {
+    double deltaY = obj->position.y / 500;
+    deltaY -= (int)deltaY;
 
-    double deltaX=obj->position.x / 500;
-    deltaX -=(int)deltaX;
+    double deltaX = obj->position.x / 500;
+    deltaX -= (int)deltaX;
 
-    double minY = 500./500;
+    double minY = 500. / 500;
     minY -= (int)minY;
-    double maxY = (500.+166-obj->height)/500;
+    double maxY = (500. + 166 - obj->height) / 500;
     maxY -= (int)maxY;
 
-    double minX = 837./500;
+    double minX = 837. / 500;
     minX -= (int)minX;
-    double maxX = (837.+166-obj->width)/500;
+    double maxX = (837. + 166 - obj->width) / 500;
     maxX -= (int)maxX;
 
-    return (deltaY > minY && deltaY < maxY ) || ( deltaX > minX && deltaX < maxX);
+    return (deltaY > minY && deltaY < maxY) || (deltaX > minX && deltaX < maxX);
 }
+
 
 void restartEnemiesPos(){
     for (int i = 0; i < enemiesCount; i++)
@@ -301,12 +315,12 @@ void gameSceneScript(Scene* self) {
 
     // enemies movement
     for (int i = 0; i < enemiesCount; i++) {
-        if (dist(enemies[i]->position.x, enemies[i]->position.y, enemies[i]->width, enemies[i]->height, player->position.x, player->position.y, player->width, player->height) <= 200){
-            double hy = hypot(player->position.x-enemies[i]->position.x, player->position.y-enemies[i]->position.y);
+        if (dist(enemies[i]->position.x, enemies[i]->position.y, enemies[i]->width, enemies[i]->height, player->position.x, player->position.y, player->width, player->height) <= 200) {
+            double hy = hypot(player->position.x - enemies[i]->position.x, player->position.y - enemies[i]->position.y);
             // find angle by cos formula
-            enemies[i]->physics.acc.x=fabs(player->position.x-enemies[i]->position.x)/hy;
+            enemies[i]->physics.acc.x = fabs(player->position.x - enemies[i]->position.x) / hy;
             // find angle by sin formula
-            enemies[i]->physics.acc.y=fabs(player->position.y-enemies[i]->position.y)/hy;
+            enemies[i]->physics.acc.y = fabs(player->position.y - enemies[i]->position.y) / hy;
 
             if (enemies[i]->position.x < player->position.x) {
                 enemies[i]->physics.directions.x = 1;
@@ -318,31 +332,33 @@ void gameSceneScript(Scene* self) {
             }
             if (enemies[i]->position.y < player->position.y) {
                 enemies[i]->physics.directions.y = 1;
-                if (enemies[i]->physics.acc.x < 0.20){
-                    enemies[i]->animation.index.y=1;
+                if (enemies[i]->physics.acc.x < 0.20) {
+                    enemies[i]->animation.index.y = 1;
                 }
             }
             else {
                 enemies[i]->physics.directions.y = -1;
-                if (enemies[i]->physics.acc.x < 0.20){
-                    enemies[i]->animation.index.y=2;
+                if (enemies[i]->physics.acc.x < 0.20) {
+                    enemies[i]->animation.index.y = 2;
                 }
             }
             if (enemies[i]->physics.acc.x >= 0.20)
-                enemies[i]->animation.index.y=0;
+                enemies[i]->animation.index.y = 0;
 
             if (playerStatus.isHidden)
             {
-                enemies[i]->physics.directions.x*=-1;
-                enemies[i]->physics.directions.y*=-1;
+                enemies[i]->physics.directions.x *= -1;
+                enemies[i]->physics.directions.y *= -1;
                 enemies[i]->animation.direction.x *= -1;
             }
 
-        } else{
-            enemies[i]->physics.acc.x=0;
-            enemies[i]->physics.acc.y=0;
+        }
+        else {
+            enemies[i]->physics.acc.x = 0;
+            enemies[i]->physics.acc.y = 0;
         }
     }
+
 
     // invisible bush test
     if (checkCollisionRect(player->position.x, player->position.y, player->width, player->height, testBush->position.x, testBush->position.y, testBush->width,  testBush->height)){
@@ -449,7 +465,7 @@ int main() {
     char* titleText = "Revolução Em Cartas";
     createText(titleText, engine->displayWidth / 2 - al_get_text_width(titleFont->font, titleText) / 2, 50, 0, al_map_rgb(255, 255, 255), al_map_rgba(0, 0, 0, 0), NULL, titleFont, 0, 0, mainMenu);
 
-    addButtonToScene(mainMenu, createButton(engine, engine->displayWidth / 2 - 200./2, engine->displayHeight / 2 - 25, 200, 50, al_map_rgb(217, 95, 54), al_map_rgb(255, 255, 255), "Jogar", "./assets/fonts/roboto.ttf", NULL, onOpenBase));
+    addButtonToScene(mainMenu, createButton(engine, engine->displayWidth / 2 - 200./2, engine->displayHeight / 2 - 25, 200, 50, al_map_rgb(217, 95, 54), al_map_rgb(255, 255, 255), "Jogar", "./assets/fonts/roboto.ttf", NULL, onOpenRestart));
     addButtonToScene(mainMenu, createButton(engine, engine->displayWidth / 2 - 75, engine->displayHeight / 2 + 55, 150, 40, al_map_rgb(210, 20, 20), al_map_rgb(255, 255, 255), "Sair", "./assets/fonts/roboto.ttf", NULL, onGameExit));
     mainMenu->backgroundColor = al_map_rgb(0, 0, 20);
 
@@ -976,7 +992,7 @@ int main() {
     lettersFont->size = 200;
     sinopseTchau = createText("Final do jogo",
         0, 0, engine->displayWidth, al_map_rgb(0, 0, 0), al_map_rgb(155, 122, 73), NULL, titleFont, 520, 550, sinopse);
-
+    restart = insideBase;
 
     while (engine->isAlive) {
         render(engine);
