@@ -50,11 +50,13 @@ extern Text* tutorialLetterContent;
 extern Text* pressEMessage;
 extern Text* sinopseTchau;
 extern Text* gameOverText;
+extern Text* mainMissionText;
 extern float fallingLeafs[100][3];
 extern float timeSet;
 extern char timeSetDir;
 // FIRST IS TUTORIAL
 extern char* lettersTexts[3];
+extern char* mainMissions[10];
 
 extern int walkIndex;
 
@@ -66,6 +68,7 @@ struct playerStatus{
     int letterId; // qual conteudo da carta que ele esta levando
     int closeLetterId; // a carta que ele esta proximo, ou que vai pegar
     int gameOverCount; // quantas vezes ele foi pego
+    int mainMissionId; // id da missao principal
 };
 extern struct playerStatus playerStatus;
 

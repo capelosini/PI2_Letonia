@@ -1,4 +1,5 @@
 #include "../../include/globals.h"
+#include <allegro5/color.h>
 
 void loadGameMap(){
     gameMap = createScene(engine, gameSceneScript);
@@ -140,4 +141,6 @@ void loadGameMap(){
     setGameObjectAnimation(testBush, loadBitmap(engine, "./assets/images/bush-sheet.png"), 16, 16, 4, 10);
 
     timeGameMap=createGameObject(SOLID, 0, 0, map->width, map->height, gameMap);
+
+    addTextToScene(gameMap, mainMissionText);
 }

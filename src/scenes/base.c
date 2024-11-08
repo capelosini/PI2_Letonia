@@ -56,4 +56,7 @@ void loadBase(){
     exitBase = createGameObject(SOLID, 350, 985, 275, 10, insideBase);
     exitBase->color = al_map_rgba(0, 0, 0, 0);
     exitBase->collisionEnabled = 1;
+
+    mainMissionText = createText(mainMissions[0], engine->displayWidth-300, 130, 300, al_map_rgb(255,255,255), al_map_rgba(0,0,0,240)
+    , NULL, lettersFont, 30, 30, insideBase);
 }

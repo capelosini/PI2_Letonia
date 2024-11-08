@@ -49,6 +49,7 @@ Text* tutorialLetterContent;
 Text* pressEMessage;
 Text* sinopseTchau;
 Text* gameOverText;
+Text* mainMissionText;
 float fallingLeafs[100][3];
 
 // enemiesCount and enemies[] length needs be equal
@@ -60,6 +61,12 @@ char* lettersTexts[3]= {
     "Aldo, sua missão como escoteiro será ajudar os aliados pró-revolução e entregar as cartas para deixar todos no quartel informados, mas cuidado, pois alguns soldados estão pelas ruas querendo prender qualquer sujeito que tente ajudar a revolução.",
     "Letter content 2",
     "Letter content 3"
+};
+
+char* mainMissions[10] = {
+    "Pegue a carta na mesa da base.",
+    "Missao 2",
+    "Missao 3"
 };
 
 int walkIndex = 0;
@@ -87,6 +94,8 @@ void onEvent(ALLEGRO_EVENT event, Scene * scene, CAEngine * engine) {
                 }
                 letterObj->visible = 0;
                 pressEMessage->visible = 0;
+                playerStatus.mainMissionId++;
+                changeText(mainMissionText, mainMissions[playerStatus.mainMissionId]);
             }
             else if (playerStatus.tutorialLetter) {
                 tutorialLetterContent->visible = !tutorialLetterContent->visible;
@@ -164,6 +173,7 @@ int main() {
     playerStatus.letterId = 0;
     playerStatus.closeLetterId = 0;
     playerStatus.gameOverCount = 0;
+    playerStatus.mainMissionId = 0;
 
     loadMainMenu();
     loadBase();
