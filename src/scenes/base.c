@@ -1,7 +1,7 @@
-#include "../../include/scenes.h"
+#include "../../include/globals.h"
 
 void loadBase(){
-    Scene* insideBase = createScene(engine, gameSceneScript);
+    insideBase = createScene(engine, gameSceneScript);
     insideBase->camera.minLimit.x = 5;
     insideBase->camera.minLimit.y = 5;
     insideBase->camera.maxLimit.x = 1001;

@@ -1,5 +1,5 @@
 #include "../CAE/include/CAE.h"
-#include "../include/scenes.h"
+#include "../include/globals.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>

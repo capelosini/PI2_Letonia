@@ -1,4 +1,4 @@
-#include "../include/scenes.h"
+#include "../include/globals.h"
 
 void onOpenMenu(Scene* scene)
 {

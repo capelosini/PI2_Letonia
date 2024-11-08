@@ -1,7 +1,7 @@
-#include "../../include/scenes.h"
+#include "../../include/globals.h"
 
 void loadSinopse(){
-    Scene* sinopse = createScene(engine, NULL);
+    sinopse = createScene(engine, NULL);
     sinopse->backgroundColor = al_map_rgb(20, 20, 20);
     lettersFont->size = 200;
     sinopseTchau = createText("Final do jogo",

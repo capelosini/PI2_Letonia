@@ -1,7 +1,7 @@
-#include "../../include/scenes.h"
+#include "../../include/globals.h"
 
 void loadGameMap(){
-    Scene* gameMap = createScene(engine, gameSceneScript);
+    gameMap = createScene(engine, gameSceneScript);
     gameMap->camera.minLimit.x = 0;
     gameMap->camera.minLimit.y = 0;
     //gameMap->camera.maxLimit.x = 200 * 16;

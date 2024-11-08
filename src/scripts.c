@@ -1,4 +1,4 @@
-#include "../include/scenes.h"
+#include "../include/globals.h"
 #include <math.h>
 
 //character movement and letter handling

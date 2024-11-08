@@ -1,7 +1,7 @@
-#include "../../include/scenes.h"
+#include "../../include/globals.h"
 
 void loadRoomLeft(){
-    Scene* roomL = createScene(engine, gameSceneScript);
+    roomL = createScene(engine, gameSceneScript);
     roomL->camera.minLimit.x = 0;
     roomL->camera.minLimit.y = 0;
     roomL->camera.maxLimit.x = 1001;

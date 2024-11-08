@@ -1,7 +1,7 @@
-#include "../../include/scenes.h"
+#include "../../include/globals.h"
 
 void loadQuartel(){
-    Scene* quartel = createScene(engine, gameSceneScript);
+    quartel = createScene(engine, gameSceneScript);
     quartel->camera.minLimit.x = 0;
     quartel->camera.minLimit.y = 0;
     quartel->camera.maxLimit.x = 2500;

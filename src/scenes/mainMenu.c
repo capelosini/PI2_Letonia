@@ -1,7 +1,7 @@
-#include "../../include/scenes.h"
+#include "../../include/globals.h"
 
 void loadMainMenu(){
-    Scene* mainMenu = createScene(engine, mainMenuScript);
+    mainMenu = createScene(engine, mainMenuScript);
 
     for (int i = 0; i < 100; i++) {
         fallingLeafs[i][0] = randInt(-100, engine->displayWidth - 5);
@@ -9,8 +9,8 @@ void loadMainMenu(){
         fallingLeafs[i][2] = randFloat(1, 2);
     }
 
-    Font* titleFont = loadTTF(engine, "./assets/fonts/kalam-bold.ttf", 80);
-    Font* stdMessageFont = loadTTF(engine, "./assets/fonts/kalam.ttf", 17);
+    titleFont = loadTTF(engine, "./assets/fonts/kalam-bold.ttf", 80);
+    stdMessageFont = loadTTF(engine, "./assets/fonts/kalam.ttf", 17);
     lettersFont = loadTTF(engine, "./assets/fonts/kalam.ttf", 18);
     char* titleText = "Revolução Em Cartas";
     createText(titleText, engine->displayWidth / 2 - al_get_text_width(titleFont->font, titleText) / 2, 50, 0, al_map_rgb(255, 255, 255), al_map_rgba(0, 0, 0, 0), NULL, titleFont, 0, 0, mainMenu);
