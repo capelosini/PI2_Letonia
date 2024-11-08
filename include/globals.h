@@ -5,7 +5,7 @@
 
 extern CAEngine* engine;
 extern Scene* mainMenu;
-extern Scene* restart;
+extern Scene* lastSceneBeforeMenu;
 extern Scene* insideBase;
 extern Scene* gameMap;
 extern Scene* quartel;

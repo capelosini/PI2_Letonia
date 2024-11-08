@@ -6,7 +6,7 @@
 
 CAEngine* engine;
 Scene* mainMenu;
-Scene* restart;
+Scene* lastSceneBeforeMenu;
 Scene* insideBase;
 Scene* gameMap;
 Scene* quartel;
@@ -174,11 +174,29 @@ int main() {
     loadRoomRight();
     loadSinopse();
 
-    restart = insideBase;
+    lastSceneBeforeMenu = insideBase;
 
     while (engine->isAlive) {
         render(engine);
     }
+
+
+    // EXIT ANIMATION
+    Vector2 pos = (Vector2){0, 0};
+    float speed = 0;
+    float acc = 0.5;
+    Vector2 monSize = getMonitorSize(getCurrentDisplayAdapter(engine));
+    changeWindowFullscreen(engine, 0);
+    changeWindowNoFrame(engine, 1);
+    changeWindowSize(engine, monSize.x, monSize.y);
+    while (pos.y < engine->displayHeight){
+        speed+=acc;
+        pos.y+=speed;
+        changeWindowPosition(engine, pos.x, pos.y);
+        al_flip_display();
+        al_rest(0.03);
+    }
+    /////////////
 
     freeEngine(engine);
     printf("\nSuccessfully exited!\n");

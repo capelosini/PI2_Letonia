@@ -1,14 +1,16 @@
 #include "../include/globals.h"
+#include <allegro5/altime.h>
+#include <allegro5/display.h>
 
 void onOpenMenu(Scene* scene)
 {
-    restart = engine->currentScene;
+    lastSceneBeforeMenu = engine->currentScene;
     changeScene(engine, mainMenu);
 }
 
 void onOpenRestart(Scene* scene)
 {
-    changeScene(engine, restart);
+    changeScene(engine, lastSceneBeforeMenu);
 }
 
 void onGameExit(Scene* scene){
