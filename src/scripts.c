@@ -61,17 +61,17 @@ void gameSceneScript(Scene* self) {
             if (enemies[i]->position.y < player->position.y) {
                 enemies[i]->physics.directions.y = 1;
                 if (enemies[i]->physics.acc.x < 0.20) {
-                    enemies[i]->animation.index.y = 1;
+                    enemies[i]->animation.index.y = 4;
                 }
             }
             else {
                 enemies[i]->physics.directions.y = -1;
                 if (enemies[i]->physics.acc.x < 0.20) {
-                    enemies[i]->animation.index.y = 2;
+                    enemies[i]->animation.index.y = 5;
                 }
             }
             if (enemies[i]->physics.acc.x >= 0.20)
-                enemies[i]->animation.index.y = 0;
+                enemies[i]->animation.index.y = 3;
 
             if (playerStatus.isHidden)
             {
@@ -84,6 +84,8 @@ void gameSceneScript(Scene* self) {
         else {
             enemies[i]->physics.acc.x = 0;
             enemies[i]->physics.acc.y = 0;
+            if (enemies[i]->animation.index.y > 2)
+                enemies[i]->animation.index.y-=3;
         }
     }
 

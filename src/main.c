@@ -152,8 +152,8 @@ int main() {
     setEventFunction(engine, onEvent);
 
     // loading the enemies sprite sheets
-    enemyBM1= loadBitmap(engine, "./assets/images/idle-soldier1-sheet.png");
-    enemyBM2= loadBitmap(engine, "./assets/images/idle-soldier2-sheet.png");
+    enemyBM1= loadBitmap(engine, "./assets/images/soldier1-sheet.png");
+    enemyBM2= loadBitmap(engine, "./assets/images/soldier2-sheet.png");
 
     // loading houses bitmaps
     for (int i=0; i<6; i++){

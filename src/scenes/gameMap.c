@@ -52,8 +52,8 @@ void loadGameMap(){
 
     // create enemies
     for (int i=0; i<enemiesCount; i++){
-        enemies[i]=createGameObject(ANIMATED_SPRITE, 0, 0, 36, 40, gameMap);
-        setGameObjectAnimation(enemies[i], enemyBM2, 16, 20, 4, 15);
+        enemies[i]=createGameObject(ANIMATED_SPRITE, 0, 0, 36, 38, gameMap);
+        setGameObjectAnimation(enemies[i], enemyBM2, 16, 18, 8, 15);
         enemies[i]->physics.enabled=1;
         enemies[i]->physics.friction=0.4;
         enemies[i]->physics.maxSpeed=4;
