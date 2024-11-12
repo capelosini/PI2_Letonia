@@ -40,6 +40,10 @@ void loadRoomRight(){
     benchRoomR->collisionEnabled = 1;
     benchRoomR->collisionType = COLLISION_RECT;
 
+    GameObject* general2 = createGameObject(ANIMATED_SPRITE, 225, 0, 50, 65, roomR);
+    ALLEGRO_BITMAP* general2Bm = loadBitmap(engine, "./assets/images/general2-sprite.png");
+    setGameObjectAnimation(general2, general2Bm, 18, 25, 4, 16);
+
     returnQuartelRoomR = createGameObject(SOLID, 330, 478, 208, 28, roomR);
     returnQuartelRoomR->color = al_map_rgba(0, 0, 0, 0);
     returnQuartelRoomR->collisionEnabled = 1;
