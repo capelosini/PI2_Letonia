@@ -1,4 +1,5 @@
 #include "../../include/globals.h"
+#include <allegro5/color.h>
 
 void loadBase(){
     insideBase = createScene(engine, gameSceneScript);
@@ -24,7 +25,7 @@ void loadBase(){
     //como o letterContent tá sendo passado para >base, quando tenta abrir a carta em >gameMap ele não abre já que não está nessa cena e não dá pra incluir letterContent em >gameMap pq o addGameObjectToScene() não aceita parâmetro do tipo Text*
     //dependendo da resolução vai precisar mudar dentro de gameSceneScript que é onde gerencia a visibilidade da carta
     tutorialLetterContent = createText(lettersTexts[0],
-        10, 200, 400, al_map_rgb(0, 0, 0), al_map_rgba(165, 132, 83, 245), NULL, lettersFont, 40, 20, insideBase);
+        10, 200, 400, al_map_rgb(0, 0, 0), al_map_rgba(165, 132, 83, 245), NULL, lettersFont, 40, 50, insideBase);
     tutorialLetterContent->visible = 0;
 
     pressEMessage = createText("Pressione E para pegar a carta", engine->displayWidth / 2, 200, 0, al_map_rgb(255, 255, 255), al_map_rgba(0, 0, 0, 100), NULL, stdMessageFont, 40, 20, insideBase);
@@ -59,4 +60,8 @@ void loadBase(){
 
     mainMissionText = createText(mainMissions[0], engine->displayWidth-300, 130, 300, al_map_rgb(255,255,255), al_map_rgba(0,0,0,240)
     , NULL, lettersFont, 30, 30, insideBase);
+
+    letterStatus = createButton(engine, 20, 20, 50, 50, al_map_rgba(0, 0, 0, 0), al_map_rgba(0, 0, 0, 0), "", "./assets/fonts/roboto.ttf", letterStatusFalseBM, NULL);
+    addButtonToScene(insideBase, letterStatus);
+
 }

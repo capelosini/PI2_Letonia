@@ -43,6 +43,9 @@ extern ALLEGRO_BITMAP* enemyBM2;
 extern ALLEGRO_BITMAP* housesBM[6];
 extern ALLEGRO_BITMAP* roadH;
 extern ALLEGRO_BITMAP* roadV;
+extern ALLEGRO_BITMAP* plateBM;
+extern ALLEGRO_BITMAP* letterStatusTrueBM;
+extern ALLEGRO_BITMAP* letterStatusFalseBM;
 extern Font* lettersFont;
 extern Font* stdMessageFont;
 extern Font* titleFont;
@@ -51,6 +54,8 @@ extern Text* pressEMessage;
 extern Text* sinopseTchau;
 extern Text* gameOverText;
 extern Text* mainMissionText;
+extern Text* closeHouseNumber;
+extern Button* letterStatus;
 extern float fallingLeafs[100][3];
 extern float timeSet;
 extern char timeSetDir;
@@ -91,6 +96,7 @@ void onEnemyCollision(GameObject* self, GameObject* obj);
 
 void restartEnemiesPos();
 unsigned char isOnRoad(GameObject* obj);
+int getPlayerNearHouse();
 
 void mainMenuScript(Scene* self);
 void loadMainMenu();

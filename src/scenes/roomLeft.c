@@ -39,4 +39,6 @@ void loadRoomLeft(){
     returnQuartelRoomL->color = al_map_rgba(0, 0, 0, 0);
     returnQuartelRoomL->collisionEnabled = 1;
     returnQuartelRoomL->collisionType = COLLISION_RECT;
+
+    addButtonToScene(roomL, letterStatus);
 }

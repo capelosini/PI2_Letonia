@@ -1,5 +1,10 @@
 #include "../include/globals.h"
 #include <math.h>
+#include <stdio.h>
+#include <time.h>
+
+int lastHouse=0;
+time_t lastTime;
 
 //character movement and letter handling
 void gameSceneScript(Scene* self) {
@@ -111,6 +116,28 @@ void gameSceneScript(Scene* self) {
         player->physics.acc.x=0;
         player->physics.acc.y=0;
     }
+
+    int currentHouse=getPlayerNearHouse();
+
+    if (currentHouse != lastHouse){
+        lastTime=time(NULL);
+        lastHouse=currentHouse;
+        closeHouseNumber->visible=1;
+        // if (currentHouse==0){
+        //     closeHouseNumber->visible=0;
+        // } else{
+        //     closeHouseNumber->visible=1;
+        // }
+
+        char tempstr[9];
+        sprintf(tempstr, "Casa %d", currentHouse);
+        changeText(closeHouseNumber, tempstr);  
+    } else{
+        if (time(NULL)-lastTime>2){
+            closeHouseNumber->visible=0;
+        }
+    }
+
 }
 
 //menu animation

@@ -98,22 +98,18 @@ void loadGameMap(){
 
 
     // houses generation
-    for (int i=0; i<map->width/500; i++){
-        for (int j=0; j<map->height/500; j++){
+    for (int i=0; i<map->width/500-1; i++){
+        for (int j=0; j<map->height/500-1; j++){
             if (i == 0 && j == 0){ continue; }
             GameObject* h = createGameObject(SPRITE, 30+i*500, 170+j*500, 300, 300, gameMap);
             int houseId = randInt(0, 5);
             setGameObjectBitmap(h, housesBM[houseId]);
             h->collisionEnabled=1;
             h->startCollisionOffset.y = 150;
-            h->endCollisionOffset.y=10;
-            h->startCollisionOffset.x = 50;
-            h->endCollisionOffset.x = -50;
+            h->endCollisionOffset.y=30;
 
-            if (houseId == 3 || houseId == 4){
-                h->startCollisionOffset.x = 20;
-                h->endCollisionOffset.x = -20;
-            }
+            GameObject* plate = createGameObject(SPRITE, h->position.x+h->width-50, h->position.y+h->height-50, 50, 49, gameMap);
+            setGameObjectBitmap(plate, plateBM);
 
         }
     }
@@ -137,10 +133,14 @@ void loadGameMap(){
     gridr2->color = al_map_rgba(0, 0, 0, 0);
     gridr2->collisionEnabled = 1;
 
-    testBush=createGameObject(ANIMATED_SPRITE, 1000, 1000, 65, 65, gameMap);
+    testBush=createGameObject(ANIMATED_SPRITE, 3000, 3000, 65, 65, gameMap);
     setGameObjectAnimation(testBush, loadBitmap(engine, "./assets/images/bush-sheet.png"), 16, 16, 4, 10);
 
     timeGameMap=createGameObject(SOLID, 0, 0, map->width, map->height, gameMap);
 
     addTextToScene(gameMap, mainMissionText);
+
+    addButtonToScene(gameMap, letterStatus);
+    Font* numberHouseFont = loadTTF(engine, "./assets/fonts/roboto.ttf", 20);
+    closeHouseNumber = createText("Casa 72", engine->displayWidth/2-al_get_text_width(numberHouseFont->font, "Casa 100")/2, 20, 100, al_map_rgb(255, 100,0), al_map_rgba(0,0,0,0), NULL, numberHouseFont, 0, 0, gameMap);
 }

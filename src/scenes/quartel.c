@@ -178,4 +178,6 @@ void loadQuartel(){
     exitQuartel->color = al_map_rgba(0, 0, 0, 0);
     exitQuartel->collisionEnabled = 1;
     exitQuartel->collisionType = COLLISION_RECT;
+
+    addButtonToScene(quartel, letterStatus);
 }

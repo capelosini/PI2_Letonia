@@ -1,5 +1,6 @@
 #include "../CAE/include/CAE.h"
 #include "../include/globals.h"
+#include <allegro5/bitmap.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
@@ -42,6 +43,9 @@ ALLEGRO_BITMAP* enemyBM2;
 ALLEGRO_BITMAP* housesBM[6];
 ALLEGRO_BITMAP* roadH;
 ALLEGRO_BITMAP* roadV;
+ALLEGRO_BITMAP* plateBM;
+ALLEGRO_BITMAP* letterStatusTrueBM;
+ALLEGRO_BITMAP* letterStatusFalseBM;
 Font* lettersFont;
 Font* stdMessageFont;
 Font* titleFont;
@@ -50,6 +54,8 @@ Text* pressEMessage;
 Text* sinopseTchau;
 Text* gameOverText;
 Text* mainMissionText;
+Text* closeHouseNumber;
+Button* letterStatus;
 float fallingLeafs[100][3];
 
 // enemiesCount and enemies[] length needs be equal
@@ -58,14 +64,14 @@ float timeSet = 0;
 char timeSetDir= 1;
 // FIRST IS TUTORIAL
 char* lettersTexts[3]= {
-    "Aldo, sua missão como escoteiro será ajudar os aliados pró-revolução e entregar as cartas para deixar todos no quartel informados, mas cuidado, pois alguns soldados estão pelas ruas querendo prender qualquer sujeito que tente ajudar a revolução.",
+    "Aldo, sua missão como escoteiro será ajudar os aliados pró-revolução e entregar as cartas para deixar todos no quartel informados, mas cuidado, pois alguns soldados estão pelas ruas querendo prender qualquer sujeito que tente ajudar a revolução.\n \nPressione Z para abrir/fechar.",
     "Letter content 2",
     "Letter content 3"
 };
 
 char* mainMissions[10] = {
     "Pegue a carta na mesa da base.",
-    "Missao 2",
+    "Vá até a casa 72, e pegue a carta.",
     "Missao 3"
 };
 
@@ -88,6 +94,7 @@ void onEvent(ALLEGRO_EVENT event, Scene * scene, CAEngine * engine) {
                 // if letter is tutorial
                 if (playerStatus.closeLetterId == 0){
                     playerStatus.tutorialLetter=1;
+                    tutorialLetterContent->visible = 1;
                 } else{
                     playerStatus.letterId = playerStatus.closeLetterId;
                     playerStatus.carryingLetter=1;
@@ -97,7 +104,9 @@ void onEvent(ALLEGRO_EVENT event, Scene * scene, CAEngine * engine) {
                 playerStatus.mainMissionId++;
                 changeText(mainMissionText, mainMissions[playerStatus.mainMissionId]);
             }
-            else if (playerStatus.tutorialLetter) {
+        }
+        else if (event.keyboard.keycode == ALLEGRO_KEY_Z){
+            if (playerStatus.tutorialLetter) {
                 tutorialLetterContent->visible = !tutorialLetterContent->visible;
             }
         }
@@ -129,7 +138,6 @@ unsigned char isOnRoad(GameObject* obj) {
 void restartEnemiesPos(){
     for (int i = 0; i < enemiesCount; i++)
     {
-
         do {
             enemies[i]->position.x = randInt(500, 4500);
             enemies[i]->position.y = randInt(500, 4500);
@@ -137,6 +145,9 @@ void restartEnemiesPos(){
     }
 }
 
+int getPlayerNearHouse(){
+    return (int)((player->position.x+100)/500+1)+((int)((player->position.y-250)/500)*10);
+}
 
 int main() {
     GameConfig engineConfig;
@@ -154,6 +165,14 @@ int main() {
     // loading the enemies sprite sheets
     enemyBM1= loadBitmap(engine, "./assets/images/soldier1-sheet.png");
     enemyBM2= loadBitmap(engine, "./assets/images/soldier2-sheet.png");
+
+    // load plate bitmap
+    plateBM = loadBitmap(engine, "./assets/images/plate.png");
+
+    // load UI letter status bitmap
+    ALLEGRO_BITMAP* mainLetterStatusBM = loadBitmap(engine, "./assets/images/letter-status-sheet.png");
+    letterStatusTrueBM=createSubBitmap(engine, mainLetterStatusBM, 0, 0, 12, 12);
+    letterStatusFalseBM=createSubBitmap(engine, mainLetterStatusBM, 0, 12, 12, 12);
 
     // loading houses bitmaps
     for (int i=0; i<6; i++){
@@ -187,6 +206,7 @@ int main() {
     lastSceneBeforeMenu = insideBase;
 
     while (engine->isAlive) {
+        printf("\n%d", getPlayerNearHouse());
         render(engine);
     }
 
