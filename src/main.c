@@ -55,6 +55,7 @@ Text* sinopseTchau;
 Text* gameOverText;
 Text* mainMissionText;
 Text* closeHouseNumber;
+Text* playerDialog;
 Button* letterStatus;
 float fallingLeafs[100][3];
 
@@ -78,6 +79,12 @@ char* mainMissions[10] = {
     "Entregue a carta para a estação ferroviaria da cidade."
 };
 
+char* dialogsTexts[3] = {
+    "dialogo 1",
+    "dialogo 2",
+    "dialogo 3"
+};
+
 int walkIndex = 0;
 
 struct playerStatus playerStatus;
@@ -95,10 +102,10 @@ void onEvent(ALLEGRO_EVENT event, Scene * scene, CAEngine * engine) {
         if (event.keyboard.keycode == ALLEGRO_KEY_E) {
             if (!(playerStatus.carryingLetter) && pressEMessage->visible) {
                 // if letter is tutorial
-                if (playerStatus.closeLetterId == 0){
+                if (playerStatus.closeLetterId == 0) {
                     playerStatus.tutorialLetter=1;
                     tutorialLetterContent->visible = 1;
-                } else{
+                } else {
                     playerStatus.letterId = playerStatus.closeLetterId;
                     playerStatus.carryingLetter=1;
                 }
@@ -106,12 +113,19 @@ void onEvent(ALLEGRO_EVENT event, Scene * scene, CAEngine * engine) {
                 pressEMessage->visible = 0;
                 playerStatus.mainMissionId++;
                 changeText(mainMissionText, mainMissions[playerStatus.mainMissionId]);
-            } else if (playerStatus.carryingLetter && pressEMessage->visible){
+            } else if (playerStatus.carryingLetter && pressEMessage->visible){ 
+                playerStatus.inDialog = 1;
                 pressEMessage->visible=0;
-                playerStatus.carryingLetter=0;
-                playerStatus.mainMissionId++;
-                changeText(mainMissionText, mainMissions[playerStatus.mainMissionId]);
+                changeText(playerDialog, dialogsTexts[playerStatus.dialogId]);
             }
+        }
+        else if (event.keyboard.keycode == ALLEGRO_KEY_RIGHT && playerStatus.inDialog == 1) {
+            playerDialog->visible=0;
+            playerStatus.inDialog=0;
+            playerStatus.carryingLetter=0;
+            playerStatus.mainMissionId++;
+            playerStatus.dialogId++;
+            changeText(mainMissionText, mainMissions[playerStatus.mainMissionId]);
         }
         else if (event.keyboard.keycode == ALLEGRO_KEY_Z){
             if (playerStatus.tutorialLetter) {
@@ -198,9 +212,11 @@ int main() {
     playerStatus.carryingLetter = 0;
     playerStatus.firstZoomIn = 0;
     playerStatus.letterId = 0;
+    playerStatus.inDialog = 0;
     playerStatus.closeLetterId = 0;
     playerStatus.gameOverCount = 0;
     playerStatus.mainMissionId = 0;
+    playerStatus.dialogId = 0;
 
     loadMainMenu();
     loadBase();

@@ -55,6 +55,7 @@ extern Text* sinopseTchau;
 extern Text* gameOverText;
 extern Text* mainMissionText;
 extern Text* closeHouseNumber;
+extern Text* playerDialog;
 extern Button* letterStatus;
 extern float fallingLeafs[100][3];
 extern float timeSet;
@@ -62,6 +63,7 @@ extern char timeSetDir;
 // FIRST IS TUTORIAL
 extern char* lettersTexts[3];
 extern char* mainMissions[10];
+extern char* dialogsTexts[3];
 
 extern int walkIndex;
 
@@ -70,10 +72,12 @@ struct playerStatus{
     unsigned char carryingLetter; // carregando uma carta?
     unsigned char firstZoomIn; // ja vez o primeiro zoom in?
     unsigned char tutorialLetter; // ja pegou a carta tutorial?
+    unsigned char inDialog; //está em um diálogo?
     int letterId; // qual conteudo da carta que ele esta levando
     int closeLetterId; // a carta que ele esta proximo, ou que vai pegar
     int gameOverCount; // quantas vezes ele foi pego
     int mainMissionId; // id da missao principal
+    int dialogId; // qual dialogo deve ser mostrado
 };
 extern struct playerStatus playerStatus;
 

@@ -22,8 +22,7 @@ void loadBase(){
 
     letterObj = createGameObject(ANIMATED_SPRITE, 467, 280, 12, 12, insideBase);
     setGameObjectAnimation(letterObj, loadBitmap(engine, "./assets/images/letter-sheet.png"), 12, 12, 5, 16);
-    //como o letterContent tá sendo passado para >base, quando tenta abrir a carta em >gameMap ele não abre já que não está nessa cena e não dá pra incluir letterContent em >gameMap pq o addGameObjectToScene() não aceita parâmetro do tipo Text*
-    //dependendo da resolução vai precisar mudar dentro de gameSceneScript que é onde gerencia a visibilidade da carta
+ 
     tutorialLetterContent = createText(lettersTexts[0],
         10, 200, 400, al_map_rgb(0, 0, 0), al_map_rgba(165, 132, 83, 245), NULL, lettersFont, 40, 50, insideBase);
     tutorialLetterContent->visible = 0;
@@ -31,6 +30,9 @@ void loadBase(){
     pressEMessage = createText("Pressione E para interagir", engine->displayWidth / 2, 200, 0, al_map_rgb(255, 255, 255), al_map_rgba(0, 0, 0, 100), NULL, stdMessageFont, 40, 20, insideBase);
     pressEMessage->position.x -= al_get_text_width(stdMessageFont->font, pressEMessage->text) / 2;
     pressEMessage->visible = 0;
+
+    playerDialog = createText(dialogsTexts[playerStatus.dialogId], engine->displayWidth / 2 - 400, engine->displayHeight - 200, 800, al_map_rgb(255, 255, 255), al_map_rgba(0, 0, 0, 100), NULL, lettersFont, 20, 50, insideBase);
+    playerDialog->visible = 0;
 
 
     GameObject*  boxl = createGameObject(SOLID, 20, 20, 78, 50, insideBase);

@@ -142,11 +142,19 @@ void gameSceneScript(Scene* self) {
 
     // first letter give action
     if (playerStatus.carryingLetter && engine->currentScene == roomL && playerStatus.mainMissionId == 2){
-        pressEMessage->visible=1;
+        if (!playerStatus.inDialog) {
+            pressEMessage->visible=1;
+        } else {
+            playerDialog->visible = 1;
+        }
     }
     // second letter give action
     if (playerStatus.carryingLetter && engine->currentScene == roomM && playerStatus.mainMissionId == 4){
-        pressEMessage->visible=1;
+        if (!playerStatus.inDialog) {
+            pressEMessage->visible=1;
+        } else {
+            playerDialog->visible = 1;
+        }
     }
 
     // UNDER THIS ONLY THINGS THAT WILL WORK ONLY IN GAMEMAP SCENE
