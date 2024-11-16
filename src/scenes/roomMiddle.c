@@ -50,4 +50,5 @@ void loadRoomMiddle(){
     returnQuartelRoomM->collisionType = COLLISION_RECT;
 
     addButtonToScene(roomM, letterStatus);
+    addTextToScene(roomM, pressEMessage);
 }

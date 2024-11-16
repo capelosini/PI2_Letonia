@@ -28,7 +28,7 @@ void loadBase(){
         10, 200, 400, al_map_rgb(0, 0, 0), al_map_rgba(165, 132, 83, 245), NULL, lettersFont, 40, 50, insideBase);
     tutorialLetterContent->visible = 0;
 
-    pressEMessage = createText("Pressione E para pegar a carta", engine->displayWidth / 2, 200, 0, al_map_rgb(255, 255, 255), al_map_rgba(0, 0, 0, 100), NULL, stdMessageFont, 40, 20, insideBase);
+    pressEMessage = createText("Pressione E para interagir", engine->displayWidth / 2, 200, 0, al_map_rgb(255, 255, 255), al_map_rgba(0, 0, 0, 100), NULL, stdMessageFont, 40, 20, insideBase);
     pressEMessage->position.x -= al_get_text_width(stdMessageFont->font, pressEMessage->text) / 2;
     pressEMessage->visible = 0;
 
@@ -58,8 +58,8 @@ void loadBase(){
     exitBase->color = al_map_rgba(0, 0, 0, 0);
     exitBase->collisionEnabled = 1;
 
-    mainMissionText = createText(mainMissions[0], engine->displayWidth-300, 130, 300, al_map_rgb(255,255,255), al_map_rgba(0,0,0,240)
-    , NULL, lettersFont, 30, 30, insideBase);
+    mainMissionText = createText(mainMissions[0], engine->displayWidth-380, 130, 300, al_map_rgb(255,255,255), al_map_rgba(0,0,0,240)
+    , NULL, lettersFont, 40, 30, insideBase);
 
     letterStatus = createButton(engine, 20, 20, 50, 50, al_map_rgba(0, 0, 0, 0), al_map_rgba(0, 0, 0, 0), "", "./assets/fonts/roboto.ttf", letterStatusFalseBM, NULL);
     addButtonToScene(insideBase, letterStatus);

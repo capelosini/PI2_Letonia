@@ -34,10 +34,25 @@ void gameSceneScript(Scene* self) {
     if (!(mov.x || mov.y))
         player->animation.index.y = walkIndex;
 
+
+    // base tutorial intro letter check
     if (!playerStatus.tutorialLetter) {
         if (dist(player->position.x, player->position.y, player->width, player->height, letterObj->position.x, letterObj->position.y, letterObj->width, letterObj->height)
             <= 60) {
             playerStatus.closeLetterId = 0;
+            pressEMessage->visible = 1;
+        }
+        else {
+            pressEMessage->visible = 0;
+            tutorialLetterContent->visible = 0;
+        }
+    }
+    // base third mission letter
+    else if (!playerStatus.carryingLetter && playerStatus.mainMissionId == 3) {
+        playerStatus.closeLetterId=2;
+        letterObj->visible=1;
+        if (dist(player->position.x, player->position.y, player->width, player->height, letterObj->position.x, letterObj->position.y, letterObj->width, letterObj->height)
+            <= 60) {
             pressEMessage->visible = 1;
         }
         else {
@@ -117,9 +132,32 @@ void gameSceneScript(Scene* self) {
         player->physics.acc.y=0;
     }
 
+
+    // letter status change
+    if (letterStatus->bitmap == letterStatusFalseBM && playerStatus.carryingLetter == 1){
+        letterStatus->bitmap = letterStatusTrueBM;
+    } else if(letterStatus->bitmap == letterStatusTrueBM && playerStatus.carryingLetter == 0){
+        letterStatus->bitmap = letterStatusFalseBM;
+    }
+
+    // first letter give action
+    if (playerStatus.carryingLetter && engine->currentScene == roomL && playerStatus.mainMissionId == 2){
+        pressEMessage->visible=1;
+    }
+    // second letter give action
+    if (playerStatus.carryingLetter && engine->currentScene == roomM && playerStatus.mainMissionId == 4){
+        pressEMessage->visible=1;
+    }
+
+    // UNDER THIS ONLY THINGS THAT WILL WORK ONLY IN GAMEMAP SCENE
+    if (engine->currentScene != gameMap){
+        return;
+    }
+
+
     int currentHouse=getPlayerNearHouse();
 
-    if (currentHouse != lastHouse){
+    if (currentHouse > 0 && currentHouse < 100 && currentHouse != lastHouse){
         lastTime=time(NULL);
         lastHouse=currentHouse;
         closeHouseNumber->visible=1;
@@ -131,11 +169,17 @@ void gameSceneScript(Scene* self) {
 
         char tempstr[9];
         sprintf(tempstr, "Casa %d", currentHouse);
-        changeText(closeHouseNumber, tempstr);  
+        changeText(closeHouseNumber, tempstr);
     } else{
         if (time(NULL)-lastTime>2){
             closeHouseNumber->visible=0;
         }
+    }
+
+    // house get letter mission
+    if (playerStatus.mainMissionId == 1 && currentHouse == 72 && !pressEMessage->visible && !playerStatus.carryingLetter){
+        pressEMessage->visible=1;
+        playerStatus.closeLetterId=1;
     }
 
 }

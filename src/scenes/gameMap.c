@@ -143,4 +143,7 @@ void loadGameMap(){
     addButtonToScene(gameMap, letterStatus);
     Font* numberHouseFont = loadTTF(engine, "./assets/fonts/roboto.ttf", 20);
     closeHouseNumber = createText("Casa 72", engine->displayWidth/2-al_get_text_width(numberHouseFont->font, "Casa 100")/2, 20, 100, al_map_rgb(255, 100,0), al_map_rgba(0,0,0,0), NULL, numberHouseFont, 0, 0, gameMap);
+
+    addTextToScene(gameMap, pressEMessage);
+
 }

@@ -180,4 +180,7 @@ void loadQuartel(){
     exitQuartel->collisionType = COLLISION_RECT;
 
     addButtonToScene(quartel, letterStatus);
+
+    addTextToScene(quartel, mainMissionText);
+    addTextToScene(quartel, pressEMessage);
 }

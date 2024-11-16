@@ -72,7 +72,10 @@ char* lettersTexts[3]= {
 char* mainMissions[10] = {
     "Pegue a carta na mesa da base.",
     "Vá até a casa 72, e pegue a carta.",
-    "Missao 3"
+    "Entregue a carta para ... no quartel que fica na parte inferior direita da cidade.",
+    "Volte para a base para pegar a carta que te deixaram lá.",
+    "Vá ao quartel entregar a carta para ...",
+    "Entregue a carta para a estação ferroviaria da cidade."
 };
 
 int walkIndex = 0;
@@ -101,6 +104,11 @@ void onEvent(ALLEGRO_EVENT event, Scene * scene, CAEngine * engine) {
                 }
                 letterObj->visible = 0;
                 pressEMessage->visible = 0;
+                playerStatus.mainMissionId++;
+                changeText(mainMissionText, mainMissions[playerStatus.mainMissionId]);
+            } else if (playerStatus.carryingLetter && pressEMessage->visible){
+                pressEMessage->visible=0;
+                playerStatus.carryingLetter=0;
                 playerStatus.mainMissionId++;
                 changeText(mainMissionText, mainMissions[playerStatus.mainMissionId]);
             }
@@ -206,7 +214,6 @@ int main() {
     lastSceneBeforeMenu = insideBase;
 
     while (engine->isAlive) {
-        printf("\n%d", getPlayerNearHouse());
         render(engine);
     }
 
