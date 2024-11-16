@@ -42,4 +42,5 @@ void loadRoomLeft(){
 
     addButtonToScene(roomL, letterStatus);
     addTextToScene(roomL, pressEMessage);
+    addTextToScene(roomL, playerDialog);
 }

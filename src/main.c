@@ -57,6 +57,7 @@ Text* gameOverText;
 Text* mainMissionText;
 Text* closeHouseNumber;
 Text* letterShowText;
+Text* playerDialog;
 Button* letterStatus;
 float fallingLeafs[100][3];
 
@@ -80,6 +81,12 @@ char* mainMissions[10] = {
     "Vá ao quartel entregar a carta para o General Isidoro Dias Lopes",
     "Pegue uma carta com o General Euclides de Oliveira Figueiredo da sala à direita.",
     "Entregue a carta para os aliados na estação ferroviaria da cidade."
+};
+
+char* dialogsTexts[3] = {
+    "dialogo 1",
+    "dialogo 2",
+    "dialogo 3"
 };
 
 int walkIndex = 0;
@@ -106,10 +113,10 @@ void onEvent(ALLEGRO_EVENT event, Scene * scene, CAEngine * engine) {
             // take letter
             if (!(playerStatus.carryingLetter) && pressEMessage->visible) {
                 // if letter is tutorial
-                if (playerStatus.closeLetterId == 0){
+                if (playerStatus.closeLetterId == 0) {
                     playerStatus.tutorialLetter=1;
                     tutorialLetterContent->visible = 1;
-                } else{
+                } else {
                     playerStatus.letterId = playerStatus.closeLetterId;
                     playerStatus.carryingLetter=1;
                 }
@@ -133,7 +140,19 @@ void onEvent(ALLEGRO_EVENT event, Scene * scene, CAEngine * engine) {
                 lastSceneBeforeMenu = engine->currentScene;
                 changeText(letterShowText, lettersTexts[playerStatus.letterId]);
                 changeScene(engine, letterShow);
+            } else if (playerStatus.carryingLetter && pressEMessage->visible){ 
+                playerStatus.inDialog = 1;
+                pressEMessage->visible=0;
+                changeText(playerDialog, dialogsTexts[playerStatus.dialogId]);
             }
+        }
+        else if (event.keyboard.keycode == ALLEGRO_KEY_RIGHT && playerStatus.inDialog == 1) {
+            playerDialog->visible=0;
+            playerStatus.inDialog=0;
+            playerStatus.carryingLetter=0;
+            playerStatus.mainMissionId++;
+            playerStatus.dialogId++;
+            changeText(mainMissionText, mainMissions[playerStatus.mainMissionId]);
         }
         else if (event.keyboard.keycode == ALLEGRO_KEY_Z){
             if (playerStatus.tutorialLetter) {
@@ -220,11 +239,13 @@ int main() {
     playerStatus.carryingLetter = 0;
     playerStatus.firstZoomIn = 0;
     playerStatus.letterId = 0;
+    playerStatus.inDialog = 0;
     playerStatus.closeLetterId = 0;
     playerStatus.gameOverCount = 0;
     playerStatus.mainMissionId = 0;
     playerStatus.tutorialLetter = 0;
     playerStatus.isLastSafeZoneQuartel = 0;
+    playerStatus.dialogId = 0;
 
     loadMainMenu();
     loadBase();
@@ -236,7 +257,7 @@ int main() {
     loadSinopse();
     loadLetterShow();
 
-    lastSceneBeforeMenu = letterShow;
+    lastSceneBeforeMenu = insideBase;
 
     while (engine->isAlive) {
         render(engine);

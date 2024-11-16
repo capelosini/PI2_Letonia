@@ -5,7 +5,7 @@ void loadMainMenu(){
 
     for (int i = 0; i < 100; i++) {
         fallingLeafs[i][0] = randInt(-100, engine->displayWidth - 5);
-        fallingLeafs[i][1] = randInt(-500, 10);
+        fallingLeafs[i][1] = randInt(-300, 10);
         fallingLeafs[i][2] = randFloat(1, 2);
     }
 
