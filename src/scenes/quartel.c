@@ -10,7 +10,6 @@ void loadQuartel(){
     quartel->camera.followTarget = player;
     setupSceneWorld(quartel, loadBitmap(engine, "./assets/images/quartel.png"), 2500, 2500);
     addWorldTile(quartel, 0, 0, 0, 0);
-    addGameObjectToScene(quartel, player);
     quartelobj = createGameObject(SOLID, 0, 0, 2500, 2500, quartel);
     quartelobj->color = al_map_rgba(0, 0, 0, 0);
     quartelobj->collisionEnabled = 1;
@@ -183,4 +182,19 @@ void loadQuartel(){
 
     addTextToScene(quartel, mainMissionText);
     addTextToScene(quartel, pressEMessage);
+
+    GameObject* friendSoldier = createGameObject(ANIMATED_SPRITE, 880, 970, 36, 38, quartel);
+    setGameObjectAnimation(friendSoldier, enemyBM1, 16, 18, 8, 12);
+    friendSoldier->collisionEnabled=1;
+
+    friendSoldier = createGameObject(ANIMATED_SPRITE, 1600, 1600, 36, 38, quartel);
+    setGameObjectAnimation(friendSoldier, enemyBM1, 16, 18, 8, 12);
+    friendSoldier->collisionEnabled=1;
+    friendSoldier->animation.direction.x=-1;
+
+    friendSoldier = createGameObject(ANIMATED_SPRITE, 750, 1600, 36, 38, quartel);
+    setGameObjectAnimation(friendSoldier, enemyBM1, 16, 18, 8, 12);
+    friendSoldier->collisionEnabled=1;
+    
+    addGameObjectToScene(quartel, player);
 }

@@ -15,6 +15,7 @@ Scene* roomL;
 Scene* roomM;
 Scene* roomR;
 Scene* sinopse;
+Scene* letterShow;
 GameObject* player;
 GameObject* ghostPlayerMenu;
 GameObject* baseObj;
@@ -55,6 +56,7 @@ Text* sinopseTchau;
 Text* gameOverText;
 Text* mainMissionText;
 Text* closeHouseNumber;
+Text* letterShowText;
 Button* letterStatus;
 float fallingLeafs[100][3];
 
@@ -63,19 +65,21 @@ int enemiesCount=50;
 float timeSet = 0;
 char timeSetDir= 1;
 // FIRST IS TUTORIAL
-char* lettersTexts[3]= {
+char* lettersTexts[4]= {
     "Aldo, sua missão como escoteiro será ajudar os aliados pró-revolução e entregar as cartas para deixar todos no quartel informados, mas cuidado, pois alguns soldados estão pelas ruas querendo prender qualquer sujeito que tente ajudar a revolução.\n \nPressione Z para abrir/fechar.",
-    "Letter content 2",
-    "Letter content 3"
+    "9 de julho de 1932\n \nGeneral, São Paulo não aceitará a centralização do poder imposta por Getúlio Vargas. O povo clama por uma nova Constituição, e lideranças políticas e militares se uniram para defender a democracia. A revolução começou, e todos os esforços estão concentrados na organização das tropas.",
+    "25 de julho de 1932\n \nAs batalhas são intensas. Resistimos bravamente em várias frentes, mas estamos em desvantagem contra as forças federais. O apoio da população é nossa força: eles arrecadam ouro, doam mantimentos e costuram uniformes. Mesmo em meio às dificuldades, lutamos por uma causa justa.",
+    "18 de setembro de 1932\n \nApós meses de luta, nossos recursos chegaram ao fim, e as forças inimigas são superiores. Apesar da derrota militar, nossa causa ecoou no Brasil. Getúlio Vargas já anuncia uma Assembleia Constituinte. Nosso sacrifício não foi em vão: a democracia renascerá."
 };
 
 char* mainMissions[10] = {
     "Pegue a carta na mesa da base.",
     "Vá até a casa 72, e pegue a carta.",
-    "Entregue a carta para ... no quartel que fica na parte inferior direita da cidade.",
+    "Entregue a carta para o General Bertoldo Klinger no quartel na parte inferior direita da cidade.",
     "Volte para a base para pegar a carta que te deixaram lá.",
-    "Vá ao quartel entregar a carta para ...",
-    "Entregue a carta para a estação ferroviaria da cidade."
+    "Vá ao quartel entregar a carta para o General Isidoro Dias Lopes",
+    "Pegue uma carta com o General Euclides de Oliveira Figueiredo da sala à direita.",
+    "Entregue a carta para os aliados na estação ferroviaria da cidade."
 };
 
 int walkIndex = 0;
@@ -92,7 +96,14 @@ void onEvent(ALLEGRO_EVENT event, Scene * scene, CAEngine * engine) {
         }
     }
     else if (event.type == ALLEGRO_EVENT_KEY_UP) {
+
+        // close letter show
+        if (engine->currentScene == letterShow){
+            changeScene(engine, lastSceneBeforeMenu);
+        }
+
         if (event.keyboard.keycode == ALLEGRO_KEY_E) {
+            // take letter
             if (!(playerStatus.carryingLetter) && pressEMessage->visible) {
                 // if letter is tutorial
                 if (playerStatus.closeLetterId == 0){
@@ -106,11 +117,22 @@ void onEvent(ALLEGRO_EVENT event, Scene * scene, CAEngine * engine) {
                 pressEMessage->visible = 0;
                 playerStatus.mainMissionId++;
                 changeText(mainMissionText, mainMissions[playerStatus.mainMissionId]);
-            } else if (playerStatus.carryingLetter && pressEMessage->visible){
+                if (playerStatus.mainMissionId == 6){
+                    lastSceneBeforeMenu = engine->currentScene;
+                    changeText(letterShowText, lettersTexts[playerStatus.letterId]);
+                    changeScene(engine, letterShow);
+                }
+            } 
+            // give letter
+            else if (playerStatus.carryingLetter && pressEMessage->visible){
                 pressEMessage->visible=0;
                 playerStatus.carryingLetter=0;
                 playerStatus.mainMissionId++;
                 changeText(mainMissionText, mainMissions[playerStatus.mainMissionId]);
+                
+                lastSceneBeforeMenu = engine->currentScene;
+                changeText(letterShowText, lettersTexts[playerStatus.letterId]);
+                changeScene(engine, letterShow);
             }
         }
         else if (event.keyboard.keycode == ALLEGRO_KEY_Z){
@@ -201,6 +223,8 @@ int main() {
     playerStatus.closeLetterId = 0;
     playerStatus.gameOverCount = 0;
     playerStatus.mainMissionId = 0;
+    playerStatus.tutorialLetter = 0;
+    playerStatus.isLastSafeZoneQuartel = 0;
 
     loadMainMenu();
     loadBase();
@@ -210,8 +234,9 @@ int main() {
     loadRoomMiddle();
     loadRoomRight();
     loadSinopse();
+    loadLetterShow();
 
-    lastSceneBeforeMenu = insideBase;
+    lastSceneBeforeMenu = letterShow;
 
     while (engine->isAlive) {
         render(engine);

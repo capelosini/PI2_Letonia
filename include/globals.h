@@ -13,6 +13,7 @@ extern Scene* roomL;
 extern Scene* roomM;
 extern Scene* roomR;
 extern Scene* sinopse;
+extern Scene* letterShow;
 extern GameObject* player;
 extern GameObject* ghostPlayerMenu;
 extern GameObject* baseObj;
@@ -55,12 +56,13 @@ extern Text* sinopseTchau;
 extern Text* gameOverText;
 extern Text* mainMissionText;
 extern Text* closeHouseNumber;
+extern Text* letterShowText;
 extern Button* letterStatus;
 extern float fallingLeafs[100][3];
 extern float timeSet;
 extern char timeSetDir;
 // FIRST IS TUTORIAL
-extern char* lettersTexts[3];
+extern char* lettersTexts[4];
 extern char* mainMissions[10];
 
 extern int walkIndex;
@@ -74,6 +76,7 @@ struct playerStatus{
     int closeLetterId; // a carta que ele esta proximo, ou que vai pegar
     int gameOverCount; // quantas vezes ele foi pego
     int mainMissionId; // id da missao principal
+    unsigned char isLastSafeZoneQuartel; // last safe zone is quartel?
 };
 extern struct playerStatus playerStatus;
 
@@ -109,5 +112,7 @@ void loadRoomLeft();
 void loadSinopse();
 void loadRoomRight();
 void loadRoomMiddle();
+void loadLetterShow();
+void letterShowScript(Scene* self);
 
 #endif

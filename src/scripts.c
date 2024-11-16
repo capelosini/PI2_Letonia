@@ -140,13 +140,23 @@ void gameSceneScript(Scene* self) {
         letterStatus->bitmap = letterStatusFalseBM;
     }
 
+    // last letter mission get letter
+    if (playerStatus.mainMissionId == 5 && engine->currentScene == roomR && playerStatus.carryingLetter == 0 && !pressEMessage->visible){
+        pressEMessage->visible=1;
+        playerStatus.closeLetterId=3;
+    }
+
+
     // first letter give action
     if (playerStatus.carryingLetter && engine->currentScene == roomL && playerStatus.mainMissionId == 2){
         pressEMessage->visible=1;
     }
     // second letter give action
-    if (playerStatus.carryingLetter && engine->currentScene == roomM && playerStatus.mainMissionId == 4){
+    else if (playerStatus.carryingLetter && engine->currentScene == roomM && playerStatus.mainMissionId == 4){
         pressEMessage->visible=1;
+    } 
+    else if (playerStatus.mainMissionId == 2 || playerStatus.mainMissionId == 4){
+        pressEMessage->visible=0;
     }
 
     // UNDER THIS ONLY THINGS THAT WILL WORK ONLY IN GAMEMAP SCENE
@@ -211,4 +221,7 @@ void mainMenuScript(Scene* self) {
         al_set_timer_count(engine->timer, 0);
     }
 
+}
+
+void letterShowScript(Scene* self){
 }

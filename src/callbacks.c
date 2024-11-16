@@ -19,6 +19,7 @@ void onGameExit(Scene* scene){
 
 //stage change
 void onOpenBase(Scene* scene) {
+    playerStatus.isLastSafeZoneQuartel=0;
     if (engine->currentScene == gameMap)
     {
         player->position.x = 450;
@@ -42,11 +43,13 @@ void onOpenGameMap(Scene* scene) {
 void onOpenGameMapR(Scene* scene) {
     player->position = (Vector2){ map->width  - 80, map->height - 360 };
     gameMap->camera.offset = (Vector2){ player->position.x, player->position.y };
+    restartEnemiesPos();
     changeScene(engine, gameMap);
 }
 
 void onOpenQuartel(Scene* scene)
 {
+    playerStatus.isLastSafeZoneQuartel=1;
     player->position = (Vector2){ quartelobj->position.x + quartelobj->width / 2 - 100 ,  quartelobj->height - 60 };
     quartel->camera.offset = (Vector2){ player->position.x, player->position.y };
     changeScene(engine, quartel);
@@ -135,7 +138,11 @@ void onEnemyCollision(GameObject* self, GameObject* obj)
         {
             playerStatus.gameOverCount++;
             gameOverText->visible=1;
-            onOpenBase(NULL);
+            if (playerStatus.isLastSafeZoneQuartel){
+                onOpenQuartel(NULL);
+            } else {
+                onOpenBase(NULL);
+            }
         }
     }
 }
