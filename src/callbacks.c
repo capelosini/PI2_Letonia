@@ -56,8 +56,8 @@ void onOpenGameMapR(Scene* scene) {
         playEndCutscene();
         playerStatus.mainMissionId++;
         changeText(mainMissionText, mainMissions[playerStatus.mainMissionId]);
-        lastSceneBeforeMenu = engine->currentScene;
-        changeScene(engine, mainMenu);
+        stopAudioStream(menuMusic);
+        onOpenMenu(NULL);
     }
 }
 

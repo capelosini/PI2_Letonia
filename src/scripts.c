@@ -45,7 +45,7 @@ void gameSceneScript(Scene* self) {
         }
     }
     // base third mission letter
-    else if (!playerStatus.carryingLetter && playerStatus.mainMissionId == 3) {
+    else if (!playerStatus.carryingLetter && engine->currentScene == insideBase && playerStatus.mainMissionId == 3) {
         playerStatus.closeLetterId=2;
         letterObj->visible=1;
         if (dist(player->position.x, player->position.y, player->width, player->height, letterObj->position.x, letterObj->position.y, letterObj->width, letterObj->height)
