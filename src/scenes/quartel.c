@@ -197,4 +197,5 @@ void loadQuartel(){
     friendSoldier->collisionEnabled=1;
     
     addGameObjectToScene(quartel, player);
+    addTextToScene(quartel, gameOverText);
 }

@@ -1,16 +1,21 @@
 #include "../include/globals.h"
-#include <allegro5/altime.h>
-#include <allegro5/display.h>
 
 void onOpenMenu(Scene* scene)
-{
+{   
+    char out[] = "Você foi pego 0000 vezes";
+    sprintf(out, "Você foi pego %d vezes", playerStatus.gameOverCount);
+    changeText(gameOverCountText, out);
     lastSceneBeforeMenu = engine->currentScene;
     changeScene(engine, mainMenu);
+    playClickSound();
+    playAudioStream(menuMusic);
 }
 
 void onOpenRestart(Scene* scene)
 {
     changeScene(engine, lastSceneBeforeMenu);
+    playClickSound();
+    pauseAudioStream(menuMusic);
 }
 
 void onGameExit(Scene* scene){
@@ -30,6 +35,8 @@ void onOpenBase(Scene* scene) {
 void onOpenGameMap(Scene* scene) {
     if (!playerStatus.tutorialLetter)
         return;
+    if (!gameOverCountText->visible)
+        gameOverCountText->visible = 1;
     player->position = (Vector2){ baseObj->position.x + baseObj->width/2 - 18, baseObj->position.y + baseObj->height - 98 };
     gameMap->camera.offset = (Vector2){ player->position.x, player->position.y };
     if (!playerStatus.firstZoomIn){
@@ -42,9 +49,16 @@ void onOpenGameMap(Scene* scene) {
 
 void onOpenGameMapR(Scene* scene) {
     player->position = (Vector2){ map->width  - 80, map->height - 360 };
-    gameMap->camera.offset = (Vector2){ player->position.x, player->position.y };
+    gameMap->camera.offset = (Vector2){ 9999, 9999 };
     restartEnemiesPos();
     changeScene(engine, gameMap);
+    if (playerStatus.mainMissionId == 6){
+        playEndCutscene();
+        playerStatus.mainMissionId++;
+        changeText(mainMissionText, mainMissions[playerStatus.mainMissionId]);
+        lastSceneBeforeMenu = engine->currentScene;
+        changeScene(engine, mainMenu);
+    }
 }
 
 void onOpenQuartel(Scene* scene)

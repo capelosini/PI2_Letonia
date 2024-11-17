@@ -2,6 +2,9 @@
 #define GLOBALS_H
 
 #include "../CAE/include/CAE.h"
+#include <stdio.h>
+#include <math.h>
+#include <time.h>
 
 extern CAEngine* engine;
 extern Scene* mainMenu;
@@ -36,7 +39,7 @@ extern GameObject* map;
 extern GameObject* exitQuartel;
 // enemiesCount and enemies[] length needs be equal
 extern int enemiesCount;
-extern GameObject* enemies[50];
+extern GameObject* enemies[75];
 extern GameObject* testBush;
 extern GameObject* timeGameMap;
 extern ALLEGRO_BITMAP* enemyBM1;
@@ -47,6 +50,8 @@ extern ALLEGRO_BITMAP* roadV;
 extern ALLEGRO_BITMAP* plateBM;
 extern ALLEGRO_BITMAP* letterStatusTrueBM;
 extern ALLEGRO_BITMAP* letterStatusFalseBM;
+extern ALLEGRO_SAMPLE* clickSound;
+extern ALLEGRO_AUDIO_STREAM* menuMusic;
 extern Font* lettersFont;
 extern Font* stdMessageFont;
 extern Font* titleFont;
@@ -58,6 +63,7 @@ extern Text* mainMissionText;
 extern Text* closeHouseNumber;
 extern Text* letterShowText;
 extern Text* playerDialog;
+extern Text* gameOverCountText;
 extern Button* letterStatus;
 extern float fallingLeafs[100][3];
 extern float timeSet;
@@ -104,6 +110,8 @@ void onEnemyCollision(GameObject* self, GameObject* obj);
 void restartEnemiesPos();
 unsigned char isOnRoad(GameObject* obj);
 int getPlayerNearHouse();
+void playEndCutscene();
+void playClickSound();
 
 void mainMenuScript(Scene* self);
 void loadMainMenu();

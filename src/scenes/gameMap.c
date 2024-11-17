@@ -1,5 +1,4 @@
 #include "../../include/globals.h"
-#include <allegro5/color.h>
 
 void loadGameMap(){
     gameMap = createScene(engine, gameSceneScript);
@@ -107,6 +106,8 @@ void loadGameMap(){
             h->collisionEnabled=1;
             h->startCollisionOffset.y = 150;
             h->endCollisionOffset.y=30;
+            h->startCollisionOffset.x = 30;
+            h->endCollisionOffset.x = -30;
 
             GameObject* plate = createGameObject(SPRITE, h->position.x+h->width-50, h->position.y+h->height-50, 50, 49, gameMap);
             setGameObjectBitmap(plate, plateBM);

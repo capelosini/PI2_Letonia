@@ -1,7 +1,4 @@
-#include "../CAE/include/CAE.h"
 #include "../include/globals.h"
-#include <allegro5/bitmap.h>
-#include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
 
@@ -36,7 +33,7 @@ GameObject* returnQuartelRoomR;
 GameObject* gridGameMap;
 GameObject* map;
 GameObject* exitQuartel;
-GameObject* enemies[50];
+GameObject* enemies[75];
 GameObject* testBush;
 GameObject* timeGameMap;
 ALLEGRO_BITMAP* enemyBM1;
@@ -47,6 +44,8 @@ ALLEGRO_BITMAP* roadV;
 ALLEGRO_BITMAP* plateBM;
 ALLEGRO_BITMAP* letterStatusTrueBM;
 ALLEGRO_BITMAP* letterStatusFalseBM;
+ALLEGRO_SAMPLE* clickSound;
+ALLEGRO_AUDIO_STREAM* menuMusic;
 Font* lettersFont;
 Font* stdMessageFont;
 Font* titleFont;
@@ -58,11 +57,12 @@ Text* mainMissionText;
 Text* closeHouseNumber;
 Text* letterShowText;
 Text* playerDialog;
+Text* gameOverCountText;
 Button* letterStatus;
 float fallingLeafs[100][3];
 
 // enemiesCount and enemies[] length needs be equal
-int enemiesCount=50;
+int enemiesCount=75;
 float timeSet = 0;
 char timeSetDir= 1;
 // FIRST IS TUTORIAL
@@ -80,7 +80,8 @@ char* mainMissions[10] = {
     "Volte para a base para pegar a carta que te deixaram lá.",
     "Vá ao quartel entregar a carta para o General Isidoro Dias Lopes",
     "Pegue uma carta com o General Euclides de Oliveira Figueiredo da sala à direita.",
-    "Entregue a carta para os aliados na estação ferroviaria da cidade."
+    "Entregue a carta para os aliados na estação ferroviaria da cidade.",
+    "Aproveite o mapa e se divirta fugindo dos soldados!"
 };
 
 char* dialogsTexts[3] = {
@@ -129,6 +130,7 @@ void onEvent(ALLEGRO_EVENT event, Scene * scene, CAEngine * engine) {
                     changeText(letterShowText, lettersTexts[playerStatus.letterId]);
                     changeScene(engine, letterShow);
                 }
+                playClickSound();
             } 
             // give letter
             else if (playerStatus.carryingLetter && pressEMessage->visible){
@@ -140,10 +142,12 @@ void onEvent(ALLEGRO_EVENT event, Scene * scene, CAEngine * engine) {
                 lastSceneBeforeMenu = engine->currentScene;
                 changeText(letterShowText, lettersTexts[playerStatus.letterId]);
                 changeScene(engine, letterShow);
+                playClickSound();
             } else if (playerStatus.carryingLetter && pressEMessage->visible){ 
                 playerStatus.inDialog = 1;
                 pressEMessage->visible=0;
                 changeText(playerDialog, dialogsTexts[playerStatus.dialogId]);
+                playClickSound();
             }
         }
         else if (event.keyboard.keycode == ALLEGRO_KEY_RIGHT && playerStatus.inDialog == 1) {
@@ -157,6 +161,7 @@ void onEvent(ALLEGRO_EVENT event, Scene * scene, CAEngine * engine) {
         else if (event.keyboard.keycode == ALLEGRO_KEY_Z){
             if (playerStatus.tutorialLetter) {
                 tutorialLetterContent->visible = !tutorialLetterContent->visible;
+                playClickSound();
             }
         }
     }
@@ -188,14 +193,37 @@ void restartEnemiesPos(){
     for (int i = 0; i < enemiesCount; i++)
     {
         do {
-            enemies[i]->position.x = randInt(500, 4500);
-            enemies[i]->position.y = randInt(500, 4500);
+            enemies[i]->position.x = randInt(1, 4500);
+            enemies[i]->position.y = randInt(1, 5000);
         } while(!isOnRoad(enemies[i]));
     }
 }
 
 int getPlayerNearHouse(){
     return (int)((player->position.x+100)/500+1)+((int)((player->position.y-250)/500)*10);
+}
+
+void playEndCutscene(){
+    ALLEGRO_VIDEO* video = al_open_video("./assets/videos/fim.ogv");
+    if (!video){
+        printf("\nFailed to load end cutscene video");
+        return;
+    }
+    al_start_video(video, al_get_default_mixer());
+    while(al_is_video_playing(video)){
+        ALLEGRO_BITMAP* frame = al_get_video_frame(video);
+        if (frame){
+            al_draw_scaled_bitmap(frame, 0, 0, al_get_bitmap_width(frame), al_get_bitmap_height(frame), 0, 0, engine->displayWidth, engine->displayHeight, 0);
+            al_flip_display();
+        }
+        al_rest(1.0 / 60);
+    }
+    al_flush_event_queue(engine->ev_queue);
+    al_close_video(video);
+}
+
+void playClickSound(){
+    playAudioSample(clickSound, 0.5, 0, 1, ALLEGRO_PLAYMODE_ONCE);
 }
 
 int main() {
@@ -233,6 +261,11 @@ int main() {
     // loading roads bitmaps
     roadH = loadBitmap(engine, "./assets/images/estradal.png");
     roadV = loadBitmap(engine, "./assets/images/estrada.png");
+
+    // sounds
+    clickSound = loadAudioSample(engine, "./assets/sounds/sfx.wav");
+    menuMusic = loadAudioStream(engine, "./assets/sounds/musica-menu.wav", 2, 2048);
+    configureAudioStream(menuMusic, 1, 0, 1, ALLEGRO_PLAYMODE_LOOP);
 
     // set playerStatus to default
     playerStatus.isHidden = 0;

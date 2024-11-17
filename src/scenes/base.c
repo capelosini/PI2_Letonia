@@ -1,5 +1,4 @@
 #include "../../include/globals.h"
-#include <allegro5/color.h>
 
 void loadBase(){
     insideBase = createScene(engine, gameSceneScript);

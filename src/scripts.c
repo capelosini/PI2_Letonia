@@ -1,7 +1,4 @@
 #include "../include/globals.h"
-#include <math.h>
-#include <stdio.h>
-#include <time.h>
 
 int lastHouse=0;
 time_t lastTime;
