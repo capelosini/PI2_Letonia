@@ -198,4 +198,5 @@ void loadQuartel(){
     
     addGameObjectToScene(quartel, player);
     addTextToScene(quartel, gameOverText);
+    addTextToScene(quartel, tutorialLetterContent);
 }

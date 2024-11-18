@@ -2,6 +2,8 @@
 
 void onOpenMenu(Scene* scene)
 {   
+    stopAudioStream(cityNoise);
+    stopAudioStream(stepsSound);
     char out[] = "Você foi pego 0000 vezes";
     sprintf(out, "Você foi pego %d vezes", playerStatus.gameOverCount);
     changeText(gameOverCountText, out);
@@ -41,7 +43,6 @@ void onOpenGameMap(Scene* scene) {
     gameMap->camera.offset = (Vector2){ player->position.x, player->position.y };
     if (!playerStatus.firstZoomIn){
         gameMap->camera.zoom=0.2;
-        playerStatus.firstZoomIn=1;
     }
     restartEnemiesPos();
     changeScene(engine, gameMap);

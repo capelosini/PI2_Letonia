@@ -52,4 +52,5 @@ void loadRoomMiddle(){
     addButtonToScene(roomM, letterStatus);
     addTextToScene(roomM, pressEMessage);
     addTextToScene(roomM, playerDialog);
+    addTextToScene(roomM, tutorialLetterContent);
 }

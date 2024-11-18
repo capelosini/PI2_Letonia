@@ -12,6 +12,18 @@ void gameSceneScript(Scene* self) {
 
     player->physics.acc = (Vector2){ abs(mov.x), abs(mov.y) };
 
+    if (mov.x != 0 || mov.y != 0) {
+        playAudioStream(stepsSound);
+    } else{
+        pauseAudioStream(stepsSound);
+    }
+
+    if (engine->currentScene == gameMap && !al_get_audio_stream_playing(cityNoise)){
+        playAudioStream(cityNoise);
+    } else if (engine->currentScene != gameMap && al_get_audio_stream_playing(cityNoise)){
+        pauseAudioStream(cityNoise);
+    }
+
     if (mov.y != 0) {
         player->physics.directions.y = mov.y;
         if (mov.y < 0) {
@@ -59,8 +71,10 @@ void gameSceneScript(Scene* self) {
     }
 
     // enemies movement
+    playerStatus.enemiesFollowing = 0;
     for (int i = 0; i < enemiesCount; i++) {
         if (dist(enemies[i]->position.x, enemies[i]->position.y, enemies[i]->width, enemies[i]->height, player->position.x, player->position.y, player->width, player->height) <= 200) {
+            playerStatus.enemiesFollowing = 1;
             double hy = hypot(player->position.x - enemies[i]->position.x, player->position.y - enemies[i]->position.y);
             // find angle by cos formula
             enemies[i]->physics.acc.x = fabs(player->position.x - enemies[i]->position.x) / hy;
@@ -92,6 +106,7 @@ void gameSceneScript(Scene* self) {
 
             if (playerStatus.isHidden)
             {
+                playerStatus.enemiesFollowing = 0;
                 enemies[i]->physics.directions.x *= -1;
                 enemies[i]->physics.directions.y *= -1;
                 enemies[i]->animation.direction.x *= -1;
@@ -116,18 +131,12 @@ void gameSceneScript(Scene* self) {
         playerStatus.isHidden = 0;
     }
 
-
-    if (timeSet > 140 || timeSet < 0){
-        timeSetDir *= -1;
-    }
-    timeSet+=0.05*timeSetDir;
-    timeGameMap->color = al_map_rgba(0,0,30/140*timeSet,(int)timeSet);
-
-    if (engine->currentScene == gameMap && gameMap->camera.zoom < 1.5){
-        gameMap->camera.zoom+=0.01;
-        player->physics.acc.x=0;
-        player->physics.acc.y=0;
-    }
+    // time functionality, disabled
+    // if (timeSet > 140 || timeSet < 0){
+    //     timeSetDir *= -1;
+    // }
+    // timeSet+=0.05*timeSetDir;
+    // timeGameMap->color = al_map_rgba(0,0,30/140*timeSet,(int)timeSet);
 
 
     // letter status change
@@ -172,6 +181,29 @@ void gameSceneScript(Scene* self) {
         return;
     }
 
+    // first zoom in handle
+    if (!playerStatus.firstZoomIn && gameMap->camera.zoom < 1.5){
+        gameMap->camera.zoom+=0.01;
+        player->physics.acc.x=0;
+        player->physics.acc.y=0;
+    } else{
+        playerStatus.firstZoomIn=1;
+    }
+
+    // on player been following
+    if (playerStatus.firstZoomIn && playerStatus.enemiesFollowing){
+        timeGameMap->color = al_map_rgba(30, 10, 0, 1);
+        if (gameMap->camera.zoom < 1.7){
+            gameMap->camera.zoom+=0.01;
+        }
+    } else if (playerStatus.firstZoomIn){
+        timeGameMap->color = al_map_rgba(30, 20, 0, 1);
+        if (gameMap->camera.zoom > 1.5){
+            gameMap->camera.zoom-=0.005;
+        } else{
+            gameMap->camera.zoom=1.5;
+        }
+    }
 
     int currentHouse=getPlayerNearHouse();
 

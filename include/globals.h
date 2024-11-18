@@ -52,6 +52,8 @@ extern ALLEGRO_BITMAP* letterStatusTrueBM;
 extern ALLEGRO_BITMAP* letterStatusFalseBM;
 extern ALLEGRO_SAMPLE* clickSound;
 extern ALLEGRO_AUDIO_STREAM* menuMusic;
+extern ALLEGRO_AUDIO_STREAM* stepsSound;
+extern ALLEGRO_AUDIO_STREAM* cityNoise;
 extern Font* lettersFont;
 extern Font* stdMessageFont;
 extern Font* titleFont;
@@ -87,6 +89,7 @@ struct playerStatus{
     int mainMissionId; // id da missao principal
     unsigned char isLastSafeZoneQuartel; // last safe zone is quartel?
     int dialogId; // qual dialogo deve ser mostrado
+    unsigned char enemiesFollowing; // esta fugindo de inimigos?
 };
 extern struct playerStatus playerStatus;
 

@@ -46,6 +46,8 @@ ALLEGRO_BITMAP* letterStatusTrueBM;
 ALLEGRO_BITMAP* letterStatusFalseBM;
 ALLEGRO_SAMPLE* clickSound;
 ALLEGRO_AUDIO_STREAM* menuMusic;
+ALLEGRO_AUDIO_STREAM* stepsSound;
+ALLEGRO_AUDIO_STREAM* cityNoise;
 Font* lettersFont;
 Font* stdMessageFont;
 Font* titleFont;
@@ -194,7 +196,7 @@ void restartEnemiesPos(){
     {
         do {
             enemies[i]->position.x = randInt(1, 4500);
-            enemies[i]->position.y = randInt(1, 5000);
+            enemies[i]->position.y = randInt(700, 5000);
         } while(!isOnRoad(enemies[i]));
     }
 }
@@ -266,6 +268,12 @@ int main() {
     clickSound = loadAudioSample(engine, "./assets/sounds/sfx.wav");
     menuMusic = loadAudioStream(engine, "./assets/sounds/musica-menu.wav", 2, 2048);
     configureAudioStream(menuMusic, 1, 0, 1, ALLEGRO_PLAYMODE_LOOP);
+    stepsSound = loadAudioStream(engine, "./assets/sounds/steps.wav", 2, 2048);
+    configureAudioStream(stepsSound, 0.5, 0, 1, ALLEGRO_PLAYMODE_LOOP);
+    cityNoise = loadAudioStream(engine, "./assets/sounds/city-noise.wav", 2, 2048);
+    configureAudioStream(stepsSound, 0.5, 0, 1, ALLEGRO_PLAYMODE_LOOP);
+    stopAudioStream(stepsSound);
+    stopAudioStream(cityNoise);
 
     // set playerStatus to default
     playerStatus.isHidden = 0;
@@ -279,6 +287,7 @@ int main() {
     playerStatus.tutorialLetter = 0;
     playerStatus.isLastSafeZoneQuartel = 0;
     playerStatus.dialogId = 0;
+    playerStatus.enemiesFollowing = 0;
 
     loadMainMenu();
     loadBase();
