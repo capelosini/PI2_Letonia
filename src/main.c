@@ -89,9 +89,9 @@ char* mainMissions[10] = {
 };
 
 char* dialogsTexts[3] = {
-    "dialogo 1",
-    "dialogo 2",
-    "dialogo 3"
+    "Estamos muito contentes de ter um jovem como você disposto a ajudar nossa causa, ótimo trabalho Aldo!",
+    "Os soldados lá fora podem parecer assustadores mas lembre, não é o medo que deve te guiar, mas o desejo de cumprir seu dever.",
+    "Não sabemos por quanto tempo essa guerra ainda durará... Mas eu gostaria de agradecê-lo por todos seu serviços Aldo, é uma honra tê-lo ao nosso lado."
 };
 
 int walkIndex = 0;
@@ -132,38 +132,41 @@ void onEvent(ALLEGRO_EVENT event, Scene * scene, CAEngine * engine) {
                 playerStatus.mainMissionId++;
                 changeText(mainMissionText, mainMissions[playerStatus.mainMissionId]);
                 if (playerStatus.mainMissionId == 6){
+                    pressEMessage->visible = 1;
                     lastSceneBeforeMenu = engine->currentScene;
                     changeText(letterShowText, lettersTexts[playerStatus.letterId]);
                     changeScene(engine, letterShow);
                 }
                 playClickSound();
-            } 
-            // give letter
-            else if (playerStatus.carryingLetter && pressEMessage->visible){
-                pressEMessage->visible=0;
-                playerStatus.carryingLetter=0;
-                playerStatus.mainMissionId++;
-                changeText(mainMissionText, mainMissions[playerStatus.mainMissionId]);
-                
-                lastSceneBeforeMenu = engine->currentScene;
-                changeText(letterShowText, lettersTexts[playerStatus.letterId]);
-                pauseAudioStream(stepsSound);
-                changeScene(engine, letterShow);
-                playClickSound();
-            } else if (playerStatus.carryingLetter && pressEMessage->visible){ 
-                playerStatus.inDialog = 1;
-                pressEMessage->visible=0;
-                changeText(playerDialog, dialogsTexts[playerStatus.dialogId]);
-                playClickSound();
             }
-        }
-        else if (event.keyboard.keycode == ALLEGRO_KEY_RIGHT && playerStatus.inDialog == 1) {
-            playerDialog->visible=0;
-            playerStatus.inDialog=0;
-            playerStatus.carryingLetter=0;
-            playerStatus.mainMissionId++;
-            playerStatus.dialogId++;
-            changeText(mainMissionText, mainMissions[playerStatus.mainMissionId]);
+            //open dialog
+            else if (playerStatus.carryingLetter && pressEMessage->visible) {
+                pressEMessage->visible = 0;
+                playerStatus.inDialog = 1;
+
+                playClickSound();
+                return;
+            }
+
+            //go to letterShow scene and update text boxes 
+            if (playerStatus.inDialog) {
+                playerDialog->visible = 0;
+                playerStatus.inDialog = 0;
+                playerStatus.carryingLetter = 0;
+                playerStatus.dialogId++;
+
+                if (playerStatus.dialogId < 3) {
+                    playerStatus.mainMissionId++;
+                    changeText(letterShowText, lettersTexts[playerStatus.letterId]);
+                    changeText(playerDialog, dialogsTexts[playerStatus.dialogId]);
+                    changeText(mainMissionText, mainMissions[playerStatus.mainMissionId]);
+
+                    pauseAudioStream(stepsSound);
+                    lastSceneBeforeMenu = engine->currentScene;
+                    changeScene(engine, letterShow);
+                }
+
+            }
         }
         else if (event.keyboard.keycode == ALLEGRO_KEY_F){
             if (playerStatus.tutorialLetter) {

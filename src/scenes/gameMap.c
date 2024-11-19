@@ -55,7 +55,6 @@ void loadGameMap(){
     player->position.y = 300;
     player->physics.enabled = 1;
     player->physics.friction = 0.4;
-    player->physics.maxSpeed = 4;
     player->collisionEnabled = 1;
     player->collisionType = COLLISION_RECT;
     player->startCollisionOffset.y = 35;

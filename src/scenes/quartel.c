@@ -183,16 +183,16 @@ void loadQuartel(){
     addTextToScene(quartel, mainMissionText);
     addTextToScene(quartel, pressEMessage);
 
-    GameObject* friendSoldier = createGameObject(ANIMATED_SPRITE, 880, 970, 36, 38, quartel);
+    GameObject* friendSoldier = createGameObject(ANIMATED_SPRITE, 880, 970, 46, 52, quartel);
     setGameObjectAnimation(friendSoldier, enemyBM1, 16, 18, 8, 12);
     friendSoldier->collisionEnabled=1;
 
-    friendSoldier = createGameObject(ANIMATED_SPRITE, 1600, 1600, 36, 38, quartel);
+    friendSoldier = createGameObject(ANIMATED_SPRITE, 1600, 1600, 46, 52, quartel);
     setGameObjectAnimation(friendSoldier, enemyBM1, 16, 18, 8, 12);
     friendSoldier->collisionEnabled=1;
     friendSoldier->animation.direction.x=-1;
 
-    friendSoldier = createGameObject(ANIMATED_SPRITE, 750, 1600, 36, 38, quartel);
+    friendSoldier = createGameObject(ANIMATED_SPRITE, 750, 1600, 46, 52, quartel);
     setGameObjectAnimation(friendSoldier, enemyBM1, 16, 18, 8, 12);
     friendSoldier->collisionEnabled=1;
     

@@ -11,7 +11,7 @@ void gameSceneScript(Scene* self) {
     Vector2 mov = getMovementVector2(&keyState, ALLEGRO_KEY_A, ALLEGRO_KEY_D, ALLEGRO_KEY_W, ALLEGRO_KEY_S);
 
     player->physics.acc = (Vector2){ abs(mov.x), abs(mov.y) };
-
+    
     if (mov.x != 0 || mov.y != 0) {
         playAudioStream(stepsSound);
     } else{
@@ -152,28 +152,18 @@ void gameSceneScript(Scene* self) {
         playerStatus.closeLetterId=3;
     }
 
-
-    // first letter give action
-    if (playerStatus.carryingLetter && engine->currentScene == roomL && playerStatus.mainMissionId == 2){
+    //letters give action
+    if (playerStatus.carryingLetter &&
+    ((engine->currentScene == roomL && playerStatus.mainMissionId == 2) || (engine->currentScene == roomM && playerStatus.mainMissionId == 4) || engine->currentScene == roomR && playerStatus.mainMissionId == 6)) {
         if (!playerStatus.inDialog) {
             pressEMessage->visible=1;
         } else {
             playerDialog->visible = 1;
         }
     }
-    // second letter give action
-    else if (playerStatus.carryingLetter && engine->currentScene == roomM && playerStatus.mainMissionId == 4){
-        pressEMessage->visible=1;
-    } 
-    else if (playerStatus.mainMissionId == 2 || playerStatus.mainMissionId == 4){
+
+    else if (playerStatus.mainMissionId == 2 || playerStatus.mainMissionId == 4 || playerStatus.mainMissionId == 6){
         pressEMessage->visible=0;
-        if (playerStatus.carryingLetter && engine->currentScene == roomM && playerStatus.mainMissionId == 4){
-            if (!playerStatus.inDialog) {
-                pressEMessage->visible=1;
-            } else {
-                playerDialog->visible = 1;
-            }
-        }
     }
 
     // UNDER THIS ONLY THINGS THAT WILL WORK ONLY IN GAMEMAP SCENE
