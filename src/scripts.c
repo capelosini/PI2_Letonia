@@ -183,7 +183,16 @@ void gameSceneScript(Scene* self) {
 
     // first zoom in handle
     if (!playerStatus.firstZoomIn && gameMap->camera.zoom < 1.5){
-        gameMap->camera.zoom+=0.01;
+        if (al_get_audio_stream_playing(stepsSound)){
+            pauseAudioStream(stepsSound);
+        } 
+        if (al_get_audio_stream_playing(cityNoise)){
+            pauseAudioStream(cityNoise);
+        }
+        if (!al_get_audio_stream_playing(introMusic)){
+            playAudioStream(introMusic);
+        }
+        gameMap->camera.zoom+=0.004;
         player->physics.acc.x=0;
         player->physics.acc.y=0;
     } else{
@@ -199,6 +208,7 @@ void gameSceneScript(Scene* self) {
             gameMap->camera.offset.x+=gameMap->camera.offset.x*0.01;
             gameMap->camera.offset.y+=gameMap->camera.offset.y*0.01;
         }
+        playAudioStream(chaseMusic);
     } else if (playerStatus.firstZoomIn){
         //timeGameMap->color = al_map_rgba(30, 20, 0, 1);
         if (gameMap->camera.zoom > 1.5){
@@ -208,6 +218,7 @@ void gameSceneScript(Scene* self) {
         } else{
             gameMap->camera.zoom=1.5;
         }
+        stopAudioStream(chaseMusic);
     }
 
     int currentHouse=getPlayerNearHouse();

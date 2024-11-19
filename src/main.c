@@ -48,6 +48,8 @@ ALLEGRO_SAMPLE* clickSound;
 ALLEGRO_AUDIO_STREAM* menuMusic;
 ALLEGRO_AUDIO_STREAM* stepsSound;
 ALLEGRO_AUDIO_STREAM* cityNoise;
+ALLEGRO_AUDIO_STREAM* introMusic;
+ALLEGRO_AUDIO_STREAM* chaseMusic;
 Font* lettersFont;
 Font* stdMessageFont;
 Font* titleFont;
@@ -272,8 +274,14 @@ int main() {
     configureAudioStream(stepsSound, 0.5, 0, 1, ALLEGRO_PLAYMODE_LOOP);
     cityNoise = loadAudioStream(engine, "./assets/sounds/city-noise.wav", 2, 2048);
     configureAudioStream(stepsSound, 0.5, 0, 1, ALLEGRO_PLAYMODE_LOOP);
+    introMusic = loadAudioStream(engine, "./assets/sounds/intro.wav", 2, 2048);
+    configureAudioStream(introMusic, 1, 0, 1, ALLEGRO_PLAYMODE_ONCE);
+    chaseMusic = loadAudioStream(engine, "./assets/sounds/chase.wav", 2, 2048);
+    configureAudioStream(chaseMusic, 1, 0, 1, ALLEGRO_PLAYMODE_LOOP);
     stopAudioStream(stepsSound);
     stopAudioStream(cityNoise);
+    stopAudioStream(introMusic);
+    stopAudioStream(chaseMusic);
 
     // set playerStatus to default
     playerStatus.isHidden = 0;

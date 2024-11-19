@@ -151,6 +151,7 @@ void onEnemyCollision(GameObject* self, GameObject* obj)
     {
         if (playerStatus.isHidden == 0)
         {
+            stopAudioStream(chaseMusic);
             playerStatus.gameOverCount++;
             gameOverText->visible=1;
             if (playerStatus.isLastSafeZoneQuartel){

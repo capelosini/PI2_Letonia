@@ -54,6 +54,8 @@ extern ALLEGRO_SAMPLE* clickSound;
 extern ALLEGRO_AUDIO_STREAM* menuMusic;
 extern ALLEGRO_AUDIO_STREAM* stepsSound;
 extern ALLEGRO_AUDIO_STREAM* cityNoise;
+extern ALLEGRO_AUDIO_STREAM* introMusic;
+extern ALLEGRO_AUDIO_STREAM* chaseMusic;
 extern Font* lettersFont;
 extern Font* stdMessageFont;
 extern Font* titleFont;
