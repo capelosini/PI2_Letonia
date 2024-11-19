@@ -103,8 +103,10 @@ void onEvent(ALLEGRO_EVENT event, Scene * scene, CAEngine * engine) {
     if (event.type == ALLEGRO_EVENT_KEY_DOWN) {
         gameOverText->visible=0;
         if (event.keyboard.keycode == ALLEGRO_KEY_ESCAPE) {
-            if(engine->currentScene != mainMenu)
-            onOpenMenu(NULL);
+            if (engine->currentScene != mainMenu && engine->currentScene != letterShow && !al_get_audio_stream_playing(introMusic))
+                onOpenMenu(NULL);
+            else if (engine->currentScene == mainMenu && playerStatus.tutorialLetter == 1)
+                onOpenRestart(NULL); 
         }
     }
     else if (event.type == ALLEGRO_EVENT_KEY_UP) {
@@ -145,6 +147,7 @@ void onEvent(ALLEGRO_EVENT event, Scene * scene, CAEngine * engine) {
                 
                 lastSceneBeforeMenu = engine->currentScene;
                 changeText(letterShowText, lettersTexts[playerStatus.letterId]);
+                pauseAudioStream(stepsSound);
                 changeScene(engine, letterShow);
                 playClickSound();
             } else if (playerStatus.carryingLetter && pressEMessage->visible){ 
