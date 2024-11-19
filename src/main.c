@@ -71,7 +71,7 @@ float timeSet = 0;
 char timeSetDir= 1;
 // FIRST IS TUTORIAL
 char* lettersTexts[4]= {
-    "Aldo, sua missão como escoteiro será ajudar os aliados pró-revolução e entregar as cartas para deixar todos no quartel informados, mas cuidado, pois alguns soldados estão pelas ruas querendo prender qualquer sujeito que tente ajudar a revolução.\n \nPressione Z para abrir/fechar.",
+    "Aldo, sua missão como escoteiro será ajudar os aliados pró-revolução e entregar as cartas para deixar todos no quartel informados, mas cuidado, pois alguns soldados estão pelas ruas querendo prender qualquer sujeito que tente ajudar a revolução.\nW/A/S/D: Movimentação | E: Interação\n \nPressione F para abrir/fechar.",
     "9 de julho de 1932\n \nGeneral, São Paulo não aceitará a centralização do poder imposta por Getúlio Vargas. O povo clama por uma nova Constituição, e lideranças políticas e militares se uniram para defender a democracia. A revolução começou, e todos os esforços estão concentrados na organização das tropas.",
     "25 de julho de 1932\n \nAs batalhas são intensas. Resistimos bravamente em várias frentes, mas estamos em desvantagem contra as forças federais. O apoio da população é nossa força: eles arrecadam ouro, doam mantimentos e costuram uniformes. Mesmo em meio às dificuldades, lutamos por uma causa justa.",
     "18 de setembro de 1932\n \nApós meses de luta, nossos recursos chegaram ao fim, e as forças inimigas são superiores. Apesar da derrota militar, nossa causa ecoou no Brasil. Getúlio Vargas já anuncia uma Assembleia Constituinte. Nosso sacrifício não foi em vão: a democracia renascerá."
@@ -79,7 +79,7 @@ char* lettersTexts[4]= {
 
 char* mainMissions[10] = {
     "Pegue a carta na mesa da base.",
-    "Vá até a casa 72, e pegue a carta.",
+    "Vá até a casa 56, e pegue a carta.",
     "Entregue a carta para o General Bertoldo Klinger no quartel na parte inferior direita da cidade.",
     "Volte para a base para pegar a carta que te deixaram lá.",
     "Vá ao quartel entregar a carta para o General Isidoro Dias Lopes",
@@ -108,13 +108,13 @@ void onEvent(ALLEGRO_EVENT event, Scene * scene, CAEngine * engine) {
         }
     }
     else if (event.type == ALLEGRO_EVENT_KEY_UP) {
-
-        // close letter show
-        if (engine->currentScene == letterShow){
-            changeScene(engine, lastSceneBeforeMenu);
-        }
-
         if (event.keyboard.keycode == ALLEGRO_KEY_E) {
+            
+            // close letter show
+            if (engine->currentScene == letterShow){
+                changeScene(engine, lastSceneBeforeMenu);
+            }
+            
             // take letter
             if (!(playerStatus.carryingLetter) && pressEMessage->visible) {
                 // if letter is tutorial
@@ -162,7 +162,7 @@ void onEvent(ALLEGRO_EVENT event, Scene * scene, CAEngine * engine) {
             playerStatus.dialogId++;
             changeText(mainMissionText, mainMissions[playerStatus.mainMissionId]);
         }
-        else if (event.keyboard.keycode == ALLEGRO_KEY_Z){
+        else if (event.keyboard.keycode == ALLEGRO_KEY_F){
             if (playerStatus.tutorialLetter) {
                 tutorialLetterContent->visible = !tutorialLetterContent->visible;
                 playClickSound();
@@ -273,7 +273,7 @@ int main() {
     stepsSound = loadAudioStream(engine, "./assets/sounds/steps.wav", 2, 2048);
     configureAudioStream(stepsSound, 0.5, 0, 1, ALLEGRO_PLAYMODE_LOOP);
     cityNoise = loadAudioStream(engine, "./assets/sounds/city-noise.wav", 2, 2048);
-    configureAudioStream(stepsSound, 0.5, 0, 1, ALLEGRO_PLAYMODE_LOOP);
+    configureAudioStream(cityNoise, 0.5, 0, 1, ALLEGRO_PLAYMODE_LOOP);
     introMusic = loadAudioStream(engine, "./assets/sounds/intro.wav", 2, 2048);
     configureAudioStream(introMusic, 1, 0, 1, ALLEGRO_PLAYMODE_ONCE);
     chaseMusic = loadAudioStream(engine, "./assets/sounds/chase.wav", 2, 2048);

@@ -4,6 +4,7 @@ void onOpenMenu(Scene* scene)
 {   
     stopAudioStream(cityNoise);
     stopAudioStream(stepsSound);
+    stopAudioStream(chaseMusic);
     char out[] = "Você foi pego 0000 vezes";
     sprintf(out, "Você foi pego %d vezes", playerStatus.gameOverCount);
     changeText(gameOverCountText, out);
@@ -26,6 +27,7 @@ void onGameExit(Scene* scene){
 
 //stage change
 void onOpenBase(Scene* scene) {
+    stopAudioStream(chaseMusic);
     playerStatus.isLastSafeZoneQuartel=0;
     if (engine->currentScene == gameMap)
     {
@@ -54,6 +56,7 @@ void onOpenGameMapR(Scene* scene) {
     restartEnemiesPos();
     changeScene(engine, gameMap);
     if (playerStatus.mainMissionId == 6){
+        stopAudioStream(stepsSound);
         playEndCutscene();
         playerStatus.mainMissionId++;
         changeText(mainMissionText, mainMissions[playerStatus.mainMissionId]);
@@ -64,6 +67,7 @@ void onOpenGameMapR(Scene* scene) {
 
 void onOpenQuartel(Scene* scene)
 {
+    stopAudioStream(chaseMusic);
     playerStatus.isLastSafeZoneQuartel=1;
     player->position = (Vector2){ quartelobj->position.x + quartelobj->width / 2 - 100 ,  quartelobj->height - 60 };
     quartel->camera.offset = (Vector2){ player->position.x, player->position.y };

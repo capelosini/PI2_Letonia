@@ -243,7 +243,7 @@ void gameSceneScript(Scene* self) {
     }
 
     // house get letter mission
-    if (playerStatus.mainMissionId == 1 && currentHouse == 72 && !pressEMessage->visible && !playerStatus.carryingLetter){
+    if (playerStatus.mainMissionId == 1 && currentHouse == 56 && !pressEMessage->visible && !playerStatus.carryingLetter){
         pressEMessage->visible=1;
         playerStatus.closeLetterId=1;
     }

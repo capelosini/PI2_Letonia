@@ -49,19 +49,6 @@ void loadGameMap(){
     exitGameMap->color = al_map_rgba(0, 0, 0, 0);
     exitGameMap->collisionEnabled = 1;
 
-    // create enemies
-    for (int i=0; i<enemiesCount; i++){
-        enemies[i]=createGameObject(ANIMATED_SPRITE, 0, 0, 36, 38, gameMap);
-        setGameObjectAnimation(enemies[i], enemyBM2, 16, 18, 8, 15);
-        enemies[i]->physics.enabled=1;
-        enemies[i]->physics.friction=0.4;
-        enemies[i]->physics.maxSpeed=4;
-        enemies[i]->collisionEnabled=1;
-        setOnGameObjectCollisionFunction(enemies[i], onEnemyCollision);
-    }
-
-    restartEnemiesPos();
-
 
     player = createGameObject(ANIMATED_SPRITE, 700, 50, 44, 50, insideBase);
     player->position.x = 450;
@@ -91,6 +78,20 @@ void loadGameMap(){
     baseObj->startCollisionOffset.y = 210;
     baseObj->endCollisionOffset.x = -60;
     baseObj->endCollisionOffset.y = -85;
+
+    // create enemies
+    for (int i=0; i<enemiesCount; i++){
+        enemies[i]=createGameObject(ANIMATED_SPRITE, 0, 0, 36, 38, gameMap);
+        setGameObjectAnimation(enemies[i], enemyBM2, 16, 18, 8, 15);
+        enemies[i]->physics.enabled=1;
+        enemies[i]->physics.friction=0.4;
+        enemies[i]->physics.maxSpeed=4;
+        enemies[i]->collisionEnabled=1;
+        enemies[i]->startCollisionOffset.y = 20;
+        setOnGameObjectCollisionFunction(enemies[i], onEnemyCollision);
+    }
+
+    restartEnemiesPos();
 
     // add player to gamemap
     addGameObjectToScene(gameMap, player);

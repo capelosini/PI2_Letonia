@@ -23,7 +23,7 @@ void loadBase(){
     setGameObjectAnimation(letterObj, loadBitmap(engine, "./assets/images/letter-sheet.png"), 12, 12, 5, 16);
  
     tutorialLetterContent = createText(lettersTexts[0],
-        10, 200, 400, al_map_rgb(0, 0, 0), al_map_rgba(165, 132, 83, 245), NULL, lettersFont, 40, 50, insideBase);
+        10, 200, 500, al_map_rgb(0, 0, 0), al_map_rgba(165, 132, 83, 245), NULL, lettersFont, 40, 50, insideBase);
     tutorialLetterContent->visible = 0;
 
     pressEMessage = createText("Pressione E para interagir", engine->displayWidth / 2, 200, 0, al_map_rgb(255, 255, 255), al_map_rgba(0, 0, 0, 100), NULL, stdMessageFont, 40, 20, insideBase);
