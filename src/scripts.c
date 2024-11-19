@@ -192,14 +192,19 @@ void gameSceneScript(Scene* self) {
 
     // on player been following
     if (playerStatus.firstZoomIn && playerStatus.enemiesFollowing){
-        timeGameMap->color = al_map_rgba(30, 10, 0, 1);
+        //timeGameMap->color = al_map_rgba(30, 10, 0, 1);
         if (gameMap->camera.zoom < 1.7){
             gameMap->camera.zoom+=0.01;
+            // smooth the camera movement based on the changed zoom factor
+            gameMap->camera.offset.x+=gameMap->camera.offset.x*0.01;
+            gameMap->camera.offset.y+=gameMap->camera.offset.y*0.01;
         }
     } else if (playerStatus.firstZoomIn){
-        timeGameMap->color = al_map_rgba(30, 20, 0, 1);
+        //timeGameMap->color = al_map_rgba(30, 20, 0, 1);
         if (gameMap->camera.zoom > 1.5){
             gameMap->camera.zoom-=0.005;
+            gameMap->camera.offset.x-=gameMap->camera.offset.x*0.005;
+            gameMap->camera.offset.y-=gameMap->camera.offset.y*0.005;
         } else{
             gameMap->camera.zoom=1.5;
         }

@@ -138,7 +138,7 @@ void loadGameMap(){
     setGameObjectAnimation(testBush, loadBitmap(engine, "./assets/images/bush-sheet.png"), 16, 16, 4, 10);
 
     timeGameMap=createGameObject(SOLID, 0, 0, map->width, map->height, gameMap);
-    timeGameMap->color = al_map_rgba(30, 20, 0, 1);
+    timeGameMap->color = al_map_rgba(0, 0, 0, 0);
 
     addTextToScene(gameMap, mainMissionText);
 
