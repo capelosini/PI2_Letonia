@@ -1,7 +1,21 @@
 #include "../include/globals.h"
 
-int lastHouse=0;
+// t = current time;  T = total time;  vmax = max speed;  dt = delta time
+float t = 0;
+float T = 6.1;
+float vmax = 18;
+float dt = 0.016;
+int lastHouse = 0;
 time_t lastTime;
+
+float easeInOut(float t, float T, float vmax) {
+    if (t >= T) {
+        playerStatus.firstZoomIn = 1;
+        return 0;
+    }
+    float x = t / T;
+    return vmax * 22 * x * x * (1 - x) * (1 - x);
+}
 
 //character movement and letter handling
 void gameSceneScript(Scene* self) {
@@ -215,7 +229,7 @@ void gameSceneScript(Scene* self) {
     }
 
     // first zoom in handle
-    if (!playerStatus.firstZoomIn && gameMap->camera.zoom < 1.5){
+    if (!playerStatus.firstZoomIn){
         if (al_get_audio_stream_playing(stepsSound)){
             pauseAudioStream(stepsSound);
         } 
@@ -225,11 +239,10 @@ void gameSceneScript(Scene* self) {
         if (!al_get_audio_stream_playing(introMusic)){
             playAudioStream(introMusic);
         }
-        gameMap->camera.zoom+=0.004;
-        player->physics.acc.x=0;
-        player->physics.acc.y=0;
-    } else{
-        playerStatus.firstZoomIn=1;
+        gameMap->camera.followMaxSpeed = easeInOut(t, T, vmax);
+        t += dt;
+    } else {
+        gameMap->camera.followMaxSpeed = 4;
     }
 
     // on player been following
@@ -256,7 +269,7 @@ void gameSceneScript(Scene* self) {
 
     int currentHouse=getPlayerNearHouse();
 
-    if (currentHouse > 0 && currentHouse < 100 && currentHouse != lastHouse){
+    if (currentHouse > 0 && currentHouse < 70 && currentHouse != lastHouse){
         lastTime=time(NULL);
         lastHouse=currentHouse;
         closeHouseNumber->visible=1;
@@ -276,7 +289,7 @@ void gameSceneScript(Scene* self) {
     }
 
     // house get letter mission
-    if (playerStatus.mainMissionId == 1 && currentHouse == 56 && !pressEMessage->visible && !playerStatus.carryingLetter){
+    if (playerStatus.mainMissionId == 1 && currentHouse == 43 && !pressEMessage->visible && !playerStatus.carryingLetter){
         pressEMessage->visible=1;
         playerStatus.closeLetterId=2;
     }
@@ -308,8 +321,6 @@ void mainMenuScript(Scene* self) {
     else {
         al_set_timer_count(engine->timer, 0);
     }
-
 }
-
 void letterShowScript(Scene* self){
 }

@@ -44,14 +44,14 @@ void onOpenGameMap(Scene* scene) {
     player->position = (Vector2){ baseObj->position.x + baseObj->width/2 - 18, baseObj->position.y + baseObj->height - 98 };
     gameMap->camera.offset = (Vector2){ player->position.x, player->position.y };
     if (!playerStatus.firstZoomIn){
-        gameMap->camera.zoom=0.2;
+        gameMap->camera.offset = (Vector2){9999, 9999};
     }
     restartEnemiesPos();
     changeScene(engine, gameMap);
 }
 
 void onOpenGameMapR(Scene* scene) {
-    player->position = (Vector2){ map->width  - 80, map->height - 360 };
+    player->position = (Vector2){ map->width  - 80, map->height - 340 };
     gameMap->camera.offset = (Vector2){ 9999, 9999 };
     restartEnemiesPos();
     changeScene(engine, gameMap);

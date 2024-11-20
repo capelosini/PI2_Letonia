@@ -67,9 +67,9 @@ Button* letterStatus;
 float fallingLeafs[100][3];
 
 // enemiesCount and enemies[] length needs be equal
-int enemiesCount=75;
+int enemiesCount = 50;
 float timeSet = 0;
-char timeSetDir= 1;
+char timeSetDir = 1;
 // FIRST IS TUTORIAL
 char* lettersTexts[5]= {
     "Aldo, sua missão como escoteiro será ajudar os aliados pró-revolução e entregar as cartas para deixar todos no quartel informados, mas cuidado, pois alguns soldados estão pelas ruas querendo prender qualquer sujeito que tente ajudar a revolução.\nW/A/S/D: Movimentação | E: Interação\n \nPressione F para abrir/fechar.",
@@ -81,7 +81,7 @@ char* lettersTexts[5]= {
 
 char* mainMissions[10] = {
     "Pegue a carta na mesa da base.",
-    "Vá até a casa 56, e pegue a carta.",
+    "Vá até a casa 43, e pegue a carta.",
     "Entregue a carta para o General Bertoldo Klinger no quartel na parte inferior direita da cidade.",
     "Volte para a base para pegar a carta que te deixaram lá.",
     "Vá até a casa 12",
@@ -213,8 +213,8 @@ void restartEnemiesPos(){
     for (int i = 0; i < enemiesCount; i++)
     {
         do {
-            enemies[i]->position.x = randInt(1, 4500);
-            enemies[i]->position.y = randInt(700, 5000);
+            enemies[i]->position.x = randInt(1, 3600);
+            enemies[i]->position.y = randInt(700, 3600);
         } while(!isOnRoad(enemies[i]));
     }
 }

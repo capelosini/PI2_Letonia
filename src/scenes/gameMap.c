@@ -6,11 +6,12 @@ void loadGameMap(){
     gameMap->camera.minLimit.y = 0;
     //gameMap->camera.maxLimit.x = 200 * 16;
     //gameMap->camera.maxLimit.y = 100 * 16;
-    gameMap->camera.maxLimit.x = 5000;
-    gameMap->camera.maxLimit.y = 5000;
+    gameMap->camera.maxLimit.x = 4000;
+    gameMap->camera.maxLimit.y = 4000;
+    gameMap->camera.followAcc = 1;
     gameMap->camera.zoom = 1.5;
 
-    map = createGameObject(SOLID, 0, 0, 5000, 5000, gameMap);
+    map = createGameObject(SOLID, 0, 0, 4000, 4000, gameMap);
     //GameObject* map = createGameObject(SOLID, 0, 0, 200 * 16, 100 * 16, gameMap);
     map->color = al_map_rgba(0, 0, 0, 0);
     map->collisionEnabled = 1;
@@ -34,14 +35,14 @@ void loadGameMap(){
     }
 
     // quartel entry
-    gridGameMap = createGameObject(SPRITE, map->width - 250, 0, 250, 5000, gameMap);
+    gridGameMap = createGameObject(SPRITE, map->width - 250, 0, 250, 4000, gameMap);
     ALLEGRO_BITMAP* ExitGameMapBM = loadBitmap(engine, "./assets/images/grid.png");
     setGameObjectBitmap(gridGameMap, ExitGameMapBM);
 
-    GameObject* treeGrid1 = createGameObject(SOLID, map->width - 215, 0, 230, 4600, gameMap);
+    GameObject* treeGrid1 = createGameObject(SOLID, map->width - 215, 0, 230, 3680, gameMap);
     treeGrid1->color = al_map_rgba(0, 0, 0, 0);
     treeGrid1->collisionEnabled = 1;
-    GameObject* treeGrid3 = createGameObject(SOLID, map->width - 215, map->height - 220, 230, 370, gameMap);
+    GameObject* treeGrid3 = createGameObject(SOLID, map->width - 215, map->height - 190, 230, 190, gameMap);
     treeGrid3->color = al_map_rgba(0, 0, 0, 0);
     treeGrid3->collisionEnabled = 1;
 
@@ -66,7 +67,7 @@ void loadGameMap(){
 
     //setupSceneWorld(gameMap, loadBitmap(engine, "./assets/images/map-sheet.png"), 16, 16);
     //loadMap("./map.CAE", gameMap);
-    setupSceneWorld(gameMap, loadBitmap(engine, "./assets/images/gamemap.png"), 5000, 5000);
+    setupSceneWorld(gameMap, loadBitmap(engine, "./assets/images/gamemap.png"), 4000, 4000);
     addWorldTile(gameMap, 0, 0, 0, 0);
 
     baseObj = createGameObject(SPRITE, 0, 0, 335, 330, gameMap);
@@ -81,7 +82,7 @@ void loadGameMap(){
 
     // create enemies
     for (int i=0; i<enemiesCount; i++){
-        enemies[i]=createGameObject(ANIMATED_SPRITE, 0, 0, 36, 38, gameMap);
+        enemies[i]=createGameObject(ANIMATED_SPRITE, 0, 0, 44, 50, gameMap);
         setGameObjectAnimation(enemies[i], enemyBM2, 16, 18, 8, 15);
         enemies[i]->physics.enabled=1;
         enemies[i]->physics.friction=0.4;
@@ -157,9 +158,6 @@ void loadGameMap(){
     addButtonToScene(gameMap, letterStatus);
     Font* numberHouseFont = loadTTF(engine, "./assets/fonts/roboto.ttf", 20);
     closeHouseNumber = createText("Casa 72", engine->displayWidth/2-al_get_text_width(numberHouseFont->font, "Casa 100")/2, 20, 100, al_map_rgb(255, 100,0), al_map_rgba(0,0,0,0), NULL, numberHouseFont, 0, 0, gameMap);
-
-    addTextToScene(gameMap, pressEMessage);
     addTextToScene(gameMap, mainMissionText);
-    addTextToScene(gameMap, playerDialog);
-
+    addTextToScene(gameMap, pressEMessage);
 }
