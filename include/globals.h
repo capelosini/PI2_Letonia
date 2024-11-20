@@ -19,6 +19,7 @@ extern Scene* sinopse;
 extern Scene* letterShow;
 extern GameObject* player;
 extern GameObject* ghostPlayerMenu;
+extern GameObject* politician;
 extern GameObject* baseObj;
 extern GameObject* letterObj;
 extern GameObject* exitBase;
@@ -73,9 +74,9 @@ extern float fallingLeafs[100][3];
 extern float timeSet;
 extern char timeSetDir;
 // FIRST IS TUTORIAL
-extern char* lettersTexts[4];
+extern char* lettersTexts[5];
 extern char* mainMissions[10];
-extern char* dialogsTexts[3];
+extern char* dialogsTexts[4];
 
 extern int walkIndex;
 

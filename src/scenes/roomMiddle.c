@@ -53,4 +53,5 @@ void loadRoomMiddle(){
     addTextToScene(roomM, pressEMessage);
     addTextToScene(roomM, playerDialog);
     addTextToScene(roomM, tutorialLetterContent);
+    addGameObjectToScene(roomM, politician);
 }

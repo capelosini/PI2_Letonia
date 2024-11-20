@@ -196,7 +196,9 @@ void loadQuartel(){
     setGameObjectAnimation(friendSoldier, enemyBM1, 16, 18, 8, 12);
     friendSoldier->collisionEnabled=1;
     
+    addGameObjectToScene(quartel, timeGameMap);
     addGameObjectToScene(quartel, player);
+    addGameObjectToScene(quartel, politician);
     addTextToScene(quartel, gameOverText);
     addTextToScene(quartel, tutorialLetterContent);
 }

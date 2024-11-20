@@ -54,6 +54,7 @@ void loadGameMap(){
     player->position.x = 450;
     player->position.y = 300;
     player->physics.enabled = 1;
+    player->physics.maxSpeed = 4;
     player->physics.friction = 0.4;
     player->collisionEnabled = 1;
     player->collisionType = COLLISION_RECT;
@@ -112,6 +113,18 @@ void loadGameMap(){
             GameObject* plate = createGameObject(SPRITE, h->position.x+h->width-50, h->position.y+h->height-50, 50, 49, gameMap);
             setGameObjectBitmap(plate, plateBM);
 
+            if (i == 1 && j == 1) {
+                politician = createGameObject(ANIMATED_SPRITE, h->position.x, h->position.y+h->height, 48, 52, gameMap);
+                politician->visible = 0;
+                politician->physics.enabled = 1;
+                politician->physics.maxSpeed = player->physics.maxSpeed / 2;
+                politician->physics.friction = 0.4;
+                politician->collisionEnabled = 1;
+                politician->collisionType = COLLISION_RECT;
+                politician->startCollisionOffset.y = 35;
+                setGameObjectAnimation(politician, loadBitmap(engine, "./assets/images/player-sprite-sheet.png"), 17, 20, 8, 15);
+            }
+
         }
     }
 
@@ -140,12 +153,13 @@ void loadGameMap(){
     timeGameMap=createGameObject(SOLID, 0, 0, map->width, map->height, gameMap);
     timeGameMap->color = al_map_rgba(0, 0, 0, 0);
 
-    addTextToScene(gameMap, mainMissionText);
 
     addButtonToScene(gameMap, letterStatus);
     Font* numberHouseFont = loadTTF(engine, "./assets/fonts/roboto.ttf", 20);
     closeHouseNumber = createText("Casa 72", engine->displayWidth/2-al_get_text_width(numberHouseFont->font, "Casa 100")/2, 20, 100, al_map_rgb(255, 100,0), al_map_rgba(0,0,0,0), NULL, numberHouseFont, 0, 0, gameMap);
 
     addTextToScene(gameMap, pressEMessage);
+    addTextToScene(gameMap, mainMissionText);
+    addTextToScene(gameMap, playerDialog);
 
 }

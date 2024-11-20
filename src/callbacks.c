@@ -55,7 +55,7 @@ void onOpenGameMapR(Scene* scene) {
     gameMap->camera.offset = (Vector2){ 9999, 9999 };
     restartEnemiesPos();
     changeScene(engine, gameMap);
-    if (playerStatus.mainMissionId == 6){
+    if (playerStatus.mainMissionId == 8){
         stopAudioStream(stepsSound);
         playEndCutscene();
         playerStatus.mainMissionId++;
@@ -66,11 +66,18 @@ void onOpenGameMapR(Scene* scene) {
 }
 
 void onOpenQuartel(Scene* scene)
-{
+{   
+    if (playerStatus.mainMissionId == 5 && dist(politician->position.x, politician->position.y, politician->width, politician->height, exitGameMap->position.x, exitGameMap->position.y, exitGameMap->width, exitGameMap->height) > 300) { return; }
+    else if (dist(politician->position.x, politician->position.y, politician->width, politician->height, exitGameMap->position.x, exitGameMap->position.y, exitGameMap->width, exitGameMap->height) <= 300) { 
+        politician->position.x = exitQuartel->position.x+50;
+        politician->position.y = exitQuartel->position.y-100;
+    }
+
     stopAudioStream(chaseMusic);
     playerStatus.isLastSafeZoneQuartel=1;
     player->position = (Vector2){ quartelobj->position.x + quartelobj->width / 2 - 100 ,  quartelobj->height - 60 };
     quartel->camera.offset = (Vector2){ player->position.x, player->position.y };
+
     changeScene(engine, quartel);
 
 }
@@ -86,6 +93,10 @@ void onOpenQuartelRM(Scene* scene)
 {
     player->position = (Vector2){ quartelobj->position.x + quartelobj->width / 2 + 70 ,  quartelobj->position.y + 930 };
     quartel->camera.offset = (Vector2){ player->position.x, player->position.y };
+
+    politician->position.x = roomMC->position.x+50;
+    politician->position.y = roomMC->position.y-100;
+
     changeScene(engine, quartel);
 
 }
