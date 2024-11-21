@@ -9,7 +9,6 @@ void loadGameMap(){
     gameMap->camera.maxLimit.x = 4000;
     gameMap->camera.maxLimit.y = 4000;
     gameMap->camera.followAcc = 0.1;
-    //gameMap->camera.followMaxSpeed = 10;
     gameMap->camera.zoom = 1.5;
 
     map = createGameObject(SOLID, 0, 0, 4000, 4000, gameMap);

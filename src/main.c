@@ -170,7 +170,7 @@ void onEvent(ALLEGRO_EVENT event, Scene * scene, CAEngine * engine) {
                     changeText(mainMissionText, mainMissions[playerStatus.mainMissionId]);
 
 
-                    if (!(playerStatus.mainMissionId == 5 || playerStatus.mainMissionId == 7)) {
+                    if (!(playerStatus.mainMissionId == 5)) {
                         playerStatus.carryingLetter = 0;
                         pauseAudioStream(stepsSound);
                         lastSceneBeforeMenu = engine->currentScene;
