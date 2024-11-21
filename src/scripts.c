@@ -307,7 +307,7 @@ void gameSceneScript(Scene* self) {
     }
 
     // invensible, just for development
-    playerStatus.isHidden=1;
+    //playerStatus.isHidden=1;
 }
 
 //menu animation

@@ -59,6 +59,7 @@ void onOpenGameMapR(Scene* scene) {
     gameMap->camera.offset = (Vector2){ 9999, 9999 };
     restartEnemiesPos();
     changeScene(engine, gameMap);
+    //printf("\n%d", playerStatus.mainMissionId);
     if (playerStatus.mainMissionId == 8){
         stopAudioStream(stepsSound);
         playEndCutscene();

@@ -94,7 +94,7 @@ char* mainMissions[10] = {
 
 char* dialogsTexts[4] = {
     "Estamos muito contentes de ter um jovem como você disposto a ajudar nossa causa, ótimo trabalho Aldo!",
-    "Você é o Aldo? Vá na frente eu te acompanho",
+    "Você é o Aldo? Vá na frente eu te acompanho!",
     "Os soldados lá fora podem parecer assustadores mas lembre, não é o medo que deve te guiar, mas o desejo de cumprir seu dever.",
     "Não sabemos por quanto tempo essa guerra ainda durará... Mas eu gostaria de agradecê-lo por todos seu serviços Aldo, é uma honra tê-lo ao nosso lado."
 };
