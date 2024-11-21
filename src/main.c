@@ -88,7 +88,8 @@ char* mainMissions[10] = {
     "Vá ao quartel levar o político para o General Isidoro Dias Lopes",
     "Pegue uma carta com o General Euclides de Oliveira Figueiredo da sala à direita.",
     "Entregue a carta para os aliados na estação ferroviaria da cidade.",
-    "Aproveite o mapa e se divirta fugindo dos soldados!"
+    "Aproveite o mapa e se divirta fugindo dos soldados!",
+    ""
 };
 
 char* dialogsTexts[4] = {
@@ -161,7 +162,7 @@ void onEvent(ALLEGRO_EVENT event, Scene * scene, CAEngine * engine) {
                 playerStatus.inDialog = 0;
                 playerStatus.dialogId++;
                 playerStatus.mainMissionId++;
-                printf("%d\n", playerStatus.mainMissionId);
+                //printf("%d\n", playerStatus.mainMissionId);
 
                 if (playerStatus.dialogId < 4 && playerStatus.mainMissionId < 9) {
                     changeText(letterShowText, lettersTexts[playerStatus.letterId]);

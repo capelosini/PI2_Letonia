@@ -2,7 +2,7 @@
 
 // t = current time;  T = total time;  vmax = max speed;  dt = delta time
 float t = 0;
-float T = 6.1;
+float T = 7.1;
 float vmax = 18;
 float dt = 0.016;
 int lastHouse = 0;
@@ -96,10 +96,11 @@ void gameSceneScript(Scene* self) {
             playerDialog->visible = 0;
         }
     }
-    printf("%d", playerStatus.mainMissionId);
+    //printf("%d", playerStatus.mainMissionId);
 
     //politician movement
-    if(playerStatus.carryingLetter && playerStatus.mainMissionId == 5 && dist(player->position.x, player->position.y, player->width, player->height, politician->position.x, politician->position.y, politician->width, politician->height) < 100) {
+    float politicianToPlayerDist = dist(player->position.x, player->position.y, player->width, player->height, politician->position.x, politician->position.y, politician->width, politician->height);
+    if(playerStatus.carryingLetter && playerStatus.mainMissionId == 5 && politicianToPlayerDist < 100 && politicianToPlayerDist > politician->width+5) {
         double dx = player->position.x - politician->position.x;
         double dy = player->position.y - politician->position.y;
         double hip = hypot(dx, dy);
@@ -247,6 +248,13 @@ void gameSceneScript(Scene* self) {
         if (t >= T) {
             gameMap->camera.followMaxSpeed = 4;
         }
+
+        // gameMap->camera.followMaxSpeed = 30;
+        // if (gameMap->camera.offset.x == gameMap->camera.minLimit.x && gameMap->camera.offset.y == gameMap->camera.minLimit.y){
+        //     gameMap->camera.followMaxSpeed = 4;
+        //     playerStatus.firstZoomIn = 1;
+        // }
+
     }
 
     // on player been following
@@ -297,6 +305,9 @@ void gameSceneScript(Scene* self) {
         pressEMessage->visible=1;
         playerStatus.closeLetterId=2;
     }
+
+    // invensible, just for development
+    playerStatus.isHidden=1;
 }
 
 //menu animation

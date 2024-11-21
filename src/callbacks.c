@@ -62,7 +62,7 @@ void onOpenGameMapR(Scene* scene) {
     if (playerStatus.mainMissionId == 8){
         stopAudioStream(stepsSound);
         playEndCutscene();
-        playerStatus.mainMissionId++;
+        //playerStatus.mainMissionId++;
         changeText(mainMissionText, mainMissions[playerStatus.mainMissionId]);
         stopAudioStream(menuMusic);
         onOpenMenu(NULL);
@@ -98,8 +98,10 @@ void onOpenQuartelRM(Scene* scene)
     player->position = (Vector2){ quartelobj->position.x + quartelobj->width / 2 + 70 ,  quartelobj->position.y + 930 };
     quartel->camera.offset = (Vector2){ player->position.x, player->position.y };
 
-    politician->position.x = roomMC->position.x+50;
-    politician->position.y = roomMC->position.y-100;
+    if (playerStatus.mainMissionId == 6){
+        politician->position.x = roomMC->position.x-50;
+        politician->position.y = roomMC->position.y+100;
+    }
 
     changeScene(engine, quartel);
 

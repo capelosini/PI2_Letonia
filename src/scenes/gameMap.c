@@ -8,7 +8,8 @@ void loadGameMap(){
     //gameMap->camera.maxLimit.y = 100 * 16;
     gameMap->camera.maxLimit.x = 4000;
     gameMap->camera.maxLimit.y = 4000;
-    gameMap->camera.followAcc = 1;
+    gameMap->camera.followAcc = 0.1;
+    //gameMap->camera.followMaxSpeed = 10;
     gameMap->camera.zoom = 1.5;
 
     map = createGameObject(SOLID, 0, 0, 4000, 4000, gameMap);
@@ -115,15 +116,17 @@ void loadGameMap(){
             setGameObjectBitmap(plate, plateBM);
 
             if (i == 1 && j == 1) {
-                politician = createGameObject(ANIMATED_SPRITE, h->position.x, h->position.y+h->height, 48, 52, gameMap);
+                politician = createGameObject(ANIMATED_SPRITE, h->position.x, h->position.y+h->height, 50, 52, gameMap);
                 politician->visible = 0;
                 politician->physics.enabled = 1;
-                politician->physics.maxSpeed = player->physics.maxSpeed * 0.75;
+                politician->physics.maxSpeed = player->physics.maxSpeed; // 0.75
                 politician->physics.friction = 0.4;
                 politician->collisionEnabled = 1;
+                politician->physics.acc.x=player->physics.acc.x/2;
+                politician->physics.acc.y=player->physics.acc.y/2;
                 politician->collisionType = COLLISION_RECT;
                 politician->startCollisionOffset.y = 35;
-                setGameObjectAnimation(politician, loadBitmap(engine, "./assets/images/player-sprite-sheet.png"), 17, 20, 8, 15);
+                setGameObjectAnimation(politician, enemyBM1, 16, 18, 8, 15);
             }
 
         }
