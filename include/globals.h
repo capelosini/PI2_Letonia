@@ -40,7 +40,7 @@ extern GameObject* map;
 extern GameObject* exitQuartel;
 // enemiesCount and enemies[] length needs be equal
 extern int enemiesCount;
-extern GameObject* enemies[75];
+extern GameObject* enemies[50];
 extern GameObject* testBush;
 extern GameObject* timeGameMap;
 extern ALLEGRO_BITMAP* enemyBM1;

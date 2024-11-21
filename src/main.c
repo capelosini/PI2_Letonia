@@ -34,7 +34,7 @@ GameObject* returnQuartelRoomR;
 GameObject* gridGameMap;
 GameObject* map;
 GameObject* exitQuartel;
-GameObject* enemies[75];
+GameObject* enemies[50];
 GameObject* testBush;
 GameObject* timeGameMap;
 ALLEGRO_BITMAP* enemyBM1;

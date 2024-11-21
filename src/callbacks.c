@@ -51,6 +51,7 @@ void onOpenGameMap(Scene* scene) {
 }
 
 void onOpenGameMapR(Scene* scene) {
+    if (playerStatus.mainMissionId == 5){ return; }
     player->position = (Vector2){ map->width  - 80, map->height - 340 };
     gameMap->camera.offset = (Vector2){ 9999, 9999 };
     restartEnemiesPos();
