@@ -118,7 +118,7 @@ void loadGameMap(){
                 politician = createGameObject(ANIMATED_SPRITE, h->position.x, h->position.y+h->height, 48, 52, gameMap);
                 politician->visible = 0;
                 politician->physics.enabled = 1;
-                politician->physics.maxSpeed = player->physics.maxSpeed / 2;
+                politician->physics.maxSpeed = player->physics.maxSpeed * 0.75;
                 politician->physics.friction = 0.4;
                 politician->collisionEnabled = 1;
                 politician->collisionType = COLLISION_RECT;
@@ -160,4 +160,5 @@ void loadGameMap(){
     closeHouseNumber = createText("Casa 72", engine->displayWidth/2-al_get_text_width(numberHouseFont->font, "Casa 100")/2, 20, 100, al_map_rgb(255, 100,0), al_map_rgba(0,0,0,0), NULL, numberHouseFont, 0, 0, gameMap);
     addTextToScene(gameMap, mainMissionText);
     addTextToScene(gameMap, pressEMessage);
+    addTextToScene(gameMap, playerDialog);
 }
