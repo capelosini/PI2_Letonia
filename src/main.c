@@ -131,20 +131,19 @@ void onEvent(ALLEGRO_EVENT event, Scene * scene, CAEngine * engine) {
                     playerStatus.letterId = playerStatus.closeLetterId;
                     playerStatus.carryingLetter=1;
                 }
-                letterObj->visible = 0;
-                pressEMessage->visible = 0;
-                playerStatus.mainMissionId++;
-                changeText(mainMissionText, mainMissions[playerStatus.mainMissionId]);
-                if (playerStatus.mainMissionId == 5) {
+                if (playerStatus.mainMissionId == 4) {
                     playerStatus.inDialog = 1;
                     playerStatus.mainMissionId--;
                 }
-                if (playerStatus.mainMissionId == 7){
-                    pressEMessage->visible = 1;
+                if (playerStatus.mainMissionId == 6){
                     lastSceneBeforeMenu = engine->currentScene;
                     changeText(letterShowText, lettersTexts[playerStatus.letterId]);
                     changeScene(engine, letterShow);
                 }
+                letterObj->visible = 0;
+                pressEMessage->visible = 0;
+                playerStatus.mainMissionId++;
+                changeText(mainMissionText, mainMissions[playerStatus.mainMissionId]);
                 playClickSound();
             }
             //open dialog
@@ -162,13 +161,15 @@ void onEvent(ALLEGRO_EVENT event, Scene * scene, CAEngine * engine) {
                 playerStatus.inDialog = 0;
                 playerStatus.dialogId++;
                 playerStatus.mainMissionId++;
+                printf("%d\n", playerStatus.mainMissionId);
 
-                if (playerStatus.dialogId < 4) {
+                if (playerStatus.dialogId < 4 && playerStatus.mainMissionId < 9) {
                     changeText(letterShowText, lettersTexts[playerStatus.letterId]);
                     changeText(playerDialog, dialogsTexts[playerStatus.dialogId]);
                     changeText(mainMissionText, mainMissions[playerStatus.mainMissionId]);
 
-                    if (!(playerStatus.mainMissionId == 5)) {
+
+                    if (!(playerStatus.mainMissionId == 5 || playerStatus.mainMissionId == 7)) {
                         playerStatus.carryingLetter = 0;
                         pauseAudioStream(stepsSound);
                         lastSceneBeforeMenu = engine->currentScene;
@@ -213,9 +214,17 @@ void restartEnemiesPos(){
     for (int i = 0; i < enemiesCount; i++)
     {
         do {
+            if ((playerStatus.mainMissionId == 4 || playerStatus.mainMissionId == 5) && i % 2 == 0) {
+                enemies[i]->visible = 0;
+                enemies[i]->position = (Vector2){350, 3900};
+                continue;
+            }
+
+            enemies[i]->visible = 1;
             enemies[i]->position.x = randInt(1, 3600);
-            enemies[i]->position.y = randInt(700, 3600);
-        } while(!isOnRoad(enemies[i]));
+            enemies[i]->position.y = randInt(700, 3800);
+        } while(!isOnRoad(enemies[i])/*  || 
+                dist(enemies[i]->position.x, enemies[i]->position.y, enemies[i]->width, enemies[i]->height, politician->position.x, politician->position.y, politician->width, politician->height) < 100 */);
     }
 }
 

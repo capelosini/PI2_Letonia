@@ -96,6 +96,7 @@ void gameSceneScript(Scene* self) {
             playerDialog->visible = 0;
         }
     }
+    printf("%d", playerStatus.mainMissionId);
 
     //politician movement
     if(playerStatus.carryingLetter && playerStatus.mainMissionId == 5 && dist(player->position.x, player->position.y, player->width, player->height, politician->position.x, politician->position.y, politician->width, politician->height) < 100) {
@@ -239,10 +240,13 @@ void gameSceneScript(Scene* self) {
         if (!al_get_audio_stream_playing(introMusic)){
             playAudioStream(introMusic);
         }
+        player->physics.acc = (Vector2){0,0};
+
         gameMap->camera.followMaxSpeed = easeInOut(t, T, vmax);
         t += dt;
-    } else {
-        gameMap->camera.followMaxSpeed = 4;
+        if (t >= T) {
+            gameMap->camera.followMaxSpeed = 4;
+        }
     }
 
     // on player been following

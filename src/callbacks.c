@@ -46,6 +46,9 @@ void onOpenGameMap(Scene* scene) {
     if (!playerStatus.firstZoomIn){
         gameMap->camera.offset = (Vector2){9999, 9999};
     }
+    if (playerStatus.mainMissionId == 5) {
+        politician->position = (Vector2){100, 500};
+    }
     restartEnemiesPos();
     changeScene(engine, gameMap);
 }
