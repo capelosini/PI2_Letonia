@@ -14,7 +14,7 @@ void loadBase(){
     baseRoom->collisionEnabled = 1;
     baseRoom->invertedCollision = 1;
 
-    gameOverText=createText("Você foi pego!", 0, 0, 0, al_map_rgb(210, 10, 10), al_map_rgba(0, 0, 0, 20), NULL, titleFont, 20, 20, insideBase);
+    gameOverText=createText("Você foi pego!", 0, 0, al_get_text_width(titleFont->font, "Você foi pego!")+41, al_map_rgb(210, 10, 10), al_map_rgba(0, 0, 0, 20), NULL, titleFont, 20, 20, insideBase);
     gameOverText->position = (Vector2){engine->displayWidth/2-al_get_text_width(titleFont->font, gameOverText->text)/2, engine->displayHeight/2-al_get_font_line_height(titleFont->font)/2};
     gameOverText->visible=0;
 
