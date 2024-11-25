@@ -337,6 +337,16 @@ int main() {
 
     while (engine->isAlive) {
         render(engine);
+        
+        // BASICALLY GETTING THE ANGLE OF THE MIDDLE BOTTOM OF THE SCREEN TO THE PLAYERS POSITION AND CALCULATING THE COS
+        // THE RESULT COS IS PUTTED AS THE STEPS PANNING
+        float x=player->position.x*engine->currentScene->camera.zoom;
+        float y=player->position.y*engine->currentScene->camera.zoom;
+        globalToLocal(engine->currentScene, &x, &y);
+        double co = engine->displayHeight-y;
+        double ca = x-engine->displayWidth/2;
+        double hyp = hypot(co, ca);
+        configureAudioStream(stepsSound, 0.5, ca/hyp, 1, ALLEGRO_PLAYMODE_LOOP);
     }
 
 
