@@ -297,13 +297,13 @@ int main() {
     menuMusic = loadAudioStream(engine, "./assets/sounds/musica-menu.wav", 2, 2048);
     configureAudioStream(menuMusic, 1, 0, 1, ALLEGRO_PLAYMODE_LOOP);
     stepsSound = loadAudioStream(engine, "./assets/sounds/steps.wav", 2, 2048);
-    configureAudioStream(stepsSound, 0.5, 0, 1, ALLEGRO_PLAYMODE_LOOP);
+    configureAudioStream(stepsSound, 0.7, 0, 1, ALLEGRO_PLAYMODE_LOOP);
     cityNoise = loadAudioStream(engine, "./assets/sounds/city-noise.wav", 2, 2048);
     configureAudioStream(cityNoise, 0.5, 0, 1, ALLEGRO_PLAYMODE_LOOP);
     introMusic = loadAudioStream(engine, "./assets/sounds/intro.wav", 2, 2048);
     configureAudioStream(introMusic, 1, 0, 1, ALLEGRO_PLAYMODE_ONCE);
     chaseMusic = loadAudioStream(engine, "./assets/sounds/chase.wav", 2, 2048);
-    configureAudioStream(chaseMusic, 1, 0, 1, ALLEGRO_PLAYMODE_LOOP);
+    configureAudioStream(chaseMusic, 0.7, 0, 1, ALLEGRO_PLAYMODE_LOOP);
     stopAudioStream(stepsSound);
     stopAudioStream(cityNoise);
     stopAudioStream(introMusic);
@@ -340,8 +340,8 @@ int main() {
         
         // BASICALLY GETTING THE ANGLE OF THE MIDDLE BOTTOM OF THE SCREEN TO THE PLAYERS POSITION AND CALCULATING THE COS
         // THE RESULT COS IS PUTTED AS THE STEPS PANNING
-        float x=player->position.x*engine->currentScene->camera.zoom;
-        float y=player->position.y*engine->currentScene->camera.zoom;
+        float x=player->position.x*engine->currentScene->camera.zoom+player->width*engine->currentScene->camera.zoom/2;
+        float y=player->position.y*engine->currentScene->camera.zoom+player->height*engine->currentScene->camera.zoom/2;
         globalToLocal(engine->currentScene, &x, &y);
         double co = engine->displayHeight-y;
         double ca = x-engine->displayWidth/2;
