@@ -1,6 +1,5 @@
 #include "../include/globals.h"
-#include <stdlib.h>
-#include <time.h>
+#include "../include/saving.h"
 
 CAEngine* engine;
 Scene* mainMenu;
@@ -101,7 +100,7 @@ char* dialogsTexts[4] = {
 
 int walkIndex = 0;
 
-struct playerStatus playerStatus;
+struct PlayerStatus playerStatus;
 
 //action handle on events
 void onEvent(ALLEGRO_EVENT event, Scene * scene, CAEngine * engine) {
@@ -111,17 +110,17 @@ void onEvent(ALLEGRO_EVENT event, Scene * scene, CAEngine * engine) {
             if (engine->currentScene != mainMenu && engine->currentScene != letterShow && !al_get_audio_stream_playing(introMusic))
                 onOpenMenu(NULL);
             else if (engine->currentScene == mainMenu && playerStatus.tutorialLetter == 1)
-                onOpenRestart(NULL); 
+                onOpenRestart(NULL);
         }
     }
     else if (event.type == ALLEGRO_EVENT_KEY_UP) {
         if (event.keyboard.keycode == ALLEGRO_KEY_E) {
-            
+
             // close letter show
             if (engine->currentScene == letterShow){
                 changeScene(engine, lastSceneBeforeMenu);
             }
-            
+
             // take letter
             if (!(playerStatus.carryingLetter) && pressEMessage->visible) {
                 // if letter is tutorial
@@ -156,7 +155,7 @@ void onEvent(ALLEGRO_EVENT event, Scene * scene, CAEngine * engine) {
                 return;
             }
 
-            //go to letterShow scene and update text boxes 
+            //go to letterShow scene and update text boxes
             if (playerStatus.inDialog) {
                 playerDialog->visible = 0;
                 playerStatus.inDialog = 0;
@@ -224,7 +223,7 @@ void restartEnemiesPos(){
             enemies[i]->visible = 1;
             enemies[i]->position.x = randInt(1, 3600);
             enemies[i]->position.y = randInt(700, 3800);
-        } while(!isOnRoad(enemies[i])/*  || 
+        } while(!isOnRoad(enemies[i])/*  ||
                 dist(enemies[i]->position.x, enemies[i]->position.y, enemies[i]->width, enemies[i]->height, politician->position.x, politician->position.y, politician->width, politician->height) < 100 */);
     }
 }
@@ -323,6 +322,14 @@ int main() {
     playerStatus.dialogId = 0;
     playerStatus.enemiesFollowing = 0;
 
+    struct SaveFile saveFile = openSaveFile("Save.caes");
+    struct SaveData saveData;
+    readSaveData(&saveFile, &saveData);
+
+    // update to saved data
+    //printf("\n %d %d \n", saveData.playerStatus.dialogId, saveData.playerStatus.mainMissionId);
+    memcpy(&playerStatus, &(saveData.playerStatus), sizeof(struct PlayerStatus));
+
     loadMainMenu();
     loadBase();
     loadGameMap();
@@ -337,7 +344,7 @@ int main() {
 
     while (engine->isAlive) {
         render(engine);
-        
+
         // BASICALLY GETTING THE ANGLE OF THE MIDDLE BOTTOM OF THE SCREEN TO THE PLAYERS POSITION AND CALCULATING THE COS
         // THE RESULT COS IS PUTTED AS THE STEPS PANNING
         float x=player->position.x*engine->currentScene->camera.zoom+player->width*engine->currentScene->camera.zoom/2;
@@ -349,6 +356,8 @@ int main() {
         configureAudioStream(stepsSound, 0.5, ca/hyp, 1, ALLEGRO_PLAYMODE_LOOP);
     }
 
+    saveGame(&saveFile);
+    closeSaveFile(&saveFile);
 
     // EXIT ANIMATION
     Vector2 pos = (Vector2){0, 0};

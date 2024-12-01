@@ -21,8 +21,14 @@ void loadBase(){
 
     letterObj = createGameObject(ANIMATED_SPRITE, 467, 280, 12, 12, insideBase);
     setGameObjectAnimation(letterObj, loadBitmap(engine, "./assets/images/letter-sheet.png"), 12, 12, 5, 16);
- 
-    tutorialLetterContent = createText(lettersTexts[0],
+    letterObj->visible = playerStatus.mainMissionId == 0 || playerStatus.mainMissionId == 3;
+    
+    char* tutLetterText = lettersTexts[0];
+    if (playerStatus.mainMissionId > 1){
+        tutLetterText = lettersTexts[1];
+    }
+    
+    tutorialLetterContent = createText(tutLetterText,
         10, 200, 500, al_map_rgb(0, 0, 0), al_map_rgba(165, 132, 83, 245), NULL, lettersFont, 40, 50, insideBase);
     tutorialLetterContent->visible = 0;
 
@@ -59,7 +65,7 @@ void loadBase(){
     exitBase->color = al_map_rgba(0, 0, 0, 0);
     exitBase->collisionEnabled = 1;
 
-    mainMissionText = createText(mainMissions[0], engine->displayWidth-380, 130, 350, al_map_rgb(255,255,255), al_map_rgba(0,0,0,240)
+    mainMissionText = createText(mainMissions[playerStatus.mainMissionId], engine->displayWidth-380, 130, 350, al_map_rgb(255,255,255), al_map_rgba(0,0,0,240)
     , NULL, lettersFont, 40, 30, insideBase);
 
     letterStatus = createButton(engine, 20, 20, 50, 50, al_map_rgba(0, 0, 0, 0), al_map_rgba(0, 0, 0, 0), "", "./assets/fonts/roboto.ttf", letterStatusFalseBM, NULL);

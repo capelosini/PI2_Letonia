@@ -116,7 +116,7 @@ void loadGameMap(){
 
             if (i == 1 && j == 1) {
                 politician = createGameObject(ANIMATED_SPRITE, h->position.x, h->position.y+h->height, 50, 52, gameMap);
-                politician->visible = 0;
+                politician->visible = playerStatus.mainMissionId >= 4 ? 1 : 0;
                 politician->physics.enabled = 1;
                 politician->physics.maxSpeed = player->physics.maxSpeed; // 0.75
                 politician->physics.friction = 0.4;

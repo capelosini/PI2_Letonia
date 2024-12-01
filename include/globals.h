@@ -80,7 +80,7 @@ extern char* dialogsTexts[4];
 
 extern int walkIndex;
 
-struct playerStatus{
+struct PlayerStatus{
     unsigned char isHidden; // ele esta escondido?
     unsigned char carryingLetter; // carregando uma carta?
     unsigned char firstZoomIn; // ja vez o primeiro zoom in?
@@ -93,8 +93,8 @@ struct playerStatus{
     unsigned char isLastSafeZoneQuartel; // last safe zone is quartel?
     int dialogId; // qual dialogo deve ser mostrado
     unsigned char enemiesFollowing; // esta fugindo de inimigos?
-};
-extern struct playerStatus playerStatus;
+} __attribute__((packed));
+extern struct PlayerStatus playerStatus;
 
 void onOpenMenu(Scene* scene);
 void onOpenRestart(Scene* scene);
