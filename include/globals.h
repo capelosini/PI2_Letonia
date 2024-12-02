@@ -74,8 +74,8 @@ extern float fallingLeafs[100][3];
 extern float timeSet;
 extern char timeSetDir;
 // FIRST IS TUTORIAL
-extern char* lettersTexts[5];
-extern char* mainMissions[10];
+extern char* lettersTexts[6];
+extern char* mainMissions[12];
 extern char* dialogsTexts[4];
 
 extern int walkIndex;

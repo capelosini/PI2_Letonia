@@ -57,6 +57,10 @@ void gameSceneScript(Scene* self) {
     if (!(mov.x || mov.y))
         player->animation.index.y = walkIndex;
 
+    // jump third mission
+    if (playerStatus.mainMissionId == 7) {
+        pressEMessage->visible = 1;
+    }
 
     // base tutorial intro letter check
     if (!playerStatus.tutorialLetter) {
@@ -70,7 +74,7 @@ void gameSceneScript(Scene* self) {
             tutorialLetterContent->visible = 0;
         }
     }
-    // base third mission letter
+    // base second mission letter
     else if (!playerStatus.carryingLetter && engine->currentScene == insideBase && playerStatus.mainMissionId == 3) {
         playerStatus.closeLetterId=1;
         letterObj->visible=1;
@@ -87,13 +91,28 @@ void gameSceneScript(Scene* self) {
     }
     //interac with politician
     else if (!playerStatus.carryingLetter && engine->currentScene == gameMap && playerStatus.mainMissionId == 4) {
-        playerStatus.closeLetterId = 3;
+        playerStatus.closeLetterId = 4;
         if (dist(player->position.x, player->position.y, player->width, player->height, politician->position.x, politician->position.y, politician->width, politician->height) <= 80) {
             pressEMessage->visible = 1;
             playerDialog->visible = 1;
         } else {
             pressEMessage->visible = 0;
             playerDialog->visible = 0;
+        }
+    }
+    // base third mission letter
+    else if (!playerStatus.carryingLetter && engine->currentScene == insideBase && playerStatus.mainMissionId == 6) {
+        playerStatus.closeLetterId=2;
+        letterObj->visible=1;
+        if (dist(player->position.x, player->position.y, player->width, player->height, letterObj->position.x, letterObj->position.y, letterObj->width, letterObj->height)
+            <= 60) {
+            pressEMessage->visible = 1;
+        }
+        else {
+            pressEMessage->visible = 0;
+            changeText(tutorialLetterContent, lettersTexts[2]);
+            tutorialLetterContent->visible = 0;
+            politician->visible = 1;
         }
     }
     //printf("%d", playerStatus.mainMissionId);
@@ -206,14 +225,14 @@ void gameSceneScript(Scene* self) {
     }
 
     // last letter mission get letter
-    if (playerStatus.mainMissionId == 6 && engine->currentScene == roomR && playerStatus.carryingLetter == 0 && !pressEMessage->visible){
+    if (playerStatus.mainMissionId == 8 && engine->currentScene == roomR && playerStatus.carryingLetter == 0 && !pressEMessage->visible){
         pressEMessage->visible=1;
-        playerStatus.closeLetterId=4;
+        playerStatus.closeLetterId=5;
     }
 
     //letters give action
     if (playerStatus.carryingLetter &&
-    ((engine->currentScene == roomL && playerStatus.mainMissionId == 2) || (engine->currentScene == roomM && playerStatus.mainMissionId == 5) || engine->currentScene == roomR && playerStatus.mainMissionId == 7)) {
+    ((engine->currentScene == roomL && playerStatus.mainMissionId == 2) || (engine->currentScene == roomM && playerStatus.mainMissionId == 5) || engine->currentScene == roomR && playerStatus.mainMissionId == 9)) {
         if (!playerStatus.inDialog) {
             pressEMessage->visible=1;
         } else {
@@ -221,7 +240,7 @@ void gameSceneScript(Scene* self) {
         }
     }
 
-    else if (playerStatus.mainMissionId == 2 || playerStatus.mainMissionId == 5 || playerStatus.mainMissionId == 7){
+    else if (playerStatus.mainMissionId == 2 || playerStatus.mainMissionId == 5 || playerStatus.mainMissionId == 9){
         pressEMessage->visible=0;
     }
 
@@ -305,11 +324,11 @@ void gameSceneScript(Scene* self) {
     // house get letter mission
     if (playerStatus.mainMissionId == 1 && currentHouse == 43 && !pressEMessage->visible && !playerStatus.carryingLetter){
         pressEMessage->visible=1;
-        playerStatus.closeLetterId=2;
+        playerStatus.closeLetterId=3;
     }
 
     // invensible, just for development
-    //playerStatus.isHidden=1;
+    // playerStatus.isHidden=1;
 }
 
 //menu animation
