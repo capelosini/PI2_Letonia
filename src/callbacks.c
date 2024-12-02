@@ -29,6 +29,7 @@ void onGameExit(Scene* scene){
 void onOpenBase(Scene* scene) {
     stopAudioStream(chaseMusic);
     playerStatus.isLastSafeZoneQuartel=0;
+    playerStatus.lastScene=INSIDE_BASE;
     if (engine->currentScene == gameMap)
     {
         player->position.x = 450;
@@ -51,6 +52,7 @@ void onOpenGameMap(Scene* scene) {
     }
     restartEnemiesPos();
     changeScene(engine, gameMap);
+    playerStatus.lastScene=GAME_MAP;
 }
 
 void onOpenGameMapR(Scene* scene) {
@@ -59,7 +61,7 @@ void onOpenGameMapR(Scene* scene) {
     gameMap->camera.offset = (Vector2){ 9999, 9999 };
     restartEnemiesPos();
     changeScene(engine, gameMap);
-
+    playerStatus.lastScene=GAME_MAP;
     if (playerStatus.mainMissionId == 8){
         stopAudioStream(stepsSound);
         playEndCutscene();
@@ -84,6 +86,7 @@ void onOpenQuartel(Scene* scene)
     quartel->camera.offset = (Vector2){ player->position.x, player->position.y };
 
     changeScene(engine, quartel);
+    playerStatus.lastScene=QUARTEL;
 
 }
 void onOpenQuartelRL(Scene* scene)
@@ -91,7 +94,7 @@ void onOpenQuartelRL(Scene* scene)
     player->position = (Vector2){ quartelobj->position.x + quartelobj->width / 2 - 300 ,  quartelobj->position.y + 930 };
     quartel->camera.offset = (Vector2){ player->position.x, player->position.y };
     changeScene(engine, quartel);
-
+    playerStatus.lastScene=QUARTEL;
 }
 
 void onOpenQuartelRM(Scene* scene)
@@ -105,7 +108,7 @@ void onOpenQuartelRM(Scene* scene)
     }
 
     changeScene(engine, quartel);
-
+    playerStatus.lastScene=QUARTEL;
 }
 
 void onOpenQuartelRR(Scene* scene)
@@ -113,7 +116,7 @@ void onOpenQuartelRR(Scene* scene)
     player->position = (Vector2){ quartelobj->position.x + quartelobj->width / 2 + 440 ,  quartelobj->position.y + 930 };
     quartel->camera.offset = (Vector2){ player->position.x, player->position.y };
     changeScene(engine, quartel);
-
+    playerStatus.lastScene=QUARTEL;
 }
 
 void onOpenRoomL(Scene* scene)
@@ -121,7 +124,7 @@ void onOpenRoomL(Scene* scene)
     player->position = (Vector2){ roomLobj->position.x + roomLobj->width / 2 - 100 ,  roomLobj->height - 60 };
     roomL->camera.offset = (Vector2){ player->position.x, player->position.y };
     changeScene(engine, roomL);
-
+    playerStatus.lastScene=ROOM_L;
 }
 
 void onOpenRoomM(Scene* scene)
@@ -129,7 +132,7 @@ void onOpenRoomM(Scene* scene)
     player->position = (Vector2){ roomMobj->position.x + roomMobj->width / 2 - 10 ,  roomMobj->height - 60 };
     roomM->camera.offset = (Vector2){ player->position.x, player->position.y };
     changeScene(engine, roomM);
-
+    playerStatus.lastScene=ROOM_M;
 }
 
 void onOpenRoomR(Scene* scene)
@@ -137,10 +140,12 @@ void onOpenRoomR(Scene* scene)
     player->position = (Vector2){ roomRobj->position.x + roomRobj->width / 2 + 130 ,  roomRobj->height - 60 };
     roomR->camera.offset = (Vector2){ player->position.x, player->position.y };
     changeScene(engine, roomR);
+    playerStatus.lastScene=ROOM_R;
 }
 
 void onOpenSinopse(Scene* scene) {
     changeScene(engine, sinopse);
+    playerStatus.lastScene=SINOPSE;
 }
 
 void onPlayerCollision(GameObject* self, GameObject* obj)

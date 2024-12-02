@@ -79,6 +79,19 @@ extern char* mainMissions[10];
 extern char* dialogsTexts[4];
 
 extern int walkIndex;
+extern Scene* allScenes[9];
+
+enum SCENES{
+    MAIN_MENU,
+    INSIDE_BASE,
+    GAME_MAP,
+    QUARTEL,
+    ROOM_L,
+    ROOM_M,
+    ROOM_R,
+    SINOPSE,
+    LETTER_SHOW
+};
 
 struct PlayerStatus{
     unsigned char isHidden; // ele esta escondido?
@@ -90,9 +103,11 @@ struct PlayerStatus{
     int closeLetterId; // a carta que ele esta proximo, ou que vai pegar
     int gameOverCount; // quantas vezes ele foi pego
     int mainMissionId; // id da missao principal
-    unsigned char isLastSafeZoneQuartel; // last safe zone is quartel?
+    unsigned char isLastSafeZoneQuartel; // ultima safe zone é o quartel?
     int dialogId; // qual dialogo deve ser mostrado
     unsigned char enemiesFollowing; // esta fugindo de inimigos?
+    enum SCENES lastScene; // ultima cena
+    Vector2 lastPosition; // ultima posição do player
 } __attribute__((packed));
 extern struct PlayerStatus playerStatus;
 

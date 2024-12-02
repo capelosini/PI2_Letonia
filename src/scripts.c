@@ -225,6 +225,8 @@ void gameSceneScript(Scene* self) {
         pressEMessage->visible=0;
     }
 
+    memcpy(&playerStatus.lastPosition, &player->position, sizeof(Vector2));
+
     // UNDER THIS ONLY THINGS THAT WILL WORK ONLY IN GAMEMAP SCENE
     if (engine->currentScene != gameMap){
         return;

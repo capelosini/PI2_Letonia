@@ -99,6 +99,7 @@ char* dialogsTexts[4] = {
 };
 
 int walkIndex = 0;
+Scene* allScenes[9];
 
 struct PlayerStatus playerStatus;
 
@@ -321,6 +322,8 @@ int main() {
     playerStatus.isLastSafeZoneQuartel = 0;
     playerStatus.dialogId = 0;
     playerStatus.enemiesFollowing = 0;
+    playerStatus.lastScene = INSIDE_BASE;
+    playerStatus.lastPosition = (Vector2){450, 300};
 
     struct SaveFile saveFile = openSaveFile("Save.caes");
     struct SaveData saveData;
@@ -331,16 +334,27 @@ int main() {
     memcpy(&playerStatus, &(saveData.playerStatus), sizeof(struct PlayerStatus));
 
     loadMainMenu();
+    allScenes[MAIN_MENU]=mainMenu;
     loadBase();
+    allScenes[INSIDE_BASE]=insideBase;
     loadGameMap();
+    allScenes[GAME_MAP]=gameMap;
     loadQuartel();
+    allScenes[QUARTEL]=quartel;
     loadRoomLeft();
+    allScenes[ROOM_L]=roomL;
     loadRoomMiddle();
+    allScenes[ROOM_M]=roomM;
     loadRoomRight();
+    allScenes[ROOM_R]=roomR;
     loadSinopse();
+    allScenes[SINOPSE]=sinopse;
     loadLetterShow();
+    allScenes[LETTER_SHOW]=letterShow;
 
-    lastSceneBeforeMenu = insideBase;
+    lastSceneBeforeMenu = allScenes[playerStatus.lastScene];
+    memcpy(&player->position, &playerStatus.lastPosition, sizeof(Vector2));
+    allScenes[playerStatus.lastScene]->camera.offset = player->position;
 
     while (engine->isAlive) {
         render(engine);
