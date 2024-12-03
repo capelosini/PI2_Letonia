@@ -94,7 +94,7 @@ enum SCENES{
     LETTER_SHOW
 };
 
-struct PlayerStatus{
+struct PlayerStatus {
     unsigned char isHidden; // ele esta escondido?
     unsigned char carryingLetter; // carregando uma carta?
     unsigned char firstZoomIn; // ja vez o primeiro zoom in?
@@ -110,7 +110,7 @@ struct PlayerStatus{
     unsigned char enemiesFollowing; // esta fugindo de inimigos?
     enum SCENES lastScene; // ultima cena
     Vector2 lastPosition; // ultima posição do player
-} __attribute__((packed));
+};
 extern struct PlayerStatus playerStatus;
 
 void onOpenMenu(Scene* scene);
