@@ -58,9 +58,9 @@ void gameSceneScript(Scene* self) {
         player->animation.index.y = walkIndex;
 
     // jump third mission
-    if (playerStatus.mainMissionId == 7) {
+    /* if (playerStatus.mainMissionId == 7) {
         pressEMessage->visible = 1;
-    }
+    } */
 
     // base tutorial intro letter check
     if (!playerStatus.tutorialLetter) {
@@ -84,7 +84,6 @@ void gameSceneScript(Scene* self) {
         }
         else {
             pressEMessage->visible = 0;
-            changeText(tutorialLetterContent, lettersTexts[1]);
             tutorialLetterContent->visible = 0;
             politician->visible = 1;
         }
@@ -110,12 +109,10 @@ void gameSceneScript(Scene* self) {
         }
         else {
             pressEMessage->visible = 0;
-            changeText(tutorialLetterContent, lettersTexts[2]);
             tutorialLetterContent->visible = 0;
-            politician->visible = 1;
         }
     }
-    //printf("%d", playerStatus.mainMissionId);
+
 
     //politician movement
     float politicianToPlayerDist = dist(player->position.x, player->position.y, player->width, player->height, politician->position.x, politician->position.y, politician->width, politician->height);
@@ -267,7 +264,7 @@ void gameSceneScript(Scene* self) {
         gameMap->camera.followMaxSpeed = easeInOut(t, T, vmax);
         t += dt;
         if (t >= T) {
-            gameMap->camera.followMaxSpeed = 4;
+            gameMap->camera.followMaxSpeed = 10;
         }
 
         // gameMap->camera.followMaxSpeed = 30;
@@ -327,8 +324,20 @@ void gameSceneScript(Scene* self) {
         playerStatus.closeLetterId=3;
     }
 
+    if (playerStatus.mainMissionId == 7) {
+        for (int i = 0; i < 5; i++) {
+            if (dist(player->position.x, player->position.y, player->width, player->height, goldObjects[i]->position.x, goldObjects[i]->position.y, goldObjects[i]->width, goldObjects[i]->height) < 60) {
+                pressEMessage->visible = 1;
+                break;
+            }
+            else {
+                pressEMessage->visible = 0;
+            }
+        }
+    }
+
     // invensible, just for development
-    // playerStatus.isHidden=1;
+     playerStatus.isHidden=1;
 }
 
 //menu animation

@@ -57,7 +57,7 @@ void onOpenGameMap(Scene* scene) {
 
 void onOpenGameMapR(Scene* scene) {
     if (playerStatus.mainMissionId == 5){ return; }
-    if (playerStatus.mainMissionId >= 6) {
+    if (playerStatus.mainMissionId == 6) {
         politician->visible = 0;
     }
     player->position = (Vector2){ map->width  - 80, map->height - 340 };

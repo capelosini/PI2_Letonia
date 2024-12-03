@@ -21,7 +21,7 @@ void loadBase(){
 
     letterObj = createGameObject(ANIMATED_SPRITE, 467, 280, 12, 12, insideBase);
     setGameObjectAnimation(letterObj, loadBitmap(engine, "./assets/images/letter-sheet.png"), 12, 12, 5, 16);
-    letterObj->visible = playerStatus.mainMissionId == 0 || playerStatus.mainMissionId == 3;
+    letterObj->visible = playerStatus.mainMissionId == 0 || playerStatus.mainMissionId == 3 || playerStatus.mainMissionId == 6;
     
     char* tutLetterText = lettersTexts[0];
     if (playerStatus.mainMissionId > 1){

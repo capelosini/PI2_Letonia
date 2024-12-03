@@ -55,7 +55,7 @@ void loadGameMap(){
     player->position.x = 450;
     player->position.y = 300;
     player->physics.enabled = 1;
-    // player->physics.maxSpeed = 10;
+    player->physics.maxSpeed = 10;
     player->physics.friction = 0.4;
     player->collisionEnabled = 1;
     player->collisionType = COLLISION_RECT;
@@ -91,7 +91,6 @@ void loadGameMap(){
         enemies[i]->startCollisionOffset.y = 20;
         setOnGameObjectCollisionFunction(enemies[i], onEnemyCollision);
     }
-
     restartEnemiesPos();
 
     // add player to gamemap
@@ -118,7 +117,7 @@ void loadGameMap(){
                 politician = createGameObject(ANIMATED_SPRITE, h->position.x, h->position.y+h->height, 50, 52, gameMap);
                 politician->visible = playerStatus.mainMissionId >= 4 ? 1 : 0;
                 politician->physics.enabled = 1;
-                politician->physics.maxSpeed = player->physics.maxSpeed; // 0.75
+                politician->physics.maxSpeed = player->physics.maxSpeed;
                 politician->physics.friction = 0.4;
                 politician->collisionEnabled = 1;
                 politician->physics.acc.x=player->physics.acc.x/2;
@@ -129,6 +128,15 @@ void loadGameMap(){
             }
 
         }
+    }
+
+    //third mission gold objects generation
+    for (int i = 0; i < 5; i++) {
+        int x = randInt(1, 6);
+        int y = randInt(1, 7);
+        goldObjects[i] = createGameObject(SPRITE, x*500 + 250, y*500 - 30, 20, 31, gameMap);
+        setGameObjectBitmap(goldObjects[i], loadBitmap(engine, "./assets/images/gold.png"));
+        goldObjects[i]->visible = playerStatus.mainMissionId == 7;
     }
 
     addTextToScene(gameMap, tutorialLetterContent);

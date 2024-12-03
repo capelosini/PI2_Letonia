@@ -36,6 +36,7 @@ GameObject* exitQuartel;
 GameObject* enemies[50];
 GameObject* testBush;
 GameObject* timeGameMap;
+GameObject* goldObjects[5];
 ALLEGRO_BITMAP* enemyBM1;
 ALLEGRO_BITMAP* enemyBM2;
 ALLEGRO_BITMAP* housesBM[6];
@@ -73,7 +74,7 @@ char timeSetDir = 1;
 char* lettersTexts[6]= {
     "Aldo, sua missão como escoteiro será ajudar os aliados pró-revolução e entregar as cartas para deixar todos no quartel informados, mas cuidado, pois alguns soldados estão pelas ruas querendo prender qualquer sujeito que tente ajudar a revolução.\nW/A/S/D: Movimentação | E: Interação\n \nPressione F para abrir/fechar.",
     "Aldo, um político precisa ser levado até o general Isidoro, precisamos que você o guie até o quartel sem que sejam pegos pelos soldados, espere a noite cair para que diminuam os soldados nas ruas",
-    "Muitos civis contribuem para a revolução doando suas regalias de ouro, para a compra de armamento e mantimentos. Procure pelas casas por objetos de ouro.",
+    "Muitos civis contribuem para a revolução doando suas regalias de ouro, para a compra de armamento e mantimentos. Procure em frente às casas por objetos de ouro.",
     "9 de julho de 1932\n \nGeneral, São Paulo não aceitará a centralização do poder imposta por Getúlio Vargas. O povo clama por uma nova Constituição, e lideranças políticas e militares se uniram para defender a democracia. A revolução começou, e todos os esforços estão concentrados na organização das tropas.",
     "25 de julho de 1932\n \nAs batalhas são intensas. Resistimos bravamente em várias frentes, mas estamos em desvantagem contra as forças federais. O apoio da população é nossa força: eles arrecadam ouro, doam mantimentos e costuram uniformes. Mesmo em meio às dificuldades, lutamos por uma causa justa.",
     "18 de setembro de 1932\n \nApós meses de luta, nossos recursos chegaram ao fim, e as forças inimigas são superiores. Apesar da derrota militar, nossa causa ecoou no Brasil. Getúlio Vargas já anuncia uma Assembleia Constituinte. Nosso sacrifício não foi em vão: a democracia renascerá."
@@ -124,6 +125,23 @@ void onEvent(ALLEGRO_EVENT event, Scene * scene, CAEngine * engine) {
                 changeScene(engine, lastSceneBeforeMenu);
             }
 
+            // take gold
+            if (playerStatus.mainMissionId == 7 && pressEMessage->visible) {
+                for (int i = 0; i < 5; i++) {
+                    if (dist(player->position.x, player->position.y, player->width, player->height, goldObjects[i]->position.x, goldObjects[i]->position.y, goldObjects[i]->width, goldObjects[i]->height) < 60) {
+                        goldObjects[i]->visible = 0;
+                        playerStatus.carryngGold++;
+                        pressEMessage->visible = 0;
+
+                    }
+                }
+
+                if (playerStatus.carryngGold == 5) {
+                    playerStatus.mainMissionId++;
+                    changeText(mainMissionText, mainMissions[playerStatus.mainMissionId]);
+                }
+            }
+
             // take letter
             if (!(playerStatus.carryingLetter) && pressEMessage->visible) {
                 // if letter is tutorial
@@ -133,6 +151,15 @@ void onEvent(ALLEGRO_EVENT event, Scene * scene, CAEngine * engine) {
                 } else {
                     playerStatus.letterId = playerStatus.closeLetterId;
                     playerStatus.carryingLetter=1;
+                }
+                if (playerStatus.mainMissionId == 3) {
+                    changeText(tutorialLetterContent, lettersTexts[1]);
+                }
+                if (playerStatus.mainMissionId == 6) {
+                    changeText(tutorialLetterContent, lettersTexts[2]);
+                    for (int i = 0; i < 5; i++) {
+                        goldObjects[i]->visible = 1;
+                    }
                 }
                 if (playerStatus.mainMissionId == 4) {
                     playerStatus.inDialog = 1;
@@ -317,6 +344,7 @@ int main() {
     playerStatus.firstZoomIn = 0;
     playerStatus.letterId = 0;
     playerStatus.inDialog = 0;
+    playerStatus.carryngGold = 0;
     playerStatus.closeLetterId = 0;
     playerStatus.gameOverCount = 0;
     playerStatus.mainMissionId = 0;

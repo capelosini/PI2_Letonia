@@ -77,6 +77,7 @@ extern char timeSetDir;
 extern char* lettersTexts[6];
 extern char* mainMissions[12];
 extern char* dialogsTexts[4];
+extern GameObject* goldObjects[5];
 
 extern int walkIndex;
 extern Scene* allScenes[9];
@@ -99,6 +100,7 @@ struct PlayerStatus{
     unsigned char firstZoomIn; // ja vez o primeiro zoom in?
     unsigned char tutorialLetter; // ja pegou a carta tutorial?
     unsigned char inDialog; //está em um diálogo?
+    int carryngGold; // quantas peças de ouro já pegou
     int letterId; // qual conteudo da carta que ele esta levando
     int closeLetterId; // a carta que ele esta proximo, ou que vai pegar
     int gameOverCount; // quantas vezes ele foi pego
