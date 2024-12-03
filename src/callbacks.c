@@ -69,11 +69,11 @@ void onOpenGameMapR(Scene* scene) {
     restartEnemiesPos();
     changeScene(engine, gameMap);
     playerStatus.lastScene=GAME_MAP;
-    if (playerStatus.mainMissionId == 10){
+    if (playerStatus.mainMissionId == 9){
         stopAudioStream(stepsSound);
         playEndCutscene();
-        changeText(mainMissionText, mainMissions[playerStatus.mainMissionId]);
         playerStatus.mainMissionId++;
+        changeText(mainMissionText, mainMissions[playerStatus.mainMissionId]);
         stopAudioStream(menuMusic);
         onOpenMenu(NULL);
     }

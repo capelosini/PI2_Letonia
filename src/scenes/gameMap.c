@@ -111,20 +111,9 @@ void loadGameMap(){
     for (int i=0; i<map->width/500-1; i++){
         for (int j=0; j<map->height/500-1; j++){
             if (i == 0 && j == 0){ continue; }
-            GameObject* h = createGameObject(SPRITE, 30+i*500, 170+j*500, 300, 300, gameMap);
-            int houseId = randInt(0, 5);
-            setGameObjectBitmap(h, housesBM[houseId]);
-            h->collisionEnabled=1;
-            h->startCollisionOffset.y = 150;
-            h->endCollisionOffset.y=30;
-            h->startCollisionOffset.x = 30;
-            h->endCollisionOffset.x = -30;
-
-            GameObject* plate = createGameObject(SPRITE, h->position.x+h->width-50, h->position.y+h->height-50, 50, 49, gameMap);
-            setGameObjectBitmap(plate, plateBM);
 
             if (i == 1 && j == 1) {
-                politician = createGameObject(ANIMATED_SPRITE, h->position.x, h->position.y+h->height, 50, 52, gameMap);
+                politician = createGameObject(ANIMATED_SPRITE, 30+i*500, (170+j*500)+300, 50, 52, gameMap);
                 politician->visible = (playerStatus.mainMissionId == 4 || playerStatus.mainMissionId == 5);
                 politician->physics.enabled = 1;
                 politician->physics.maxSpeed = player->physics.maxSpeed;
@@ -136,6 +125,18 @@ void loadGameMap(){
                 politician->startCollisionOffset.y = 35;
                 setGameObjectAnimation(politician, enemyBM1, 16, 18, 8, 15);
             }
+
+            GameObject* h = createGameObject(SPRITE, 30+i*500, 170+j*500, 300, 300, gameMap);
+            int houseId = randInt(0, 5);
+            setGameObjectBitmap(h, housesBM[houseId]);
+            h->collisionEnabled=1;
+            h->startCollisionOffset.y = 150;
+            h->endCollisionOffset.y=30;
+            h->startCollisionOffset.x = 30;
+            h->endCollisionOffset.x = -30;
+
+            GameObject* plate = createGameObject(SPRITE, h->position.x+h->width-50, h->position.y+h->height-50, 50, 49, gameMap);
+            setGameObjectBitmap(plate, plateBM);
 
         }
     }

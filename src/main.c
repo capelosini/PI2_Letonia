@@ -200,8 +200,10 @@ void onEvent(ALLEGRO_EVENT event, Scene * scene, CAEngine * engine) {
             if (playerStatus.inDialog) {
                 playerDialog->visible = 0;
                 playerStatus.inDialog = 0;
-                playerStatus.dialogId++;
-                playerStatus.mainMissionId++;
+                if (playerStatus.dialogId < 3) {
+                    playerStatus.dialogId++;
+                    playerStatus.mainMissionId++;
+                }
                 //printf("%d\n", playerStatus.mainMissionId);
 
                 if (playerStatus.dialogId < 4 && playerStatus.mainMissionId < 11) {
@@ -300,16 +302,16 @@ void playEndCutscene(){
             al_flip_display();
         }
 
-        ALLEGRO_EVENT event;
-        while (al_get_next_event(engine->ev_queue, &event)) {
-            if (event.type == ALLEGRO_EVENT_KEY_DOWN) {
-                switch (event.keyboard.keycode) {
-                    case ALLEGRO_KEY_SPACE:
-                        al_seek_video(video, al_get_video_position(video, ALLEGRO_VIDEO_POSITION_ACTUAL)+2);
-                        break;
-                }
-            }
-        }
+        // ALLEGRO_EVENT event;
+        // while (al_get_next_event(engine->ev_queue, &event)) {
+        //     if (event.type == ALLEGRO_EVENT_KEY_DOWN) {
+        //         switch (event.keyboard.keycode) {
+        //             case ALLEGRO_KEY_SPACE:
+        //                 al_seek_video(video, al_get_video_position(video, ALLEGRO_VIDEO_POSITION_VIDEO_DECODE)+2);
+        //                 break;
+        //         }
+        //     }
+        // }
 
         al_rest(1.0 / 60);
     }
