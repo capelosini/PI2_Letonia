@@ -1,5 +1,6 @@
 #include "../include/globals.h"
 #include "../include/saving.h"
+#include <allegro5/allegro_video.h>
 
 CAEngine* engine;
 Scene* mainMenu;
@@ -66,6 +67,7 @@ Text* playerDialog;
 Text* gameOverCountText;
 Text* goldCounterText;
 Button* letterStatus;
+Button* continueBtn;
 float fallingLeafs[100][3];
 
 // enemiesCount and enemies[] length needs be equal
@@ -88,10 +90,10 @@ char* mainMissions[12] = {
     "Entregue a carta para o General Bertoldo Klinger no quartel na parte inferior direita da cidade.",
     "Volte para a base para pegar a carta que te deixaram lá.",
     "Vá até a casa 12",
-    "Vá ao quartel levar o político para o General Isidoro Dias Lopes",
+    "Vá ao quartel levar o político que está com a carta para o General Isidoro Dias Lopes.",
     "Volte para a base e pegue a próxima missão.",
     "Procure pelos objetos de ouro espalhados no mapa.",
-    "Vá até o general Euclides de Oliveira Figueiredo.",
+    "Entregue o ouro para o general Euclides de Oliveira Figueiredo e Pegue uma carta com o mesmo.",
     "Entregue a carta para os aliados na estação ferroviaria da cidade.",
     "Aproveite o mapa e se divirta fugindo dos soldados!",
     ""
@@ -252,6 +254,7 @@ unsigned char isOnRoad(GameObject* obj) {
 void restartEnemiesPos(){
     for (int i = 0; i < enemiesCount; i++)
     {
+        unsigned char isColWOtherEnemy=0;
         do {
             if ((playerStatus.mainMissionId == 4 || playerStatus.mainMissionId == 5) && i % 2 == 0) {
                 enemies[i]->visible = 0;
@@ -262,8 +265,19 @@ void restartEnemiesPos(){
             enemies[i]->visible = 1;
             enemies[i]->position.x = randInt(1, 3600);
             enemies[i]->position.y = randInt(700, 3800);
-        } while(!isOnRoad(enemies[i])/*  ||
-                dist(enemies[i]->position.x, enemies[i]->position.y, enemies[i]->width, enemies[i]->height, politician->position.x, politician->position.y, politician->width, politician->height) < 100 */);
+
+            isColWOtherEnemy=0;
+            for (int j=0; j < i; j++){
+                if ((playerStatus.mainMissionId == 4 || playerStatus.mainMissionId == 5) && j % 2 == 0)
+                    continue;
+                if (enemies[j]->visible && checkCollisionRect(enemies[i]->position.x, enemies[i]->position.y, enemies[i]->width, enemies[i]->height, enemies[j]->position.x, enemies[j]->position.y, enemies[j]->width, enemies[j]->height)){
+                    isColWOtherEnemy=1;
+                    break;
+                }
+            }
+
+        } while(isColWOtherEnemy || !isOnRoad(enemies[i]) || dist(enemies[i]->position.x, enemies[i]->position.y, enemies[i]->width, enemies[i]->height, player->position.x, player->position.y, player->width, player->height) <= 200);/*  ||
+                dist(enemies[i]->position.x, enemies[i]->position.y, enemies[i]->width, enemies[i]->height, politician->position.x, politician->position.y, politician->width, politician->height) < 100 */
     }
 }
 
@@ -279,11 +293,24 @@ void playEndCutscene(){
     }
     al_start_video(video, al_get_default_mixer());
     while(al_is_video_playing(video)){
+
         ALLEGRO_BITMAP* frame = al_get_video_frame(video);
         if (frame){
             al_draw_scaled_bitmap(frame, 0, 0, al_get_bitmap_width(frame), al_get_bitmap_height(frame), 0, 0, engine->displayWidth, engine->displayHeight, 0);
             al_flip_display();
         }
+
+        ALLEGRO_EVENT event;
+        while (al_get_next_event(engine->ev_queue, &event)) {
+            if (event.type == ALLEGRO_EVENT_KEY_DOWN) {
+                switch (event.keyboard.keycode) {
+                    case ALLEGRO_KEY_SPACE:
+                        al_seek_video(video, al_get_video_position(video, ALLEGRO_VIDEO_POSITION_ACTUAL)+2);
+                        break;
+                }
+            }
+        }
+
         al_rest(1.0 / 60);
     }
     al_flush_event_queue(engine->ev_queue);

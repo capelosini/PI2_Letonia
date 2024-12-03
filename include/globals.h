@@ -72,6 +72,7 @@ extern Text* playerDialog;
 extern Text* gameOverCountText;
 extern Text* goldCounterText;
 extern Button* letterStatus;
+extern Button* continueBtn;
 extern float fallingLeafs[100][3];
 extern float timeSet;
 extern char timeSetDir;
