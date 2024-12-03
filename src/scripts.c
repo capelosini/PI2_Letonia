@@ -264,14 +264,8 @@ void gameSceneScript(Scene* self) {
         gameMap->camera.followMaxSpeed = easeInOut(t, T, vmax);
         t += dt;
         if (t >= T) {
-            gameMap->camera.followMaxSpeed = 10;
+            gameMap->camera.followMaxSpeed = 4;
         }
-
-        // gameMap->camera.followMaxSpeed = 30;
-        // if (gameMap->camera.offset.x == gameMap->camera.minLimit.x && gameMap->camera.offset.y == gameMap->camera.minLimit.y){
-        //     gameMap->camera.followMaxSpeed = 4;
-        //     playerStatus.firstZoomIn = 1;
-        // }
 
     }
 
@@ -337,7 +331,7 @@ void gameSceneScript(Scene* self) {
     }
 
     // invensible, just for development
-     playerStatus.isHidden=1;
+    // playerStatus.isHidden=1;
 }
 
 //menu animation
