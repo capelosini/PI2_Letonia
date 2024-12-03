@@ -51,6 +51,7 @@ extern ALLEGRO_BITMAP* roadV;
 extern ALLEGRO_BITMAP* plateBM;
 extern ALLEGRO_BITMAP* letterStatusTrueBM;
 extern ALLEGRO_BITMAP* letterStatusFalseBM;
+extern ALLEGRO_BITMAP* goldBM;
 extern ALLEGRO_SAMPLE* clickSound;
 extern ALLEGRO_AUDIO_STREAM* menuMusic;
 extern ALLEGRO_AUDIO_STREAM* stepsSound;
@@ -69,6 +70,7 @@ extern Text* closeHouseNumber;
 extern Text* letterShowText;
 extern Text* playerDialog;
 extern Text* gameOverCountText;
+extern Text* goldCounterText;
 extern Button* letterStatus;
 extern float fallingLeafs[100][3];
 extern float timeSet;
@@ -100,7 +102,7 @@ struct PlayerStatus {
     unsigned char firstZoomIn; // ja vez o primeiro zoom in?
     unsigned char tutorialLetter; // ja pegou a carta tutorial?
     unsigned char inDialog; //está em um diálogo?
-    int carryngGold; // quantas peças de ouro já pegou
+    int goldAmount; // quantas peças de ouro já pegou
     int letterId; // qual conteudo da carta que ele esta levando
     int closeLetterId; // a carta que ele esta proximo, ou que vai pegar
     int gameOverCount; // quantas vezes ele foi pego

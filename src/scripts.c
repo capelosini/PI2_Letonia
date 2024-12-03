@@ -25,7 +25,7 @@ void gameSceneScript(Scene* self) {
     Vector2 mov = getMovementVector2(&keyState, ALLEGRO_KEY_A, ALLEGRO_KEY_D, ALLEGRO_KEY_W, ALLEGRO_KEY_S);
 
     player->physics.acc = (Vector2){ abs(mov.x), abs(mov.y) };
-    
+
     if (mov.x != 0 || mov.y != 0) {
         playAudioStream(stepsSound);
     } else{
@@ -138,6 +138,71 @@ void gameSceneScript(Scene* self) {
         politician->animation.index.y = 0;
     }
 
+
+    // invisible bush test
+    if (checkCollisionRect(player->position.x, player->position.y, player->width, player->height, testBush->position.x, testBush->position.y, testBush->width,  testBush->height)){
+        testBush->animation.index.y = 1;
+        playerStatus.isHidden = 1;
+    } else{
+        testBush->animation.index.y = 0;
+        playerStatus.isHidden = 0;
+    }
+
+
+    // night in mission 2
+    if (playerStatus.mainMissionId == 3) {
+        timeGameMap->color = al_map_rgba(0, 0, 10, 100);
+    } else if (playerStatus.mainMissionId == 5 && engine->currentScene == quartel) {
+        timeGameMap->color = al_map_rgba(0, 0, 20, 80);
+    } else if (playerStatus.mainMissionId == 4 || playerStatus.mainMissionId == 5) {
+        timeGameMap->color = al_map_rgba(0, 0, 10, 180);
+    } else {
+        timeGameMap->color = al_map_rgba(0, 0, 0, 0);
+    }
+
+
+
+
+    // letter status change
+    if (letterStatus->bitmap == letterStatusFalseBM && playerStatus.carryingLetter == 1){
+        letterStatus->bitmap = letterStatusTrueBM;
+    } else if(letterStatus->bitmap == letterStatusTrueBM && playerStatus.carryingLetter == 0){
+        letterStatus->bitmap = letterStatusFalseBM;
+    }
+
+    // last letter mission get letter
+    if (playerStatus.mainMissionId == 8 && engine->currentScene == roomR && playerStatus.carryingLetter == 0 && !pressEMessage->visible){
+        pressEMessage->visible=1;
+        playerStatus.closeLetterId=5;
+    }
+
+    //letters give action
+    if (playerStatus.carryingLetter &&
+    ((engine->currentScene == roomL && playerStatus.mainMissionId == 2) || (engine->currentScene == roomM && playerStatus.mainMissionId == 5) || engine->currentScene == roomR && playerStatus.mainMissionId == 9)) {
+        if (!playerStatus.inDialog) {
+            pressEMessage->visible=1;
+        } else {
+            playerDialog->visible = 1;
+        }
+    }
+
+    else if (playerStatus.mainMissionId == 2 || playerStatus.mainMissionId == 5 || playerStatus.mainMissionId == 9){
+        pressEMessage->visible=0;
+    }
+
+    memcpy(&playerStatus.lastPosition, &player->position, sizeof(Vector2));
+
+    // UNDER THIS ONLY THINGS THAT WILL WORK ONLY IN GAMEMAP SCENE
+    if (engine->currentScene != gameMap){
+        return;
+    }
+
+    if (playerStatus.mainMissionId == 7){
+        goldCounterText->visible = 1;
+    } else{
+        goldCounterText->visible = 0;
+    }
+
     // enemies movement
     playerStatus.enemiesFollowing = 0;
     for (int i = 0; i < enemiesCount; i++) {
@@ -189,70 +254,11 @@ void gameSceneScript(Scene* self) {
         }
     }
 
-
-    // invisible bush test
-    if (checkCollisionRect(player->position.x, player->position.y, player->width, player->height, testBush->position.x, testBush->position.y, testBush->width,  testBush->height)){
-        testBush->animation.index.y = 1;
-        playerStatus.isHidden = 1;
-    } else{
-        testBush->animation.index.y = 0;
-        playerStatus.isHidden = 0;
-    }
-
-
-    // night in mission 2
-    if (playerStatus.mainMissionId == 3) {
-        timeGameMap->color = al_map_rgba(0, 0, 10, 100);
-    } else if (playerStatus.mainMissionId == 5 && engine->currentScene == quartel) {
-        timeGameMap->color = al_map_rgba(0, 0, 20, 80);
-    } else if (playerStatus.mainMissionId == 4 || playerStatus.mainMissionId == 5) {
-        timeGameMap->color = al_map_rgba(0, 0, 10, 180);
-    } else {
-        timeGameMap->color = al_map_rgba(0, 0, 0, 0);
-    }
-
-    
-
-
-    // letter status change
-    if (letterStatus->bitmap == letterStatusFalseBM && playerStatus.carryingLetter == 1){
-        letterStatus->bitmap = letterStatusTrueBM;
-    } else if(letterStatus->bitmap == letterStatusTrueBM && playerStatus.carryingLetter == 0){
-        letterStatus->bitmap = letterStatusFalseBM;
-    }
-
-    // last letter mission get letter
-    if (playerStatus.mainMissionId == 8 && engine->currentScene == roomR && playerStatus.carryingLetter == 0 && !pressEMessage->visible){
-        pressEMessage->visible=1;
-        playerStatus.closeLetterId=5;
-    }
-
-    //letters give action
-    if (playerStatus.carryingLetter &&
-    ((engine->currentScene == roomL && playerStatus.mainMissionId == 2) || (engine->currentScene == roomM && playerStatus.mainMissionId == 5) || engine->currentScene == roomR && playerStatus.mainMissionId == 9)) {
-        if (!playerStatus.inDialog) {
-            pressEMessage->visible=1;
-        } else {
-            playerDialog->visible = 1;
-        }
-    }
-
-    else if (playerStatus.mainMissionId == 2 || playerStatus.mainMissionId == 5 || playerStatus.mainMissionId == 9){
-        pressEMessage->visible=0;
-    }
-
-    memcpy(&playerStatus.lastPosition, &player->position, sizeof(Vector2));
-
-    // UNDER THIS ONLY THINGS THAT WILL WORK ONLY IN GAMEMAP SCENE
-    if (engine->currentScene != gameMap){
-        return;
-    }
-
     // first zoom in handle
     if (!playerStatus.firstZoomIn){
         if (al_get_audio_stream_playing(stepsSound)){
             pauseAudioStream(stepsSound);
-        } 
+        }
         if (al_get_audio_stream_playing(cityNoise)){
             pauseAudioStream(cityNoise);
         }
@@ -320,7 +326,7 @@ void gameSceneScript(Scene* self) {
 
     if (playerStatus.mainMissionId == 7) {
         for (int i = 0; i < 5; i++) {
-            if (dist(player->position.x, player->position.y, player->width, player->height, goldObjects[i]->position.x, goldObjects[i]->position.y, goldObjects[i]->width, goldObjects[i]->height) < 60) {
+            if (goldObjects[i]->visible && dist(player->position.x, player->position.y, player->width, player->height, goldObjects[i]->position.x, goldObjects[i]->position.y, goldObjects[i]->width, goldObjects[i]->height) < 60) {
                 pressEMessage->visible = 1;
                 break;
             }
@@ -331,7 +337,7 @@ void gameSceneScript(Scene* self) {
     }
 
     // invensible, just for development
-    // playerStatus.isHidden=1;
+    playerStatus.isHidden=1;
 }
 
 //menu animation

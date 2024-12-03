@@ -1,4 +1,6 @@
 #include "../../include/globals.h"
+#include <allegro5/allegro_font.h>
+#include <allegro5/color.h>
 
 void loadGameMap(){
     gameMap = createScene(engine, gameSceneScript);
@@ -50,6 +52,14 @@ void loadGameMap(){
     exitGameMap->color = al_map_rgba(0, 0, 0, 0);
     exitGameMap->collisionEnabled = 1;
 
+    //third mission gold objects generation
+    for (int i = 0; i < 5; i++) {
+        int x = randInt(1, 6);
+        int y = randInt(1, 7);
+        goldObjects[i] = createGameObject(SPRITE, x*500 + 250, y*500 - 30, 20, 31, gameMap);
+        setGameObjectBitmap(goldObjects[i], goldBM);
+        goldObjects[i]->visible = playerStatus.mainMissionId == 7;
+    }
 
     player = createGameObject(ANIMATED_SPRITE, 700, 50, 44, 50, insideBase);
     player->position.x = 450;
@@ -130,15 +140,6 @@ void loadGameMap(){
         }
     }
 
-    //third mission gold objects generation
-    for (int i = 0; i < 5; i++) {
-        int x = randInt(1, 6);
-        int y = randInt(1, 7);
-        goldObjects[i] = createGameObject(SPRITE, x*500 + 250, y*500 - 30, 20, 31, gameMap);
-        setGameObjectBitmap(goldObjects[i], loadBitmap(engine, "./assets/images/gold.png"));
-        goldObjects[i]->visible = playerStatus.mainMissionId == 7;
-    }
-
     addTextToScene(gameMap, tutorialLetterContent);
     GameObject* houseTop = createGameObject(SPRITE, baseObj->position.x, baseObj->position.y-10, baseObj->width, baseObj->height/2 +70, gameMap);
     setGameObjectBitmap(houseTop, createSubBitmap(engine, baseBitMap,0,0,500,500/2 + 70));
@@ -171,4 +172,8 @@ void loadGameMap(){
     addTextToScene(gameMap, mainMissionText);
     addTextToScene(gameMap, pressEMessage);
     addTextToScene(gameMap, playerDialog);
+
+    char tempStr[]="Ouro: 0/5";
+    sprintf(tempStr, "Ouro: %d/5", playerStatus.goldAmount);
+    goldCounterText=createText(tempStr, 10, 70 , al_get_text_width(stdMessageFont->font, "Ouro: 0/5")+20, al_map_rgb(255, 255, 255), al_map_rgba(0,0,0,0), NULL, stdMessageFont, 10, 10, gameMap);
 }

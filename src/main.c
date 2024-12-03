@@ -45,6 +45,7 @@ ALLEGRO_BITMAP* roadV;
 ALLEGRO_BITMAP* plateBM;
 ALLEGRO_BITMAP* letterStatusTrueBM;
 ALLEGRO_BITMAP* letterStatusFalseBM;
+ALLEGRO_BITMAP* goldBM;
 ALLEGRO_SAMPLE* clickSound;
 ALLEGRO_AUDIO_STREAM* menuMusic;
 ALLEGRO_AUDIO_STREAM* stepsSound;
@@ -63,6 +64,7 @@ Text* closeHouseNumber;
 Text* letterShowText;
 Text* playerDialog;
 Text* gameOverCountText;
+Text* goldCounterText;
 Button* letterStatus;
 float fallingLeafs[100][3];
 
@@ -127,23 +129,30 @@ void onEvent(ALLEGRO_EVENT event, Scene * scene, CAEngine * engine) {
 
             // take gold
             if (playerStatus.mainMissionId == 7 && pressEMessage->visible) {
+                playerStatus.goldAmount++;
+                // update text gold counter
+                char tempStr[]="Ouro: 0/5";
+                sprintf(tempStr, "Ouro: %d/5", playerStatus.goldAmount);
+                changeText(goldCounterText, tempStr);
+
                 for (int i = 0; i < 5; i++) {
                     if (dist(player->position.x, player->position.y, player->width, player->height, goldObjects[i]->position.x, goldObjects[i]->position.y, goldObjects[i]->width, goldObjects[i]->height) < 60) {
                         goldObjects[i]->visible = 0;
-                        playerStatus.carryngGold++;
-                        pressEMessage->visible = 0;
-
                     }
                 }
 
-                if (playerStatus.carryngGold == 5) {
+                if (playerStatus.goldAmount == 5) {
                     playerStatus.mainMissionId++;
                     changeText(mainMissionText, mainMissions[playerStatus.mainMissionId]);
+                    pressEMessage->visible=0;
+                    for (int i = 0; i < 5; i++) {
+                        goldObjects[i]->visible = 0;
+                    }
                 }
             }
 
             // take letter
-            if (!(playerStatus.carryingLetter) && pressEMessage->visible) {
+            else if (!(playerStatus.carryingLetter) && pressEMessage->visible) {
                 // if letter is tutorial
                 if (playerStatus.closeLetterId < 3) {
                     playerStatus.tutorialLetter=1;
@@ -285,6 +294,24 @@ void playClickSound(){
     playAudioSample(clickSound, 0.5, 0, 1, ALLEGRO_PLAYMODE_ONCE);
 }
 
+void setDefaultPlayerStatus(){
+    playerStatus.isHidden = 0;
+    playerStatus.carryingLetter = 0;
+    playerStatus.firstZoomIn = 0;
+    playerStatus.letterId = 0;
+    playerStatus.inDialog = 0;
+    playerStatus.goldAmount = 0;
+    playerStatus.closeLetterId = 0;
+    playerStatus.gameOverCount = 0;
+    playerStatus.mainMissionId = 0;
+    playerStatus.tutorialLetter = 0;
+    playerStatus.isLastSafeZoneQuartel = 0;
+    playerStatus.dialogId = 0;
+    playerStatus.enemiesFollowing = 0;
+    playerStatus.lastScene = INSIDE_BASE;
+    playerStatus.lastPosition = (Vector2){450, 300};
+}
+
 int main() {
     GameConfig engineConfig;
     engineConfig.fps = 60;
@@ -309,6 +336,9 @@ int main() {
     ALLEGRO_BITMAP* mainLetterStatusBM = loadBitmap(engine, "./assets/images/letter-status-sheet.png");
     letterStatusTrueBM=createSubBitmap(engine, mainLetterStatusBM, 0, 0, 12, 12);
     letterStatusFalseBM=createSubBitmap(engine, mainLetterStatusBM, 0, 12, 12, 12);
+
+    // load gold bm all
+    goldBM = loadBitmap(engine, "./assets/images/gold.png");
 
     // loading houses bitmaps
     for (int i=0; i<6; i++){
@@ -339,21 +369,7 @@ int main() {
     stopAudioStream(chaseMusic);
 
     // set playerStatus to default
-    playerStatus.isHidden = 0;
-    playerStatus.carryingLetter = 0;
-    playerStatus.firstZoomIn = 0;
-    playerStatus.letterId = 0;
-    playerStatus.inDialog = 0;
-    playerStatus.carryngGold = 0;
-    playerStatus.closeLetterId = 0;
-    playerStatus.gameOverCount = 0;
-    playerStatus.mainMissionId = 0;
-    playerStatus.tutorialLetter = 0;
-    playerStatus.isLastSafeZoneQuartel = 0;
-    playerStatus.dialogId = 0;
-    playerStatus.enemiesFollowing = 0;
-    playerStatus.lastScene = INSIDE_BASE;
-    playerStatus.lastPosition = (Vector2){450, 300};
+    setDefaultPlayerStatus();
 
     struct SaveFile saveFile = openSaveFile("Save.caes");
     struct SaveData saveData;

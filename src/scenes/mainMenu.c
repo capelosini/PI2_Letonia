@@ -33,5 +33,5 @@ void loadMainMenu(){
     char out[] = "Você foi pego 0000 vezes";
     sprintf(out, "Você foi pego %d vezes", playerStatus.gameOverCount);
     gameOverCountText = createText(out, engine->displayWidth/2-al_get_text_width(stdMessageFont->font, out)/2, engine->displayHeight-40, al_get_text_width(stdMessageFont->font, out)+10, al_map_rgb(255, 255, 255), al_map_rgba(0, 0, 0, 0), NULL, stdMessageFont, 0, 0, mainMenu);
-    gameOverCountText->visible = 0;
+    gameOverCountText->visible = playerStatus.tutorialLetter;
 }
