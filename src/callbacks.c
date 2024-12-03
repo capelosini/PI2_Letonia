@@ -47,8 +47,12 @@ void onOpenGameMap(Scene* scene) {
     if (!playerStatus.firstZoomIn){
         gameMap->camera.offset = (Vector2){9999, 9999};
     }
-    if (playerStatus.mainMissionId == 5) {
+    if ((playerStatus.mainMissionId == 4 || playerStatus.mainMissionId == 5) && playerStatus.dialogId > 1 ) {
+        politician->visible = 1;
         politician->position = (Vector2){100, 500};
+    }
+    else {
+        politician->visible = 0;
     }
     restartEnemiesPos();
     changeScene(engine, gameMap);
@@ -56,10 +60,7 @@ void onOpenGameMap(Scene* scene) {
 }
 
 void onOpenGameMapR(Scene* scene) {
-    if (playerStatus.mainMissionId == 5){ return; }
-    if (playerStatus.mainMissionId == 6) {
-        politician->visible = 0;
-    }
+    politician->visible = playerStatus.mainMissionId == 5 ;
     player->position = (Vector2){ map->width  - 80, map->height - 340 };
     gameMap->camera.offset = (Vector2){ 9999, 9999 };
     restartEnemiesPos();

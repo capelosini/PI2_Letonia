@@ -74,12 +74,12 @@ float timeSet = 0;
 char timeSetDir = 1;
 // FIRST IS TUTORIAL
 char* lettersTexts[6]= {
-    "Aldo, sua missão como escoteiro será ajudar os aliados pró-revolução e entregar as cartas para deixar todos no quartel informados, mas cuidado, pois alguns soldados estão pelas ruas querendo prender qualquer sujeito que tente ajudar a revolução.\nW/A/S/D: Movimentação | E: Interação\n \nPressione F para abrir/fechar.",
+    "Aldo, sua missão como escoteiro será ajudar os aliados \n pró-revolução e entregar as cartas para deixar todos no quartel informados, mas cuidado, pois alguns soldados estão pelas ruas querendo prender qualquer sujeito que tente ajudar a revolução. \n \n W/A/S/D: Movimentação | E: Interação \n \n Pressione F para abrir/fechar.",
     "Aldo, um político precisa ser levado até o general Isidoro, precisamos que você o guie até o quartel sem que sejam pegos pelos soldados, espere a noite cair para que diminuam os soldados nas ruas",
     "Muitos civis contribuem para a revolução doando suas regalias de ouro, para a compra de armamento e mantimentos. Procure em frente às casas por objetos de ouro.",
-    "9 de julho de 1932\n \nGeneral, São Paulo não aceitará a centralização do poder imposta por Getúlio Vargas. O povo clama por uma nova Constituição, e lideranças políticas e militares se uniram para defender a democracia. A revolução começou, e todos os esforços estão concentrados na organização das tropas.",
-    "25 de julho de 1932\n \nAs batalhas são intensas. Resistimos bravamente em várias frentes, mas estamos em desvantagem contra as forças federais. O apoio da população é nossa força: eles arrecadam ouro, doam mantimentos e costuram uniformes. Mesmo em meio às dificuldades, lutamos por uma causa justa.",
-    "18 de setembro de 1932\n \nApós meses de luta, nossos recursos chegaram ao fim, e as forças inimigas são superiores. Apesar da derrota militar, nossa causa ecoou no Brasil. Getúlio Vargas já anuncia uma Assembleia Constituinte. Nosso sacrifício não foi em vão: a democracia renascerá."
+    "9 de julho de 1932 \n \n General, São Paulo não aceitará a centralização do poder imposta por Getúlio Vargas. O povo clama por uma nova Constituição, e lideranças políticas e militares se uniram para defender a democracia. A revolução começou, e todos os esforços estão concentrados na organização das tropas.",
+    "25 de julho de 1932 \n \n As batalhas são intensas. Resistimos bravamente em várias frentes, mas estamos em desvantagem contra as forças federais. O apoio da população é nossa força: eles arrecadam ouro, doam mantimentos e costuram uniformes. Mesmo em meio às dificuldades, lutamos por uma causa justa.",
+    "18 de setembro de 1932 \n \n Após meses de luta, nossos recursos chegaram ao fim, e as forças inimigas são superiores. Apesar da derrota militar, nossa causa ecoou no Brasil. Getúlio Vargas já anuncia uma Assembleia Constituinte. Nosso sacrifício não foi em vão: a democracia renascerá."
 };
 
 char* mainMissions[12] = {

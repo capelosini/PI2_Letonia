@@ -57,7 +57,7 @@ void loadGameMap(){
         int x = randInt(1, 6);
         int y = randInt(1, 7);
         goldObjects[i] = createGameObject(SPRITE, x*500 + 250, y*500 - 30, 20, 31, gameMap);
-        setGameObjectBitmap(goldObjects[i], goldBM);
+        setGameObjectBitmap(goldObjects[i], createSubBitmap(engine,goldBM,0,31*i,20,31));
         goldObjects[i]->visible = playerStatus.mainMissionId == 7;
     }
 
@@ -125,7 +125,7 @@ void loadGameMap(){
 
             if (i == 1 && j == 1) {
                 politician = createGameObject(ANIMATED_SPRITE, h->position.x, h->position.y+h->height, 50, 52, gameMap);
-                politician->visible = playerStatus.mainMissionId >= 4 ? 1 : 0;
+                politician->visible = (playerStatus.mainMissionId == 4 || playerStatus.mainMissionId == 5);
                 politician->physics.enabled = 1;
                 politician->physics.maxSpeed = player->physics.maxSpeed;
                 politician->physics.friction = 0.4;
