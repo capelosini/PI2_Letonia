@@ -73,6 +73,7 @@ extern Text* gameOverCountText;
 extern Text* goldCounterText;
 extern Button* letterStatus;
 extern Button* continueBtn;
+extern Button* resetSaveBtn;
 extern float fallingLeafs[100][3];
 extern float timeSet;
 extern char timeSetDir;
@@ -84,6 +85,8 @@ extern GameObject* goldObjects[5];
 
 extern int walkIndex;
 extern Scene* allScenes[9];
+
+extern struct SaveFile saveFile;
 
 enum SCENES{
     MAIN_MENU,
@@ -132,12 +135,14 @@ void onOpenRoomR(Scene* scene);
 void onOpenSinopse(Scene* scene);
 void onPlayerCollision(GameObject* self, GameObject* obj);
 void onEnemyCollision(GameObject* self, GameObject* obj);
+void onResetSaveClicked(Scene* scene);
 
 void restartEnemiesPos();
 unsigned char isOnRoad(GameObject* obj);
 int getPlayerNearHouse();
 void playEndCutscene();
 void playClickSound();
+void setDefaultPlayerStatus();
 
 void mainMenuScript(Scene* self);
 void loadMainMenu();

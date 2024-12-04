@@ -68,6 +68,7 @@ Text* gameOverCountText;
 Text* goldCounterText;
 Button* letterStatus;
 Button* continueBtn;
+Button* resetSaveBtn;
 float fallingLeafs[100][3];
 
 // enemiesCount and enemies[] length needs be equal
@@ -108,6 +109,8 @@ char* dialogsTexts[4] = {
 
 int walkIndex = 0;
 Scene* allScenes[9];
+
+struct SaveFile saveFile;
 
 struct PlayerStatus playerStatus;
 
@@ -160,6 +163,7 @@ void onEvent(ALLEGRO_EVENT event, Scene * scene, CAEngine * engine) {
                     playerStatus.tutorialLetter=1;
                     tutorialLetterContent->visible = 1;
                     continueBtn->visible = 1;
+                    resetSaveBtn->visible = 1;
                 } else {
                     playerStatus.letterId = playerStatus.closeLetterId;
                     playerStatus.carryingLetter=1;
@@ -401,7 +405,7 @@ int main() {
     // set playerStatus to default
     setDefaultPlayerStatus();
 
-    struct SaveFile saveFile = openSaveFile("Save.caes");
+    saveFile = openSaveFile("Save.caes");
     struct SaveData saveData;
     readSaveData(&saveFile, &saveData);
 

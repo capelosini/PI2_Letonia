@@ -20,6 +20,10 @@ void loadMainMenu(){
     addButtonToScene(mainMenu, continueBtn);
     continueBtn->visible = playerStatus.tutorialLetter;
     addButtonToScene(mainMenu, createButton(engine, engine->displayWidth / 2 - 75, engine->displayHeight / 2 + 55, 150, 40, al_map_rgb(210, 20, 20), al_map_rgb(255, 255, 255), "Sair", "./assets/fonts/roboto.ttf", NULL, onGameExit));
+    resetSaveBtn=createButton(engine, engine->displayWidth - 200, engine->displayHeight-50, 200, 50, al_map_rgb(210, 20, 20), al_map_rgb(255, 255, 255), "Reiniciar", "./assets/fonts/roboto.ttf", NULL, onResetSaveClicked);
+    addButtonToScene(mainMenu, resetSaveBtn);
+    resetSaveBtn->visible = playerStatus.tutorialLetter;
+
     mainMenu->backgroundColor = al_map_rgb(0, 0, 20);
 
     ghostPlayerMenu = createGameObject(ANIMATED_SPRITE, -60, engine->displayHeight - 200, 45, 40, mainMenu);

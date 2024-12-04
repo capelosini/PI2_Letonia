@@ -1,4 +1,5 @@
 #include "../include/globals.h"
+#include "../include/saving.h"
 
 void onOpenMenu(Scene* scene)
 {
@@ -196,4 +197,22 @@ void onEnemyCollision(GameObject* self, GameObject* obj)
             }
         }
     }
+}
+
+void onResetSaveClicked(Scene* scene){
+    setDefaultPlayerStatus();
+    saveGame(&saveFile);
+
+    changeText(mainMissionText, mainMissions[playerStatus.mainMissionId]);
+
+    lastSceneBeforeMenu = allScenes[playerStatus.lastScene];
+    memcpy(&player->position, &playerStatus.lastPosition, sizeof(Vector2));
+    allScenes[playerStatus.lastScene]->camera.offset = player->position;
+    resetSaveBtn->visible = 0;
+
+    continueBtn->visible=0;
+    letterObj->visible=1;
+    tutorialLetterContent->visible=0;
+
+    playClickSound();
 }
