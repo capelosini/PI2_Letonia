@@ -13,10 +13,17 @@ void loadMainMenu(){
     stdMessageFont = loadTTF(engine, "./assets/fonts/kalam.ttf", 17);
     lettersFont = loadTTF(engine, "./assets/fonts/kalam.ttf", 18);
     char* titleText = "Revolução Em Cartas";
-    createText(titleText, engine->displayWidth / 2 - al_get_text_width(titleFont->font, titleText) / 2, 50, 0, al_map_rgb(255, 255, 255), al_map_rgba(0, 0, 0, 0), NULL, titleFont, 0, 0, mainMenu);
+    createText(titleText, engine->displayWidth / 2 - al_get_text_width(titleFont->font, titleText) / 2, 50, al_get_text_width(titleFont->font, titleText)+10, al_map_rgb(255, 255, 255), al_map_rgba(0, 0, 0, 0), NULL, titleFont, 0, 0, mainMenu);
 
     addButtonToScene(mainMenu, createButton(engine, engine->displayWidth / 2 - 200./2, engine->displayHeight / 2 - 25, 200, 50, al_map_rgb(217, 95, 54), al_map_rgb(255, 255, 255), "Jogar", "./assets/fonts/roboto.ttf", NULL, onOpenRestart));
+    continueBtn = createButton(engine, engine->displayWidth / 2 - 200./2, engine->displayHeight / 2 - 25, 200, 50, al_map_rgb(1, 105, 54), al_map_rgb(255, 255, 255), "Continuar", "./assets/fonts/roboto.ttf", NULL, onOpenRestart);
+    addButtonToScene(mainMenu, continueBtn);
+    continueBtn->visible = playerStatus.tutorialLetter;
     addButtonToScene(mainMenu, createButton(engine, engine->displayWidth / 2 - 75, engine->displayHeight / 2 + 55, 150, 40, al_map_rgb(210, 20, 20), al_map_rgb(255, 255, 255), "Sair", "./assets/fonts/roboto.ttf", NULL, onGameExit));
+    resetSaveBtn=createButton(engine, engine->displayWidth - 200, engine->displayHeight-50, 200, 50, al_map_rgb(210, 20, 20), al_map_rgb(255, 255, 255), "Reiniciar", "./assets/fonts/roboto.ttf", NULL, onResetSaveClicked);
+    addButtonToScene(mainMenu, resetSaveBtn);
+    resetSaveBtn->visible = playerStatus.tutorialLetter;
+
     mainMenu->backgroundColor = al_map_rgb(0, 0, 20);
 
     ghostPlayerMenu = createGameObject(ANIMATED_SPRITE, -60, engine->displayHeight - 200, 45, 40, mainMenu);
@@ -28,10 +35,8 @@ void loadMainMenu(){
     ghostPlayerMenu->physics.directions.x = 1;
     ghostPlayerMenu->physics.acc.x = 1;
 
-    changeScene(engine, mainMenu);
-
     char out[] = "Você foi pego 0000 vezes";
     sprintf(out, "Você foi pego %d vezes", playerStatus.gameOverCount);
-    gameOverCountText = createText(out, engine->displayWidth/2-al_get_text_width(stdMessageFont->font, out)/2, engine->displayHeight-40, 0, al_map_rgb(255, 255, 255), al_map_rgba(0, 0, 0, 0), NULL, stdMessageFont, 0, 0, mainMenu);
-    gameOverCountText->visible = 0;
+    gameOverCountText = createText(out, engine->displayWidth/2-al_get_text_width(stdMessageFont->font, out)/2, engine->displayHeight-40, al_get_text_width(stdMessageFont->font, out)+10, al_map_rgb(255, 255, 255), al_map_rgba(0, 0, 0, 0), NULL, stdMessageFont, 0, 0, mainMenu);
+    gameOverCountText->visible = playerStatus.tutorialLetter;
 }

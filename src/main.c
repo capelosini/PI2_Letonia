@@ -1,6 +1,6 @@
 #include "../include/globals.h"
-#include <stdlib.h>
-#include <time.h>
+#include "../include/saving.h"
+#include <allegro5/allegro_video.h>
 
 CAEngine* engine;
 Scene* mainMenu;
@@ -15,6 +15,7 @@ Scene* sinopse;
 Scene* letterShow;
 GameObject* player;
 GameObject* ghostPlayerMenu;
+GameObject* politician;
 GameObject* baseObj;
 GameObject* letterObj;
 GameObject* exitBase;
@@ -33,9 +34,10 @@ GameObject* returnQuartelRoomR;
 GameObject* gridGameMap;
 GameObject* map;
 GameObject* exitQuartel;
-GameObject* enemies[75];
+GameObject* enemies[50];
 GameObject* testBush;
 GameObject* timeGameMap;
+GameObject* goldObjects[5];
 ALLEGRO_BITMAP* enemyBM1;
 ALLEGRO_BITMAP* enemyBM2;
 ALLEGRO_BITMAP* housesBM[6];
@@ -44,8 +46,13 @@ ALLEGRO_BITMAP* roadV;
 ALLEGRO_BITMAP* plateBM;
 ALLEGRO_BITMAP* letterStatusTrueBM;
 ALLEGRO_BITMAP* letterStatusFalseBM;
+ALLEGRO_BITMAP* goldBM;
 ALLEGRO_SAMPLE* clickSound;
 ALLEGRO_AUDIO_STREAM* menuMusic;
+ALLEGRO_AUDIO_STREAM* stepsSound;
+ALLEGRO_AUDIO_STREAM* cityNoise;
+ALLEGRO_AUDIO_STREAM* introMusic;
+ALLEGRO_AUDIO_STREAM* chaseMusic;
 Font* lettersFont;
 Font* stdMessageFont;
 Font* titleFont;
@@ -58,107 +65,169 @@ Text* closeHouseNumber;
 Text* letterShowText;
 Text* playerDialog;
 Text* gameOverCountText;
+Text* goldCounterText;
 Button* letterStatus;
+Button* continueBtn;
+Button* resetSaveBtn;
 float fallingLeafs[100][3];
 
 // enemiesCount and enemies[] length needs be equal
-int enemiesCount=75;
+int enemiesCount = 50;
 float timeSet = 0;
-char timeSetDir= 1;
+char timeSetDir = 1;
 // FIRST IS TUTORIAL
-char* lettersTexts[4]= {
-    "Aldo, sua missão como escoteiro será ajudar os aliados pró-revolução e entregar as cartas para deixar todos no quartel informados, mas cuidado, pois alguns soldados estão pelas ruas querendo prender qualquer sujeito que tente ajudar a revolução.\n \nPressione Z para abrir/fechar.",
-    "9 de julho de 1932\n \nGeneral, São Paulo não aceitará a centralização do poder imposta por Getúlio Vargas. O povo clama por uma nova Constituição, e lideranças políticas e militares se uniram para defender a democracia. A revolução começou, e todos os esforços estão concentrados na organização das tropas.",
-    "25 de julho de 1932\n \nAs batalhas são intensas. Resistimos bravamente em várias frentes, mas estamos em desvantagem contra as forças federais. O apoio da população é nossa força: eles arrecadam ouro, doam mantimentos e costuram uniformes. Mesmo em meio às dificuldades, lutamos por uma causa justa.",
-    "18 de setembro de 1932\n \nApós meses de luta, nossos recursos chegaram ao fim, e as forças inimigas são superiores. Apesar da derrota militar, nossa causa ecoou no Brasil. Getúlio Vargas já anuncia uma Assembleia Constituinte. Nosso sacrifício não foi em vão: a democracia renascerá."
+char* lettersTexts[6]= {
+    "Aldo, sua missão como escoteiro será ajudar os aliados \n pró-revolução e entregar as cartas para deixar todos no quartel informados, mas cuidado, pois alguns soldados estão pelas ruas querendo prender qualquer sujeito que tente ajudar a revolução. \n \n W/A/S/D: Movimentação | E: Interação \n \n Pressione F para abrir/fechar.",
+    "Aldo, um político precisa ser levado até o general Isidoro, precisamos que você o guie até o quartel sem que sejam pegos pelos soldados, espere a noite cair para que diminuam os soldados nas ruas",
+    "Muitos civis contribuem para a revolução doando suas regalias de ouro, para a compra de armamento e mantimentos. Procure em frente às casas por objetos de ouro.",
+    "9 de julho de 1932 \n \n General, São Paulo não aceitará a centralização do poder imposta por Getúlio Vargas. O povo clama por uma nova Constituição, e lideranças políticas e militares se uniram para defender a democracia. A revolução começou, e todos os esforços estão concentrados na organização das tropas.",
+    "25 de julho de 1932 \n \n As batalhas são intensas. Resistimos bravamente em várias frentes, mas estamos em desvantagem contra as forças federais. O apoio da população é nossa força: eles arrecadam ouro, doam mantimentos e costuram uniformes. Mesmo em meio às dificuldades, lutamos por uma causa justa.",
+    "18 de setembro de 1932 \n \n Após meses de luta, nossos recursos chegaram ao fim, e as forças inimigas são superiores. Apesar da derrota militar, nossa causa ecoou no Brasil. Getúlio Vargas já anuncia uma Assembleia Constituinte. Nosso sacrifício não foi em vão: a democracia renascerá."
 };
 
-char* mainMissions[10] = {
+char* mainMissions[12] = {
     "Pegue a carta na mesa da base.",
-    "Vá até a casa 72, e pegue a carta.",
+    "Vá até a casa 43, e pegue a carta.",
     "Entregue a carta para o General Bertoldo Klinger no quartel na parte inferior direita da cidade.",
     "Volte para a base para pegar a carta que te deixaram lá.",
-    "Vá ao quartel entregar a carta para o General Isidoro Dias Lopes",
-    "Pegue uma carta com o General Euclides de Oliveira Figueiredo da sala à direita.",
+    "Vá até a casa 12",
+    "Vá ao quartel levar o político que está com a carta para o General Isidoro Dias Lopes.",
+    "Volte para a base e pegue a próxima missão.",
+    "Procure pelos objetos de ouro espalhados no mapa.",
+    "Entregue o ouro para o general Euclides de Oliveira Figueiredo e Pegue uma carta com o mesmo.",
     "Entregue a carta para os aliados na estação ferroviaria da cidade.",
-    "Aproveite o mapa e se divirta fugindo dos soldados!"
+    "Aproveite o mapa e se divirta fugindo dos soldados!",
+    ""
 };
 
-char* dialogsTexts[3] = {
-    "dialogo 1",
-    "dialogo 2",
-    "dialogo 3"
+char* dialogsTexts[4] = {
+    "Estamos muito contentes de ter um jovem como você disposto a ajudar nossa causa, ótimo trabalho Aldo!",
+    "Você é o Aldo? Vá na frente eu te acompanho!",
+    "Os soldados lá fora podem parecer assustadores mas lembre, não é o medo que deve te guiar, mas o desejo de cumprir seu dever.",
+    "Não sabemos por quanto tempo essa guerra ainda durará... Mas eu gostaria de agradecê-lo por todos seu serviços Aldo, é uma honra tê-lo ao nosso lado."
 };
 
 int walkIndex = 0;
+Scene* allScenes[9];
 
-struct playerStatus playerStatus;
+struct SaveFile saveFile;
+
+struct PlayerStatus playerStatus;
 
 //action handle on events
 void onEvent(ALLEGRO_EVENT event, Scene * scene, CAEngine * engine) {
     if (event.type == ALLEGRO_EVENT_KEY_DOWN) {
         gameOverText->visible=0;
         if (event.keyboard.keycode == ALLEGRO_KEY_ESCAPE) {
-            if(engine->currentScene != mainMenu)
-            onOpenMenu(NULL);
+            if (engine->currentScene != mainMenu && engine->currentScene != letterShow && !al_get_audio_stream_playing(introMusic))
+                onOpenMenu(NULL);
+            else if (engine->currentScene == mainMenu && playerStatus.tutorialLetter == 1)
+                onOpenRestart(NULL);
         }
     }
     else if (event.type == ALLEGRO_EVENT_KEY_UP) {
-
-        // close letter show
-        if (engine->currentScene == letterShow){
-            changeScene(engine, lastSceneBeforeMenu);
-        }
-
         if (event.keyboard.keycode == ALLEGRO_KEY_E) {
+            // close letter show
+            if (engine->currentScene == letterShow){
+                changeScene(engine, lastSceneBeforeMenu);
+            }
+
+            // take gold
+            if (playerStatus.mainMissionId == 7 && pressEMessage->visible) {
+                playerStatus.goldAmount++;
+                // update text gold counter
+                char tempStr[]="Ouro: 0/5";
+                sprintf(tempStr, "Ouro: %d/5", playerStatus.goldAmount);
+                changeText(goldCounterText, tempStr);
+
+                for (int i = 0; i < 5; i++) {
+                    if (dist(player->position.x, player->position.y, player->width, player->height, goldObjects[i]->position.x, goldObjects[i]->position.y, goldObjects[i]->width, goldObjects[i]->height) < 60) {
+                        goldObjects[i]->visible = 0;
+                    }
+                }
+
+                if (playerStatus.goldAmount == 5) {
+                    playerStatus.mainMissionId++;
+                    changeText(mainMissionText, mainMissions[playerStatus.mainMissionId]);
+                    pressEMessage->visible=0;
+                    for (int i = 0; i < 5; i++) {
+                        goldObjects[i]->visible = 0;
+                    }
+                }
+            }
+
             // take letter
-            if (!(playerStatus.carryingLetter) && pressEMessage->visible) {
+            else if (!(playerStatus.carryingLetter) && pressEMessage->visible) {
                 // if letter is tutorial
-                if (playerStatus.closeLetterId == 0) {
+                if (playerStatus.closeLetterId < 3) {
                     playerStatus.tutorialLetter=1;
                     tutorialLetterContent->visible = 1;
+                    continueBtn->visible = 1;
+                    resetSaveBtn->visible = 1;
                 } else {
                     playerStatus.letterId = playerStatus.closeLetterId;
                     playerStatus.carryingLetter=1;
+                }
+                if (playerStatus.mainMissionId == 3) {
+                    changeText(tutorialLetterContent, lettersTexts[1]);
+                }
+                if (playerStatus.mainMissionId == 6) {
+                    changeText(tutorialLetterContent, lettersTexts[2]);
+                    for (int i = 0; i < 5; i++) {
+                        goldObjects[i]->visible = 1;
+                    }
+                }
+                if (playerStatus.mainMissionId == 4) {
+                    playerStatus.inDialog = 1;
+                    playerStatus.mainMissionId--;
+                }
+                if (playerStatus.mainMissionId == 8){
+                    lastSceneBeforeMenu = engine->currentScene;
+                    changeText(letterShowText, lettersTexts[playerStatus.letterId]);
+                    changeScene(engine, letterShow);
                 }
                 letterObj->visible = 0;
                 pressEMessage->visible = 0;
                 playerStatus.mainMissionId++;
                 changeText(mainMissionText, mainMissions[playerStatus.mainMissionId]);
-                if (playerStatus.mainMissionId == 6){
-                    lastSceneBeforeMenu = engine->currentScene;
-                    changeText(letterShowText, lettersTexts[playerStatus.letterId]);
-                    changeScene(engine, letterShow);
-                }
-                playClickSound();
-            } 
-            // give letter
-            else if (playerStatus.carryingLetter && pressEMessage->visible){
-                pressEMessage->visible=0;
-                playerStatus.carryingLetter=0;
-                playerStatus.mainMissionId++;
-                changeText(mainMissionText, mainMissions[playerStatus.mainMissionId]);
-                
-                lastSceneBeforeMenu = engine->currentScene;
-                changeText(letterShowText, lettersTexts[playerStatus.letterId]);
-                changeScene(engine, letterShow);
-                playClickSound();
-            } else if (playerStatus.carryingLetter && pressEMessage->visible){ 
-                playerStatus.inDialog = 1;
-                pressEMessage->visible=0;
-                changeText(playerDialog, dialogsTexts[playerStatus.dialogId]);
                 playClickSound();
             }
+            //open dialog
+            else if (playerStatus.carryingLetter && pressEMessage->visible) {
+                pressEMessage->visible = 0;
+                playerStatus.inDialog = 1;
+
+                playClickSound();
+                return;
+            }
+
+            //go to letterShow scene and update text boxes
+            if (playerStatus.inDialog) {
+                playerDialog->visible = 0;
+                playerStatus.inDialog = 0;
+                if (playerStatus.dialogId < 3) {
+                    playerStatus.dialogId++;
+                    playerStatus.mainMissionId++;
+                }
+                //printf("%d\n", playerStatus.mainMissionId);
+
+                if (playerStatus.dialogId < 4 && playerStatus.mainMissionId < 11) {
+                    changeText(letterShowText, lettersTexts[playerStatus.letterId]);
+                    changeText(playerDialog, dialogsTexts[playerStatus.dialogId]);
+                    changeText(mainMissionText, mainMissions[playerStatus.mainMissionId]);
+
+
+                    if (!(playerStatus.mainMissionId == 5)) {
+                        playerStatus.carryingLetter = 0;
+                        pauseAudioStream(stepsSound);
+                        lastSceneBeforeMenu = engine->currentScene;
+                        changeScene(engine, letterShow);
+                    }
+                }
+
+            }
         }
-        else if (event.keyboard.keycode == ALLEGRO_KEY_RIGHT && playerStatus.inDialog == 1) {
-            playerDialog->visible=0;
-            playerStatus.inDialog=0;
-            playerStatus.carryingLetter=0;
-            playerStatus.mainMissionId++;
-            playerStatus.dialogId++;
-            changeText(mainMissionText, mainMissions[playerStatus.mainMissionId]);
-        }
-        else if (event.keyboard.keycode == ALLEGRO_KEY_Z){
+        else if (event.keyboard.keycode == ALLEGRO_KEY_F){
             if (playerStatus.tutorialLetter) {
                 tutorialLetterContent->visible = !tutorialLetterContent->visible;
                 playClickSound();
@@ -192,10 +261,30 @@ unsigned char isOnRoad(GameObject* obj) {
 void restartEnemiesPos(){
     for (int i = 0; i < enemiesCount; i++)
     {
+        unsigned char isColWOtherEnemy=0;
         do {
-            enemies[i]->position.x = randInt(1, 4500);
-            enemies[i]->position.y = randInt(1, 5000);
-        } while(!isOnRoad(enemies[i]));
+            if ((playerStatus.mainMissionId == 4 || playerStatus.mainMissionId == 5) && i % 2 == 0) {
+                enemies[i]->visible = 0;
+                enemies[i]->position = (Vector2){350, 3900};
+                continue;
+            }
+
+            enemies[i]->visible = 1;
+            enemies[i]->position.x = randInt(1, 3600);
+            enemies[i]->position.y = randInt(700, 3800);
+
+            isColWOtherEnemy=0;
+            for (int j=0; j < i; j++){
+                if ((playerStatus.mainMissionId == 4 || playerStatus.mainMissionId == 5) && j % 2 == 0)
+                    continue;
+                if (enemies[j]->visible && checkCollisionRect(enemies[i]->position.x, enemies[i]->position.y, enemies[i]->width, enemies[i]->height, enemies[j]->position.x, enemies[j]->position.y, enemies[j]->width, enemies[j]->height)){
+                    isColWOtherEnemy=1;
+                    break;
+                }
+            }
+
+        } while(isColWOtherEnemy || !isOnRoad(enemies[i]) || dist(enemies[i]->position.x, enemies[i]->position.y, enemies[i]->width, enemies[i]->height, player->position.x, player->position.y, player->width, player->height) <= 200);/*  ||
+                dist(enemies[i]->position.x, enemies[i]->position.y, enemies[i]->width, enemies[i]->height, politician->position.x, politician->position.y, politician->width, politician->height) < 100 */
     }
 }
 
@@ -211,11 +300,24 @@ void playEndCutscene(){
     }
     al_start_video(video, al_get_default_mixer());
     while(al_is_video_playing(video)){
+
         ALLEGRO_BITMAP* frame = al_get_video_frame(video);
         if (frame){
             al_draw_scaled_bitmap(frame, 0, 0, al_get_bitmap_width(frame), al_get_bitmap_height(frame), 0, 0, engine->displayWidth, engine->displayHeight, 0);
             al_flip_display();
         }
+
+        // ALLEGRO_EVENT event;
+        // while (al_get_next_event(engine->ev_queue, &event)) {
+        //     if (event.type == ALLEGRO_EVENT_KEY_DOWN) {
+        //         switch (event.keyboard.keycode) {
+        //             case ALLEGRO_KEY_SPACE:
+        //                 al_seek_video(video, al_get_video_position(video, ALLEGRO_VIDEO_POSITION_VIDEO_DECODE)+2);
+        //                 break;
+        //         }
+        //     }
+        // }
+
         al_rest(1.0 / 60);
     }
     al_flush_event_queue(engine->ev_queue);
@@ -224,6 +326,24 @@ void playEndCutscene(){
 
 void playClickSound(){
     playAudioSample(clickSound, 0.5, 0, 1, ALLEGRO_PLAYMODE_ONCE);
+}
+
+void setDefaultPlayerStatus(){
+    playerStatus.isHidden = 0;
+    playerStatus.carryingLetter = 0;
+    playerStatus.firstZoomIn = 0;
+    playerStatus.letterId = 0;
+    playerStatus.inDialog = 0;
+    playerStatus.goldAmount = 0;
+    playerStatus.closeLetterId = 0;
+    playerStatus.gameOverCount = 0;
+    playerStatus.mainMissionId = 0;
+    playerStatus.tutorialLetter = 0;
+    playerStatus.isLastSafeZoneQuartel = 0;
+    playerStatus.dialogId = 0;
+    playerStatus.enemiesFollowing = 0;
+    playerStatus.lastScene = INSIDE_BASE;
+    playerStatus.lastPosition = (Vector2){450, 300};
 }
 
 int main() {
@@ -251,6 +371,9 @@ int main() {
     letterStatusTrueBM=createSubBitmap(engine, mainLetterStatusBM, 0, 0, 12, 12);
     letterStatusFalseBM=createSubBitmap(engine, mainLetterStatusBM, 0, 12, 12, 12);
 
+    // load gold bm all
+    goldBM = loadBitmap(engine, "./assets/images/gold.png");
+
     // loading houses bitmaps
     for (int i=0; i<6; i++){
         char str[23] = "";
@@ -266,36 +389,71 @@ int main() {
     clickSound = loadAudioSample(engine, "./assets/sounds/sfx.wav");
     menuMusic = loadAudioStream(engine, "./assets/sounds/musica-menu.wav", 2, 2048);
     configureAudioStream(menuMusic, 1, 0, 1, ALLEGRO_PLAYMODE_LOOP);
+    stepsSound = loadAudioStream(engine, "./assets/sounds/steps.wav", 2, 2048);
+    configureAudioStream(stepsSound, 0.7, 0, 1, ALLEGRO_PLAYMODE_LOOP);
+    cityNoise = loadAudioStream(engine, "./assets/sounds/city-noise.wav", 2, 2048);
+    configureAudioStream(cityNoise, 0.5, 0, 1, ALLEGRO_PLAYMODE_LOOP);
+    introMusic = loadAudioStream(engine, "./assets/sounds/intro.wav", 2, 2048);
+    configureAudioStream(introMusic, 1, 0, 1, ALLEGRO_PLAYMODE_ONCE);
+    chaseMusic = loadAudioStream(engine, "./assets/sounds/chase.wav", 2, 2048);
+    configureAudioStream(chaseMusic, 0.7, 0, 1, ALLEGRO_PLAYMODE_LOOP);
+    stopAudioStream(stepsSound);
+    stopAudioStream(cityNoise);
+    stopAudioStream(introMusic);
+    stopAudioStream(chaseMusic);
 
     // set playerStatus to default
-    playerStatus.isHidden = 0;
-    playerStatus.carryingLetter = 0;
-    playerStatus.firstZoomIn = 0;
-    playerStatus.letterId = 0;
-    playerStatus.inDialog = 0;
-    playerStatus.closeLetterId = 0;
-    playerStatus.gameOverCount = 0;
-    playerStatus.mainMissionId = 0;
-    playerStatus.tutorialLetter = 0;
-    playerStatus.isLastSafeZoneQuartel = 0;
-    playerStatus.dialogId = 0;
+    setDefaultPlayerStatus();
+
+    saveFile = openSaveFile("Save.caes");
+    struct SaveData saveData;
+    readSaveData(&saveFile, &saveData);
+
+    // update to saved data
+    //printf("\n %d %d \n", saveData.playerStatus.dialogId, saveData.playerStatus.mainMissionId);
+    memcpy(&playerStatus, &(saveData.playerStatus), sizeof(struct PlayerStatus));
 
     loadMainMenu();
+    allScenes[MAIN_MENU]=mainMenu;
     loadBase();
+    allScenes[INSIDE_BASE]=insideBase;
     loadGameMap();
+    allScenes[GAME_MAP]=gameMap;
     loadQuartel();
+    allScenes[QUARTEL]=quartel;
     loadRoomLeft();
+    allScenes[ROOM_L]=roomL;
     loadRoomMiddle();
+    allScenes[ROOM_M]=roomM;
     loadRoomRight();
+    allScenes[ROOM_R]=roomR;
     loadSinopse();
+    allScenes[SINOPSE]=sinopse;
     loadLetterShow();
+    allScenes[LETTER_SHOW]=letterShow;
 
-    lastSceneBeforeMenu = insideBase;
+    changeScene(engine, mainMenu);
+
+    lastSceneBeforeMenu = allScenes[playerStatus.lastScene];
+    memcpy(&player->position, &playerStatus.lastPosition, sizeof(Vector2));
+    allScenes[playerStatus.lastScene]->camera.offset = player->position;
 
     while (engine->isAlive) {
         render(engine);
+
+        // BASICALLY GETTING THE ANGLE OF THE MIDDLE BOTTOM OF THE SCREEN TO THE PLAYERS POSITION AND CALCULATING THE COS
+        // THE RESULT COS IS PUTTED AS THE STEPS PANNING
+        float x=player->position.x*engine->currentScene->camera.zoom+player->width*engine->currentScene->camera.zoom/2;
+        float y=player->position.y*engine->currentScene->camera.zoom+player->height*engine->currentScene->camera.zoom/2;
+        globalToLocal(engine->currentScene, &x, &y);
+        double co = engine->displayHeight-y;
+        double ca = x-engine->displayWidth/2;
+        double hyp = hypot(co, ca);
+        configureAudioStream(stepsSound, 0.5, ca/hyp, 1, ALLEGRO_PLAYMODE_LOOP);
     }
 
+    saveGame(&saveFile);
+    closeSaveFile(&saveFile);
 
     // EXIT ANIMATION
     Vector2 pos = (Vector2){0, 0};
