@@ -185,6 +185,7 @@ void onEnemyCollision(GameObject* self, GameObject* obj)
     {
         if (playerStatus.isHidden == 0)
         {
+            pressEMessage->visible=0;
             stopAudioStream(chaseMusic);
             playerStatus.gameOverCount++;
             gameOverText->visible=1;

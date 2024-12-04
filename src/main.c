@@ -159,6 +159,7 @@ void onEvent(ALLEGRO_EVENT event, Scene * scene, CAEngine * engine) {
                 if (playerStatus.closeLetterId < 3) {
                     playerStatus.tutorialLetter=1;
                     tutorialLetterContent->visible = 1;
+                    continueBtn->visible = 1;
                 } else {
                     playerStatus.letterId = playerStatus.closeLetterId;
                     playerStatus.carryingLetter=1;
@@ -426,6 +427,8 @@ int main() {
     allScenes[SINOPSE]=sinopse;
     loadLetterShow();
     allScenes[LETTER_SHOW]=letterShow;
+
+    changeScene(engine, mainMenu);
 
     lastSceneBeforeMenu = allScenes[playerStatus.lastScene];
     memcpy(&player->position, &playerStatus.lastPosition, sizeof(Vector2));

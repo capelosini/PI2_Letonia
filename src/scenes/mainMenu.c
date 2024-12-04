@@ -16,6 +16,9 @@ void loadMainMenu(){
     createText(titleText, engine->displayWidth / 2 - al_get_text_width(titleFont->font, titleText) / 2, 50, al_get_text_width(titleFont->font, titleText)+10, al_map_rgb(255, 255, 255), al_map_rgba(0, 0, 0, 0), NULL, titleFont, 0, 0, mainMenu);
 
     addButtonToScene(mainMenu, createButton(engine, engine->displayWidth / 2 - 200./2, engine->displayHeight / 2 - 25, 200, 50, al_map_rgb(217, 95, 54), al_map_rgb(255, 255, 255), "Jogar", "./assets/fonts/roboto.ttf", NULL, onOpenRestart));
+    continueBtn = createButton(engine, engine->displayWidth / 2 - 200./2, engine->displayHeight / 2 - 25, 200, 50, al_map_rgb(1, 105, 54), al_map_rgb(255, 255, 255), "Continuar", "./assets/fonts/roboto.ttf", NULL, onOpenRestart);
+    addButtonToScene(mainMenu, continueBtn);
+    continueBtn->visible = playerStatus.tutorialLetter;
     addButtonToScene(mainMenu, createButton(engine, engine->displayWidth / 2 - 75, engine->displayHeight / 2 + 55, 150, 40, al_map_rgb(210, 20, 20), al_map_rgb(255, 255, 255), "Sair", "./assets/fonts/roboto.ttf", NULL, onGameExit));
     mainMenu->backgroundColor = al_map_rgb(0, 0, 20);
 
@@ -27,8 +30,6 @@ void loadMainMenu(){
     ghostPlayerMenu->physics.maxSpeed = 4;
     ghostPlayerMenu->physics.directions.x = 1;
     ghostPlayerMenu->physics.acc.x = 1;
-
-    changeScene(engine, mainMenu);
 
     char out[] = "Você foi pego 0000 vezes";
     sprintf(out, "Você foi pego %d vezes", playerStatus.gameOverCount);
