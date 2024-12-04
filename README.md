@@ -4,6 +4,8 @@
 
 ----
 
+![onesheetpaper](https://github.com/user-attachments/assets/690f2b18-3a44-467d-bde7-8b2184f475d4)
+
 ### Setup
 ```
 # Clone repo with CAE
